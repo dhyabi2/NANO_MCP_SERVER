@@ -1,0 +1,31 @@
+{
+  "name": "n8n-nodes-nano",
+  "version": "1.0.0",
+  "description": "n8n node for interacting with Nano (XNO) cryptocurrency",
+  "keywords": [
+    "n8n",
+    "nano",
+    "xno",
+    "cryptocurrency",
+    "blockchain",
+    "rpc"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "main": "Nano.node.js",
+  "files": [
+    "Nano.node.js",
+    "nano.svg"
+  ],
+  "dependencies": {
+    "nanocurrency": "^2.5.0"
+  },
+  "n8n": {
+    "credentials": [
+      "NanoApi.credentials.js"
+    ],
+    "nodes": [
+      "Nano.node.js"
+    ]
+  }
+} 

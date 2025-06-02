@@ -1,0 +1,63 @@
+{
+  "name": "@nano/mcp-server",
+  "version": "1.0.0",
+  "description": "Model Context Protocol (MCP) server for NANO cryptocurrency interactions",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "prepare": "npm run build"
+  },
+  "bin": {
+    "nano-mcp": "./dist/index.js"
+  },
+  "keywords": [
+    "mcp",
+    "nano",
+    "xno",
+    "cryptocurrency",
+    "blockchain",
+    "modelcontextprotocol",
+    "rpc",
+    "api"
+  ],
+  "author": {
+    "name": "Aldhiyabi",
+    "url": "https://github.com/dhyabi2"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "nanocurrency": "^2.5.0",
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.11.24",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.2",
+    "typescript": "^5.3.3"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dhyabi2/NANO_MCP_SERVER.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dhyabi2/NANO_MCP_SERVER/issues"
+  },
+  "homepage": "https://github.com/dhyabi2/NANO_MCP_SERVER#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

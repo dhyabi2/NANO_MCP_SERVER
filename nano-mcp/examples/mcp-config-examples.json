@@ -1,0 +1,55 @@
+{
+  "cursor": {
+    "mcpServers": {
+      "nano": {
+        "command": "npx",
+        "args": ["@nano/mcp-server"]
+      }
+    }
+  },
+  "claude_desktop": {
+    "mcpServers": {
+      "nano": {
+        "command": "npx",
+        "args": ["@nano/mcp-server"]
+      }
+    }
+  },
+  "vscode_cline": {
+    "mcpServers": {
+      "nano": {
+        "command": "npx",
+        "args": ["-y", "@nano/mcp-server"],
+        "disabled": false,
+        "autoApprove": []
+      }
+    }
+  },
+  "windows_example": {
+    "mcpServers": {
+      "nano": {
+        "command": "cmd",
+        "args": ["/c", "npx", "-y", "@nano/mcp-server"],
+        "disabled": false,
+        "autoApprove": []
+      }
+    }
+  },
+  "local_development": {
+    "mcpServers": {
+      "nano": {
+        "command": "node",
+        "args": ["./nano-mcp/dist/index.js"]
+      }
+    }
+  },
+  "docker_example": {
+    "mcpServers": {
+      "nano": {
+        "command": "docker",
+        "args": ["run", "-i", "--rm", "nano-mcp:latest"],
+        "transportType": "stdio"
+      }
+    }
+  }
+} 
