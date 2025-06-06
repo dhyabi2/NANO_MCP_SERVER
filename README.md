@@ -48,6 +48,200 @@ The server supports the following RPC methods:
 - `sendTransaction` - Send NANO to another address
 - `receivePending` - Receive pending transactions
 
+## API Documentation
+
+All API endpoints use POST method and expect JSON-RPC 2.0 format. The default server endpoint is `http://localhost:8080`.
+
+### Headers
+All requests should include:
+```
+Content-Type: application/json
+X-API-Key: your-rpc-key
+```
+
+### Initialize Server
+```bash
+curl -X POST http://localhost:8080 \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: your-rpc-key" \
+  -d '{
+    "jsonrpc": "2.0",
+    "method": "initialize",
+    "params": {},
+    "id": 1
+  }'
+```
+Response:
+```json
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "status": "success",
+    "capabilities": ["wallet", "send", "receive", "balance"]
+  },
+  "id": 1
+}
+```
+
+### Generate Wallet
+```bash
+curl -X POST http://localhost:8080 \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: your-rpc-key" \
+  -d '{
+    "jsonrpc": "2.0",
+    "method": "generateWallet",
+    "params": {},
+    "id": 1
+  }'
+```
+Response:
+```json
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "address": "nano_...",
+    "privateKey": "encrypted_key_here",
+    "publicKey": "public_key_here"
+  },
+  "id": 1
+}
+```
+
+### Get Balance
+```bash
+curl -X POST http://localhost:8080 \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: your-rpc-key" \
+  -d '{
+    "jsonrpc": "2.0",
+    "method": "getBalance",
+    "params": {
+      "address": "nano_..."
+    },
+    "id": 1
+  }'
+```
+Response:
+```json
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "balance": "100000000000000000000000000000",
+    "pending": "0"
+  },
+  "id": 1
+}
+```
+
+### Initialize Account
+```bash
+curl -X POST http://localhost:8080 \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: your-rpc-key" \
+  -d '{
+    "jsonrpc": "2.0",
+    "method": "initializeAccount",
+    "params": {
+      "address": "nano_...",
+      "privateKey": "encrypted_key_here"
+    },
+    "id": 1
+  }'
+```
+Response:
+```json
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "status": "success",
+    "initialized": true
+  },
+  "id": 1
+}
+```
+
+### Send Transaction
+```bash
+curl -X POST http://localhost:8080 \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: your-rpc-key" \
+  -d '{
+    "jsonrpc": "2.0",
+    "method": "sendTransaction",
+    "params": {
+      "fromAddress": "nano_...",
+      "toAddress": "nano_...",
+      "amount": "1000000000000000000000000",
+      "privateKey": "encrypted_key_here"
+    },
+    "id": 1
+  }'
+```
+Response:
+```json
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "status": "success",
+    "hash": "transaction_hash_here"
+  },
+  "id": 1
+}
+```
+
+### Receive Pending
+```bash
+curl -X POST http://localhost:8080 \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: your-rpc-key" \
+  -d '{
+    "jsonrpc": "2.0",
+    "method": "receivePending",
+    "params": {
+      "address": "nano_...",
+      "privateKey": "encrypted_key_here"
+    },
+    "id": 1
+  }'
+```
+Response:
+```json
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "received": [
+      {
+        "hash": "block_hash_here",
+        "amount": "1000000000000000000000000"
+      }
+    ]
+  },
+  "id": 1
+}
+```
+
+### Error Handling
+All errors follow JSON-RPC 2.0 error format:
+```json
+{
+  "jsonrpc": "2.0",
+  "error": {
+    "code": -32000,
+    "message": "Error description here"
+  },
+  "id": 1
+}
+```
+
+Common error codes:
+- `-32700`: Parse error
+- `-32600`: Invalid request
+- `-32601`: Method not found
+- `-32602`: Invalid params
+- `-32603`: Internal error
+- `-32000`: Server error
+
 ## Environment Variables
 
 Create a `.env` file in the root directory with the following variables:
