@@ -1,3 +1,5 @@
+export type MCPMethod = (...args: any[]) => Promise<any>;
+
 export interface MCPServerConfig {
   name: string;
   description: string;
@@ -5,7 +7,11 @@ export interface MCPServerConfig {
   author: string;
 }
 
-export type MCPMethod = (...args: any[]) => Promise<any> | any;
+export interface RPCConfig {
+  nodeUrl: string;
+  walletId?: string;
+  apiKey?: string;
+}
 
 export interface MCPRequest<T = any> {
   jsonrpc: '2.0';
@@ -29,10 +35,14 @@ export type RequestHandler<T = any, R = any> = (request: MCPRequest<T>) => Promi
 
 export abstract class MCPServer {
   protected config: MCPServerConfig;
+  protected rpcConfig: RPCConfig;
   private handlers: Map<string, RequestHandler>;
 
-  constructor(config: MCPServerConfig) {
+  constructor(config: MCPServerConfig, rpcConfig?: RPCConfig) {
     this.config = config;
+    this.rpcConfig = rpcConfig || {
+      nodeUrl: 'https://proxy.nanos.cc/proxy'
+    };
     this.handlers = new Map();
   }
 

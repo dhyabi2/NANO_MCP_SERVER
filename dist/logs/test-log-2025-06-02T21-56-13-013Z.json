@@ -1,0 +1,76 @@
+[
+  {
+    "timestamp": "2025-06-02T21:56:13.019Z",
+    "type": "TEST_START",
+    "data": "Starting Wallet Transfer Test"
+  },
+  {
+    "timestamp": "2025-06-02T21:56:13.027Z",
+    "type": "WALLET1_CREATE",
+    "data": "Creating first wallet"
+  },
+  {
+    "timestamp": "2025-06-02T21:56:13.225Z",
+    "type": "WALLET1_CREATED",
+    "data": {
+      "address": "nano_18giut44rerzihjng711tps4zn74c5b3jmsfe4w6g3anabjfmu54a8zgxwn6"
+    }
+  },
+  {
+    "timestamp": "2025-06-02T21:56:13.236Z",
+    "type": "WAITING_FOR_FUNDS",
+    "data": "Waiting for incoming transaction"
+  },
+  {
+    "timestamp": "2025-06-02T21:56:14.028Z",
+    "type": "BALANCE_UPDATE",
+    "data": {
+      "account": "nano_18giut44rerzihjng711tps4zn74c5b3jmsfe4w6g3anabjfmu54a8zgxwn6",
+      "balance": "0.000000000000000000000000000000",
+      "receivable": "0.000000000000000000000000000000"
+    }
+  },
+  {
+    "timestamp": "2025-06-02T21:56:46.932Z",
+    "type": "BALANCE_UPDATE",
+    "data": {
+      "account": "nano_18giut44rerzihjng711tps4zn74c5b3jmsfe4w6g3anabjfmu54a8zgxwn6",
+      "balance": "0.000000000000000000000000000000",
+      "receivable": "0.000100000000000000000000000000"
+    }
+  },
+  {
+    "timestamp": "2025-06-02T21:56:46.944Z",
+    "type": "FUNDS_RECEIVED",
+    "data": {
+      "account": "nano_18giut44rerzihjng711tps4zn74c5b3jmsfe4w6g3anabjfmu54a8zgxwn6",
+      "balance": "0.000000000000000000000000000000",
+      "receivable": "0.000100000000000000000000000000"
+    }
+  },
+  {
+    "timestamp": "2025-06-02T21:56:51.034Z",
+    "type": "WALLET2_CREATE",
+    "data": "Creating second wallet"
+  },
+  {
+    "timestamp": "2025-06-02T21:56:51.228Z",
+    "type": "WALLET2_CREATED",
+    "data": {
+      "address": "nano_3jjhitstfyannkazhu3y9yarx7wy7ae1u4ng3r8epnuhtdd7ig1af4m1uxda"
+    }
+  },
+  {
+    "timestamp": "2025-06-02T21:56:51.234Z",
+    "type": "SENDING_TO_WALLET2",
+    "data": "Sending funds from wallet 1 to wallet 2"
+  },
+  {
+    "timestamp": "2025-06-02T21:56:52.031Z",
+    "type": "TEST_FAILURE",
+    "data": {
+      "message": "Source account must exist and have a balance to send",
+      "stack": "Error: Source account must exist and have a balance to send\n    at send (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/dist/wallet-transfer-test-rpc.js:126:15)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async testWalletTransfer (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/dist/wallet-transfer-test-rpc.js:315:26)"
+    }
+  }
+]

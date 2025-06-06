@@ -1,0 +1,58 @@
+[
+  {
+    "timestamp": "2025-06-02T21:49:12.520Z",
+    "type": "TEST_START",
+    "data": "Starting Wallet Transfer Test"
+  },
+  {
+    "timestamp": "2025-06-02T21:49:12.530Z",
+    "type": "WALLET1_CREATE",
+    "data": "Creating first wallet"
+  },
+  {
+    "timestamp": "2025-06-02T21:49:12.854Z",
+    "type": "WALLET1_CREATED",
+    "data": {
+      "address": "nano_38hwfadacbosfojmbey69got1rg9mdnfnptegdwonozr7fx47zrqyybs4zar"
+    }
+  },
+  {
+    "timestamp": "2025-06-02T21:49:12.863Z",
+    "type": "WAITING_FOR_FUNDS",
+    "data": "Waiting for incoming transaction"
+  },
+  {
+    "timestamp": "2025-06-02T21:50:41.175Z",
+    "type": "FUNDS_RECEIVED",
+    "data": {
+      "account": "nano_38hwfadacbosfojmbey69got1rg9mdnfnptegdwonozr7fx47zrqyybs4zar",
+      "balance": "0.000000000000000000000000000000",
+      "receivable": "0.000420000000000000000000000000"
+    }
+  },
+  {
+    "timestamp": "2025-06-02T21:50:45.122Z",
+    "type": "WALLET2_CREATE",
+    "data": "Creating second wallet"
+  },
+  {
+    "timestamp": "2025-06-02T21:50:45.287Z",
+    "type": "WALLET2_CREATED",
+    "data": {
+      "address": "nano_1m8diuk3shmgxue3j68ih4r6dcdh144ktqwahztkyy7axp8533ybz3rhhemg"
+    }
+  },
+  {
+    "timestamp": "2025-06-02T21:50:45.293Z",
+    "type": "SENDING_TO_WALLET2",
+    "data": "Sending funds from wallet 1 to wallet 2"
+  },
+  {
+    "timestamp": "2025-06-02T21:50:46.266Z",
+    "type": "TEST_FAILURE",
+    "data": {
+      "message": "Source account must exist and have a balance to send",
+      "stack": "Error: Source account must exist and have a balance to send\n    at send (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/dist/wallet-transfer-test-rpc.js:110:15)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async testWalletTransfer (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/dist/wallet-transfer-test-rpc.js:285:26)"
+    }
+  }
+]

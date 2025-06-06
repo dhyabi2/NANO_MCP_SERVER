@@ -1,0 +1,40 @@
+[
+  {
+    "timestamp": "2025-06-02T22:05:24.373Z",
+    "type": "TEST_START",
+    "data": "Starting Wallet Transfer Test"
+  },
+  {
+    "timestamp": "2025-06-02T22:05:24.381Z",
+    "type": "WALLET1_CREATE",
+    "data": "Creating first wallet"
+  },
+  {
+    "timestamp": "2025-06-02T22:05:24.666Z",
+    "type": "WALLET1_CREATED",
+    "data": {
+      "address": "nano_37jj4iuy8tar9hoeudex8bruyic4n9dn9nhdhz771rm6p1ubmz7be7ixnzd4"
+    }
+  },
+  {
+    "timestamp": "2025-06-02T22:05:24.675Z",
+    "type": "WAITING_FOR_FUNDS",
+    "data": "Waiting for incoming transaction"
+  },
+  {
+    "timestamp": "2025-06-02T22:05:30.720Z",
+    "type": "CHECK_BALANCE_ERROR",
+    "data": {
+      "message": "Invalid API Key.",
+      "stack": "Error: Invalid API Key.\n    at rpc (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/dist/wallet-transfer-test-rpc.js:68:15)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async balance (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/dist/wallet-transfer-test-rpc.js:96:26)\n    at async testWalletTransfer (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/dist/wallet-transfer-test-rpc.js:285:37)"
+    }
+  },
+  {
+    "timestamp": "2025-06-02T22:05:40.795Z",
+    "type": "CHECK_BALANCE_ERROR",
+    "data": {
+      "message": "Invalid API Key.",
+      "stack": "Error: Invalid API Key.\n    at rpc (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/dist/wallet-transfer-test-rpc.js:68:15)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async balance (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/dist/wallet-transfer-test-rpc.js:96:26)\n    at async testWalletTransfer (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/dist/wallet-transfer-test-rpc.js:285:37)"
+    }
+  }
+]

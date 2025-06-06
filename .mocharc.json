@@ -1,0 +1,7 @@
+{
+  "extension": ["js"],
+  "spec": "test/**/*.test.js",
+  "require": "ts-node/register",
+  "timeout": 5000,
+  "exit": true
+} 

@@ -1,0 +1,20 @@
+[
+  {
+    "timestamp": "2025-06-02T21:31:46.095Z",
+    "type": "TEST_START",
+    "data": "Starting Wallet Transfer Test"
+  },
+  {
+    "timestamp": "2025-06-02T21:31:46.103Z",
+    "type": "WALLET1_CREATE",
+    "data": "Creating first wallet"
+  },
+  {
+    "timestamp": "2025-06-02T21:31:56.896Z",
+    "type": "TEST_FAILURE",
+    "data": {
+      "message": "fetch failed",
+      "stack": "TypeError: fetch failed\n    at node:internal/deps/undici/undici:13502:13\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async rpc (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/dist/wallet-transfer-test-rpc.js:15:22)\n    at async createAccount (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/dist/wallet-transfer-test-rpc.js:51:18)\n    at async testWalletTransfer (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/dist/wallet-transfer-test-rpc.js:105:32)"
+    }
+  }
+]

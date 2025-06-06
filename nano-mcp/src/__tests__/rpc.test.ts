@@ -1,6 +1,8 @@
 import { jest } from '@jest/globals';
 import { checkAddress, checkHash, convert, Unit } from 'nanocurrency';
-import { rpcCall, DEFAULT_RPC_URL } from '../rpc';
+import { rpcCall } from '../rpc';
+import { RPCConfig } from '../mcp-types';
+import type { MockResponse } from './types';
 
 describe('NANO RPC Tests', () => {
   const TEST_ACCOUNT = 'nano_3t6k35gi95xu6tergt6p69ck76ogmitsa8mnijtpxm9fkcm736xtoncuohr3';
@@ -108,5 +110,74 @@ describe('NANO RPC Tests', () => {
       expect(result).toHaveProperty('store_vendor');
       expect(result).toHaveProperty('network');
     });
+  });
+});
+
+describe('RPC', () => {
+  const mockConfig: RPCConfig = {
+    nodeUrl: 'https://proxy.nanos.cc/proxy',
+    apiKey: 'test-key'
+  };
+
+  beforeEach(() => {
+    (global.fetch as jest.Mock).mockClear();
+  });
+
+  it('should make successful RPC calls', async () => {
+    const mockResponse = { success: true };
+    (global.fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve(mockResponse)
+    } as MockResponse);
+
+    const result = await rpcCall('test_action', { param: 'value' }, mockConfig);
+    expect(result).toEqual(mockResponse);
+
+    expect(global.fetch).toHaveBeenCalledWith(
+      mockConfig.nodeUrl,
+      expect.objectContaining({
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer test-key'
+        },
+        body: JSON.stringify({
+          action: 'test_action',
+          param: 'value'
+        })
+      })
+    );
+  });
+
+  it('should handle HTTP errors', async () => {
+    (global.fetch as jest.Mock).mockResolvedValueOnce({
+      ok: false,
+      status: 500
+    } as MockResponse);
+
+    await expect(rpcCall('test_action', {}, mockConfig))
+      .rejects
+      .toThrow('HTTP error! status: 500');
+  });
+
+  it('should handle RPC errors', async () => {
+    (global.fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({ error: 'RPC error message' })
+    } as MockResponse);
+
+    await expect(rpcCall('test_action', {}, mockConfig))
+      .rejects
+      .toThrow('RPC error message');
+  });
+
+  it('should handle network errors', async () => {
+    (global.fetch as jest.Mock).mockRejectedValueOnce(
+      new Error('Network error')
+    );
+
+    await expect(rpcCall('test_action', {}, mockConfig))
+      .rejects
+      .toThrow('RPC call failed: Network error');
   });
 }); 

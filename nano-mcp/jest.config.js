@@ -15,4 +15,10 @@ export default {
       },
     ],
   },
+  transformIgnorePatterns: [
+    'node_modules/(?!(nanocurrency-web|node-fetch|data-uri-to-buffer|fetch-blob|formdata-polyfill|web-streams-polyfill)/)'
+  ],
+  setupFiles: ['<rootDir>/src/__tests__/setup.ts'],
+  moduleDirectories: ['node_modules'],
+  testTimeout: 300000
 }; 

@@ -1,0 +1,133 @@
+=== NANO MCP Test Run Log ===
+Started at: 2025-06-02T21:21:02.549Z
+Working Directory: C:\Users\Ahmed.aldhiyabi\Downloads\animatorPrompt
+Log Directory: C:\Users\Ahmed.aldhiyabi\Downloads\animatorPrompt\logs
+Log File: C:\Users\Ahmed.aldhiyabi\Downloads\animatorPrompt\logs\test-run-2025-06-02T21-21-02-542Z.log
+
+
+==================================================
+2025-06-02T21:21:02.557Z - TEST_START
+==================================================
+Starting Wallet Transfer Test
+
+==================================================
+2025-06-02T21:21:02.561Z - WALLET1_CREATE
+==================================================
+Creating first wallet
+
+==================================================
+2025-06-02T21:21:02.778Z - WALLET1_CREATED
+==================================================
+{
+  "address": "nano_3zosxwpm1dwif7r7atrwcfiwtgar4m5b6uei7zbqga5xkot5p8q5buo8hdny",
+  "publicKey": "feb9ef2d302f906970546b1c5361cd391814c6926d902fd377207d95743b1ae3"
+}
+
+==================================================
+2025-06-02T21:21:02.783Z - WAITING_FOR_FUNDS
+==================================================
+Waiting for incoming transaction
+
+==================================================
+2025-06-02T21:21:03.393Z - CHECK_BALANCE_ERROR
+==================================================
+ERROR: {
+  "message": "Unexpected non-whitespace character after JSON at position 4 (line 1 column 5)",
+  "stack": "SyntaxError: Unexpected non-whitespace character after JSON at position 4 (line 1 column 5)\n    at JSON.parse (<anonymous>)\n    at parseJSONFromBytes (node:internal/deps/undici/undici:5738:19)\n    at successSteps (node:internal/deps/undici/undici:5719:27)\n    at fullyReadBody (node:internal/deps/undici/undici:4609:9)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async consumeBody (node:internal/deps/undici/undici:5728:7)\n    at async testWalletTransfer (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/wallet-transfer-test.js:58:30)"
+}
+
+==================================================
+2025-06-02T21:21:08.708Z - CHECK_BALANCE_ERROR
+==================================================
+ERROR: {
+  "message": "Unexpected non-whitespace character after JSON at position 4 (line 1 column 5)",
+  "stack": "SyntaxError: Unexpected non-whitespace character after JSON at position 4 (line 1 column 5)\n    at JSON.parse (<anonymous>)\n    at parseJSONFromBytes (node:internal/deps/undici/undici:5738:19)\n    at successSteps (node:internal/deps/undici/undici:5719:27)\n    at fullyReadBody (node:internal/deps/undici/undici:4609:9)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async consumeBody (node:internal/deps/undici/undici:5728:7)\n    at async testWalletTransfer (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/wallet-transfer-test.js:58:30)"
+}
+
+==================================================
+2025-06-02T21:21:13.909Z - CHECK_BALANCE_ERROR
+==================================================
+ERROR: {
+  "message": "Unexpected non-whitespace character after JSON at position 4 (line 1 column 5)",
+  "stack": "SyntaxError: Unexpected non-whitespace character after JSON at position 4 (line 1 column 5)\n    at JSON.parse (<anonymous>)\n    at parseJSONFromBytes (node:internal/deps/undici/undici:5738:19)\n    at successSteps (node:internal/deps/undici/undici:5719:27)\n    at fullyReadBody (node:internal/deps/undici/undici:4609:9)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async consumeBody (node:internal/deps/undici/undici:5728:7)\n    at async testWalletTransfer (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/wallet-transfer-test.js:58:30)"
+}
+
+==================================================
+2025-06-02T21:21:19.224Z - CHECK_BALANCE_ERROR
+==================================================
+ERROR: {
+  "message": "Unexpected non-whitespace character after JSON at position 4 (line 1 column 5)",
+  "stack": "SyntaxError: Unexpected non-whitespace character after JSON at position 4 (line 1 column 5)\n    at JSON.parse (<anonymous>)\n    at parseJSONFromBytes (node:internal/deps/undici/undici:5738:19)\n    at successSteps (node:internal/deps/undici/undici:5719:27)\n    at fullyReadBody (node:internal/deps/undici/undici:4609:9)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async consumeBody (node:internal/deps/undici/undici:5728:7)\n    at async testWalletTransfer (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/wallet-transfer-test.js:58:30)"
+}
+
+==================================================
+2025-06-02T21:21:24.552Z - CHECK_BALANCE_ERROR
+==================================================
+ERROR: {
+  "message": "Unexpected non-whitespace character after JSON at position 4 (line 1 column 5)",
+  "stack": "SyntaxError: Unexpected non-whitespace character after JSON at position 4 (line 1 column 5)\n    at JSON.parse (<anonymous>)\n    at parseJSONFromBytes (node:internal/deps/undici/undici:5738:19)\n    at successSteps (node:internal/deps/undici/undici:5719:27)\n    at fullyReadBody (node:internal/deps/undici/undici:4609:9)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async consumeBody (node:internal/deps/undici/undici:5728:7)\n    at async testWalletTransfer (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/wallet-transfer-test.js:58:30)"
+}
+
+==================================================
+2025-06-02T21:21:29.740Z - CHECK_BALANCE_ERROR
+==================================================
+ERROR: {
+  "message": "Unexpected non-whitespace character after JSON at position 4 (line 1 column 5)",
+  "stack": "SyntaxError: Unexpected non-whitespace character after JSON at position 4 (line 1 column 5)\n    at JSON.parse (<anonymous>)\n    at parseJSONFromBytes (node:internal/deps/undici/undici:5738:19)\n    at successSteps (node:internal/deps/undici/undici:5719:27)\n    at fullyReadBody (node:internal/deps/undici/undici:4609:9)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async consumeBody (node:internal/deps/undici/undici:5728:7)\n    at async testWalletTransfer (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/wallet-transfer-test.js:58:30)"
+}
+
+==================================================
+2025-06-02T21:21:34.918Z - CHECK_BALANCE_ERROR
+==================================================
+ERROR: {
+  "message": "Unexpected non-whitespace character after JSON at position 4 (line 1 column 5)",
+  "stack": "SyntaxError: Unexpected non-whitespace character after JSON at position 4 (line 1 column 5)\n    at JSON.parse (<anonymous>)\n    at parseJSONFromBytes (node:internal/deps/undici/undici:5738:19)\n    at successSteps (node:internal/deps/undici/undici:5719:27)\n    at fullyReadBody (node:internal/deps/undici/undici:4609:9)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async consumeBody (node:internal/deps/undici/undici:5728:7)\n    at async testWalletTransfer (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/wallet-transfer-test.js:58:30)"
+}
+
+==================================================
+2025-06-02T21:21:40.094Z - CHECK_BALANCE_ERROR
+==================================================
+ERROR: {
+  "message": "Unexpected non-whitespace character after JSON at position 4 (line 1 column 5)",
+  "stack": "SyntaxError: Unexpected non-whitespace character after JSON at position 4 (line 1 column 5)\n    at JSON.parse (<anonymous>)\n    at parseJSONFromBytes (node:internal/deps/undici/undici:5738:19)\n    at successSteps (node:internal/deps/undici/undici:5719:27)\n    at fullyReadBody (node:internal/deps/undici/undici:4609:9)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async consumeBody (node:internal/deps/undici/undici:5728:7)\n    at async testWalletTransfer (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/wallet-transfer-test.js:58:30)"
+}
+
+==================================================
+2025-06-02T21:21:45.266Z - CHECK_BALANCE_ERROR
+==================================================
+ERROR: {
+  "message": "Unexpected non-whitespace character after JSON at position 4 (line 1 column 5)",
+  "stack": "SyntaxError: Unexpected non-whitespace character after JSON at position 4 (line 1 column 5)\n    at JSON.parse (<anonymous>)\n    at parseJSONFromBytes (node:internal/deps/undici/undici:5738:19)\n    at successSteps (node:internal/deps/undici/undici:5719:27)\n    at fullyReadBody (node:internal/deps/undici/undici:4609:9)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async consumeBody (node:internal/deps/undici/undici:5728:7)\n    at async testWalletTransfer (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/wallet-transfer-test.js:58:30)"
+}
+
+==================================================
+2025-06-02T21:21:50.440Z - CHECK_BALANCE_ERROR
+==================================================
+ERROR: {
+  "message": "Unexpected non-whitespace character after JSON at position 4 (line 1 column 5)",
+  "stack": "SyntaxError: Unexpected non-whitespace character after JSON at position 4 (line 1 column 5)\n    at JSON.parse (<anonymous>)\n    at parseJSONFromBytes (node:internal/deps/undici/undici:5738:19)\n    at successSteps (node:internal/deps/undici/undici:5719:27)\n    at fullyReadBody (node:internal/deps/undici/undici:4609:9)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async consumeBody (node:internal/deps/undici/undici:5728:7)\n    at async testWalletTransfer (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/wallet-transfer-test.js:58:30)"
+}
+
+==================================================
+2025-06-02T21:21:55.621Z - CHECK_BALANCE_ERROR
+==================================================
+ERROR: {
+  "message": "Unexpected non-whitespace character after JSON at position 4 (line 1 column 5)",
+  "stack": "SyntaxError: Unexpected non-whitespace character after JSON at position 4 (line 1 column 5)\n    at JSON.parse (<anonymous>)\n    at parseJSONFromBytes (node:internal/deps/undici/undici:5738:19)\n    at successSteps (node:internal/deps/undici/undici:5719:27)\n    at fullyReadBody (node:internal/deps/undici/undici:4609:9)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async consumeBody (node:internal/deps/undici/undici:5728:7)\n    at async testWalletTransfer (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/wallet-transfer-test.js:58:30)"
+}
+
+==================================================
+2025-06-02T21:22:00.804Z - CHECK_BALANCE_ERROR
+==================================================
+ERROR: {
+  "message": "Unexpected non-whitespace character after JSON at position 4 (line 1 column 5)",
+  "stack": "SyntaxError: Unexpected non-whitespace character after JSON at position 4 (line 1 column 5)\n    at JSON.parse (<anonymous>)\n    at parseJSONFromBytes (node:internal/deps/undici/undici:5738:19)\n    at successSteps (node:internal/deps/undici/undici:5719:27)\n    at fullyReadBody (node:internal/deps/undici/undici:4609:9)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async consumeBody (node:internal/deps/undici/undici:5728:7)\n    at async testWalletTransfer (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/wallet-transfer-test.js:58:30)"
+}
+
+==================================================
+2025-06-02T21:22:05.823Z - TEST_FAILURE
+==================================================
+ERROR: {
+  "message": "Timeout waiting for funds",
+  "stack": "Error: Timeout waiting for funds\n    at testWalletTransfer (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/wallet-transfer-test.js:79:19)"
+}

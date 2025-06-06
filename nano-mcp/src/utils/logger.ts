@@ -27,4 +27,42 @@ export function logRpcCall(entry: RpcLogEntry): void {
   }, null, 2);
 
   fs.appendFileSync(RPC_LOG_FILE, logEntry + '\n---\n');
+}
+
+export class Logger {
+    private logDir: string;
+
+    constructor(logDir: string) {
+        this.logDir = logDir;
+        this.ensureLogDirectory();
+    }
+
+    private ensureLogDirectory() {
+        if (!fs.existsSync(this.logDir)) {
+            fs.mkdirSync(this.logDir, { recursive: true });
+        }
+    }
+
+    private getLogFilePath(type: string): string {
+        const date = new Date().toISOString().split('T')[0];
+        return path.join(this.logDir, `${type}_${date}.log`);
+    }
+
+    private writeLog(type: string, data: any) {
+        const timestamp = new Date().toISOString();
+        const logEntry = `[${timestamp}] ${JSON.stringify(data, null, 2)}\n`;
+        fs.appendFileSync(this.getLogFilePath(type), logEntry);
+    }
+
+    log(type: string, data: any) {
+        this.writeLog(type, data);
+    }
+
+    logError(type: string, error: any) {
+        this.writeLog(`ERROR_${type}`, {
+            message: error.message,
+            stack: error.stack,
+            ...error
+        });
+    }
 } 

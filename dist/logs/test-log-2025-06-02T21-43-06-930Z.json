@@ -1,0 +1,58 @@
+[
+  {
+    "timestamp": "2025-06-02T21:43:06.938Z",
+    "type": "TEST_START",
+    "data": "Starting Wallet Transfer Test"
+  },
+  {
+    "timestamp": "2025-06-02T21:43:06.951Z",
+    "type": "WALLET1_CREATE",
+    "data": "Creating first wallet"
+  },
+  {
+    "timestamp": "2025-06-02T21:43:07.297Z",
+    "type": "WALLET1_CREATED",
+    "data": {
+      "address": "nano_1g43k61nzc3mycoqby8psq99angbe8z1c8ptqh4o8ixcp87a8yf8ng8mjerb"
+    }
+  },
+  {
+    "timestamp": "2025-06-02T21:43:07.309Z",
+    "type": "WAITING_FOR_FUNDS",
+    "data": "Waiting for incoming transaction"
+  },
+  {
+    "timestamp": "2025-06-02T21:45:53.037Z",
+    "type": "FUNDS_RECEIVED",
+    "data": {
+      "account": "nano_1g43k61nzc3mycoqby8psq99angbe8z1c8ptqh4o8ixcp87a8yf8ng8mjerb",
+      "balance": "0.000000000000000000000000000000",
+      "receivable": "0.000010000000000000000000000000"
+    }
+  },
+  {
+    "timestamp": "2025-06-02T21:45:54.019Z",
+    "type": "WALLET2_CREATE",
+    "data": "Creating second wallet"
+  },
+  {
+    "timestamp": "2025-06-02T21:45:54.234Z",
+    "type": "WALLET2_CREATED",
+    "data": {
+      "address": "nano_3ud9nuyt34dth1pdknbewouksgpgreizkoi1qer8rcoehnr64rkjufq3quey"
+    }
+  },
+  {
+    "timestamp": "2025-06-02T21:45:54.241Z",
+    "type": "SENDING_TO_WALLET2",
+    "data": "Sending funds from wallet 1 to wallet 2"
+  },
+  {
+    "timestamp": "2025-06-02T21:45:54.633Z",
+    "type": "TEST_FAILURE",
+    "data": {
+      "message": "Account not found",
+      "stack": "Error: Account not found\n    at rpc (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/dist/wallet-transfer-test-rpc.js:32:15)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async send (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/dist/wallet-transfer-test-rpc.js:61:25)\n    at async testWalletTransfer (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/dist/wallet-transfer-test-rpc.js:228:26)"
+    }
+  }
+]

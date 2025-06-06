@@ -1,0 +1,12 @@
+[2025-06-05T18:34:43.420Z] {
+  "message": "nanoWeb.deriveSecretKey is not a function",
+  "stack": "TypeError: nanoWeb.deriveSecretKey is not a function\n    at KeyManager.generateKeyPair (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/src/key-manager.js:16:46)\n    at WalletService.generateWallet (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/src/services/wallet-service.js:68:50)\n    at file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/src/mcp.js:34:45\n    at IncomingMessage.<anonymous> (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/src/mcp-types.js:48:46)\n    at IncomingMessage.emit (node:events:524:28)\n    at endReadableNT (node:internal/streams/readable:1698:12)\n    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)"
+}
+[2025-06-05T18:34:43.439Z] {
+  "message": "nanoWeb.deriveSecretKey is not a function",
+  "stack": "TypeError: nanoWeb.deriveSecretKey is not a function\n    at KeyManager.generateKeyPair (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/src/key-manager.js:16:46)\n    at WalletService.generateWallet (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/src/services/wallet-service.js:68:50)\n    at file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/src/mcp.js:34:45\n    at IncomingMessage.<anonymous> (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/src/mcp-types.js:48:46)\n    at IncomingMessage.emit (node:events:524:28)\n    at endReadableNT (node:internal/streams/readable:1698:12)\n    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)"
+}
+[2025-06-05T18:45:07.215Z] {
+  "message": "nanoWeb.deriveSecretKey is not a function",
+  "stack": "TypeError: nanoWeb.deriveSecretKey is not a function\n    at KeyManager.generateKeyPair (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/src/key-manager.js:16:46)\n    at WalletService.generateWallet (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/src/services/wallet-service.js:68:50)\n    at file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/src/mcp.js:34:45\n    at IncomingMessage.<anonymous> (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/src/mcp-types.js:48:46)\n    at IncomingMessage.emit (node:events:524:28)\n    at endReadableNT (node:internal/streams/readable:1698:12)\n    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)"
+}

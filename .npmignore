@@ -1,0 +1,46 @@
+# Development files
+.git
+.gitignore
+.env
+.env.example
+.editorconfig
+.eslintrc
+.prettierrc
+.vscode/
+.idea/
+
+# Test files
+test/
+__tests__/
+*.test.js
+*.spec.js
+coverage/
+
+# Documentation
+docs/
+*.md
+!README.md
+
+# Build files
+dist/
+build/
+*.log
+logs/
+
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+
+# Miscellaneous
+.DS_Store
+*.swp
+*.swo
+.tmp/
+temp/
+
+# Logs
+npm-debug.log*
+
+# Other
+*.tgz 

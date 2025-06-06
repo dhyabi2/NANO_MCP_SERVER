@@ -1,0 +1,10 @@
+[2025-06-05T18:52:28.650Z] {
+  "publicKey": "2A43AA7669407BE5CD934C4D5C659A2EEFBF6E3A4982ADADFBDBC17173EC798D",
+  "address": "nano_1ck5obu8ki5uwq8s8m4fdjksndqhqxq5nke4oppzqpy3g7syryef76baxens",
+  "message": "New key pair generated successfully"
+}
+[2025-06-05T18:54:12.999Z] {
+  "publicKey": "F53D4B79273B6C63ABC8BB395424E1DEAEA72D6EB97067111B2F578FDEDDC06A",
+  "address": "nano_3xbxbfwkggueegowjgsscikg5qognwppxgdiewajpdtqjzhfui5cimooshob",
+  "message": "New key pair generated successfully"
+}

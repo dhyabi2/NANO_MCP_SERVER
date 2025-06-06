@@ -1,0 +1,168 @@
+[2025-06-05T18:52:28.667Z] {
+  "action": "account_balance",
+  "params": {
+    "account": "nano_1ck5obu8ki5uwq8s8m4fdjksndqhqxq5nke4oppzqpy3g7syryef76baxens",
+    "include_only_confirmed": true
+  }
+}
+[2025-06-05T18:52:39.491Z] {
+  "action": "account_balance",
+  "params": {
+    "account": "nano_1ck5obu8ki5uwq8s8m4fdjksndqhqxq5nke4oppzqpy3g7syryef76baxens",
+    "include_only_confirmed": true
+  }
+}
+[2025-06-05T18:52:50.131Z] {
+  "action": "account_balance",
+  "params": {
+    "account": "nano_1ck5obu8ki5uwq8s8m4fdjksndqhqxq5nke4oppzqpy3g7syryef76baxens",
+    "include_only_confirmed": true
+  }
+}
+[2025-06-05T18:53:00.886Z] {
+  "action": "account_balance",
+  "params": {
+    "account": "nano_1ck5obu8ki5uwq8s8m4fdjksndqhqxq5nke4oppzqpy3g7syryef76baxens",
+    "include_only_confirmed": true
+  }
+}
+[2025-06-05T18:53:11.554Z] {
+  "action": "account_balance",
+  "params": {
+    "account": "nano_1ck5obu8ki5uwq8s8m4fdjksndqhqxq5nke4oppzqpy3g7syryef76baxens",
+    "include_only_confirmed": true
+  }
+}
+[2025-06-05T18:53:22.078Z] {
+  "action": "account_balance",
+  "params": {
+    "account": "nano_1ck5obu8ki5uwq8s8m4fdjksndqhqxq5nke4oppzqpy3g7syryef76baxens",
+    "include_only_confirmed": true
+  }
+}
+[2025-06-05T18:53:32.668Z] {
+  "action": "account_balance",
+  "params": {
+    "account": "nano_1ck5obu8ki5uwq8s8m4fdjksndqhqxq5nke4oppzqpy3g7syryef76baxens",
+    "include_only_confirmed": true
+  }
+}
+[2025-06-05T18:53:43.217Z] {
+  "action": "account_balance",
+  "params": {
+    "account": "nano_1ck5obu8ki5uwq8s8m4fdjksndqhqxq5nke4oppzqpy3g7syryef76baxens",
+    "include_only_confirmed": true
+  }
+}
+[2025-06-05T18:53:53.790Z] {
+  "action": "account_balance",
+  "params": {
+    "account": "nano_1ck5obu8ki5uwq8s8m4fdjksndqhqxq5nke4oppzqpy3g7syryef76baxens",
+    "include_only_confirmed": true
+  }
+}
+[2025-06-05T18:54:04.365Z] {
+  "action": "account_balance",
+  "params": {
+    "account": "nano_1ck5obu8ki5uwq8s8m4fdjksndqhqxq5nke4oppzqpy3g7syryef76baxens",
+    "include_only_confirmed": true
+  }
+}
+[2025-06-05T18:54:05.604Z] {
+  "action": "pending",
+  "params": {
+    "account": "nano_1ck5obu8ki5uwq8s8m4fdjksndqhqxq5nke4oppzqpy3g7syryef76baxens",
+    "threshold": "1",
+    "source": true,
+    "include_active": true,
+    "include_only_confirmed": true
+  }
+}
+[2025-06-05T18:54:06.136Z] {
+  "action": "blocks_info",
+  "params": {
+    "hashes": [
+      "6D70904873068720F8A5C9D89EAF823497BB1F99262A13B622893F35756AB832"
+    ],
+    "json_block": "true",
+    "pending": true,
+    "source": true
+  }
+}
+[2025-06-05T18:54:06.577Z] {
+  "action": "account_info",
+  "params": {
+    "account": "nano_1ck5obu8ki5uwq8s8m4fdjksndqhqxq5nke4oppzqpy3g7syryef76baxens",
+    "representative": true
+  }
+}
+[2025-06-05T18:54:07.478Z] {
+  "action": "work_generate",
+  "params": {
+    "hash": "2A43AA7669407BE5CD934C4D5C659A2EEFBF6E3A4982ADADFBDBC17173EC798D",
+    "difficulty": "fffffff800000000"
+  }
+}
+[2025-06-05T18:54:10.953Z] {
+  "action": "process",
+  "params": {
+    "json_block": "true",
+    "subtype": "open",
+    "block": {
+      "type": "state",
+      "account": "nano_1ck5obu8ki5uwq8s8m4fdjksndqhqxq5nke4oppzqpy3g7syryef76baxens",
+      "previous": "0000000000000000000000000000000000000000000000000000000000000000",
+      "representative": "nano_1ck5obu8ki5uwq8s8m4fdjksndqhqxq5nke4oppzqpy3g7syryef76baxens",
+      "balance": "10000000000000000000000000",
+      "link": "6D70904873068720F8A5C9D89EAF823497BB1F99262A13B622893F35756AB832",
+      "signature": "c91a42f66def3117426753e4d0a3e4f0c127a0708e6b8491bcc654c0146af023ea9ce85dbc75adf3119642bf6ba6dd4836f5eec65017567646893fd3b6f3af01",
+      "work": "f3d7a867a13f3e52"
+    }
+  }
+}
+[2025-06-05T18:54:12.442Z] {
+  "action": "account_balance",
+  "params": {
+    "account": "nano_1ck5obu8ki5uwq8s8m4fdjksndqhqxq5nke4oppzqpy3g7syryef76baxens",
+    "include_only_confirmed": true
+  }
+}
+[2025-06-05T18:54:13.008Z] {
+  "action": "account_balance",
+  "params": {
+    "account": "nano_1ck5obu8ki5uwq8s8m4fdjksndqhqxq5nke4oppzqpy3g7syryef76baxens",
+    "include_only_confirmed": true
+  }
+}
+[2025-06-05T18:54:13.496Z] {
+  "action": "pending",
+  "params": {
+    "account": "nano_1ck5obu8ki5uwq8s8m4fdjksndqhqxq5nke4oppzqpy3g7syryef76baxens",
+    "threshold": "1",
+    "source": true,
+    "include_active": true,
+    "include_only_confirmed": true
+  }
+}
+[2025-06-05T18:54:13.923Z] {
+  "action": "account_balance",
+  "params": {
+    "account": "nano_1ck5obu8ki5uwq8s8m4fdjksndqhqxq5nke4oppzqpy3g7syryef76baxens",
+    "include_only_confirmed": true
+  }
+}
+[2025-06-05T18:54:14.439Z] {
+  "action": "account_info",
+  "params": {
+    "account": "nano_1ck5obu8ki5uwq8s8m4fdjksndqhqxq5nke4oppzqpy3g7syryef76baxens",
+    "representative": true,
+    "json_block": "true"
+  }
+}
+[2025-06-05T18:54:14.946Z] {
+  "action": "work_generate",
+  "params": {
+    "hash": "1FE6B592DFE95951E9B31B10D7F7B941490188A2AB79DA2B0D4CEFA7DBA7F47F",
+    "difficulty": "fffffff800000000"
+  }
+}

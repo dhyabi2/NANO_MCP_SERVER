@@ -1,0 +1,4 @@
+[2025-06-05T18:55:55.346Z] {
+  "message": "HTTP error! status: 524, body: ",
+  "stack": "Error: HTTP error! status: 524, body: \n    at WalletService.makeRpcCall (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/src/wallet-service.js:47:23)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async WalletService.sendTransaction (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/src/wallet-service.js:307:30)\n    at async runWalletTest (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/src/wallet-service.js:469:28)"
+}
