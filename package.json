@@ -1,6 +1,6 @@
 {
   "name": "nano-mcp",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "NANO Wallet Service",
   "type": "module",
   "main": "src/index.js",
