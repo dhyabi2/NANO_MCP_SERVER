@@ -1,6 +1,7 @@
-export class MCPServer {
-    config;
-    handlers;
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.MCPServer = void 0;
+class MCPServer {
     constructor(config) {
         this.config = config;
         this.handlers = new Map();
@@ -24,3 +25,4 @@ export class MCPServer {
         console.log(`${this.config.name} MCP Server v${this.config.version} started`);
     }
 }
+exports.MCPServer = MCPServer;

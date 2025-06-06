@@ -13,8 +13,8 @@ import axios from 'axios';
 
 dotenv.config();
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// Use CommonJS __dirname directly
+const __dirname = path.resolve();
 
 export class WalletService {
     private apiUrl: string;

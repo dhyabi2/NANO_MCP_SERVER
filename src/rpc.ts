@@ -32,9 +32,12 @@ export async function rpcCall<T>(action: string, params: Record<string, any> = {
         });
 
         const data = await response.json();
-        if (data.error) {
-            throw new Error(data.error);
+        
+        // Type guard to check if data has error property
+        if (typeof data === 'object' && data !== null && 'error' in data) {
+            throw new Error(String(data.error));
         }
+        
         return data as T;
     } catch (error) {
         throw new Error(`RPC call failed: ${error instanceof Error ? error.message : 'Unknown error'}`);

@@ -1,9 +1,9 @@
 import fetch from 'node-fetch';
-import { tools } from 'nanocurrency-web';
-import { convert } from 'nanocurrency-web';
+import { tools, wallet } from 'nanocurrency-web';
 import { config } from '../config/global';
 import { ConfigValidationResult } from '../types/config';
 import { AccountInfo, Block, PendingBlocks } from '../types/nano';
+import { BigNumber } from 'bignumber.js';
 
 export class NanoTransactions {
     private apiUrl: string;
@@ -31,7 +31,7 @@ export class NanoTransactions {
         }
     }
 
-    private async rpcCall(action: string, params: Record<string, any> = {}) {
+    private async rpcCall<T>(action: string, params: Record<string, any> = {}): Promise<T> {
         const response = await fetch(this.apiUrl, {
             method: 'POST',
             headers: {
@@ -48,7 +48,8 @@ export class NanoTransactions {
             throw new Error(`RPC call failed: ${response.statusText}`);
         }
 
-        return response.json();
+        const data = await response.json();
+        return data as T;
     }
 
     async validateConfig(errors: string[]): Promise<ConfigValidationResult> {
@@ -74,7 +75,8 @@ export class NanoTransactions {
     }
 
     async createOpenBlock(address: string, privateKey: string, sourceBlock: string, sourceAmount: string): Promise<Block> {
-        const publicKey = tools.getPublicKey(privateKey);
+        const walletData = await wallet.generate(privateKey);
+        const publicKey = walletData.accounts[0].publicKey;
         const account = address;
 
         const previous = '0000000000000000000000000000000000000000000000000000000000000000';
@@ -91,9 +93,9 @@ export class NanoTransactions {
             link: sourceBlock
         };
 
-        const signature = tools.sign(JSON.stringify(block), privateKey);
+        const signature = tools.sign(privateKey, tools.blake2b(JSON.stringify(block)));
 
-        return this.rpcCall('process', {
+        return this.rpcCall<Block>('process', {
             json_block: 'true',
             subtype: 'open',
             block: {
@@ -105,18 +107,22 @@ export class NanoTransactions {
     }
 
     async createSendBlock(fromAddress: string, privateKey: string, toAddress: string, amount: string, accountInfo: AccountInfo): Promise<Block> {
-        const publicKey = tools.getPublicKey(privateKey);
-        const account = fromAddress; // Use provided address
+        const walletData = await wallet.generate(privateKey);
+        const publicKey = walletData.accounts[0].publicKey;
+        const account = fromAddress;
 
-        if (!tools.validateAddress(account)) {
+        if (!tools.validateAddress(toAddress)) {
             throw new Error('Invalid sender address');
         }
 
         const previous = accountInfo.frontier;
-        const rawAmount = convert('NANO', 'raw', amount);
+        const rawAmount = tools.convert(amount, 'NANO', 'raw');
         const balance = (BigInt(accountInfo.balance) - BigInt(rawAmount)).toString();
         
         const work = await this.generateWork(previous);
+        
+        const recipientWallet = await wallet.generate(toAddress);
+        const recipientPublicKey = recipientWallet.accounts[0].publicKey;
         
         const block = {
             type: 'state',
@@ -124,12 +130,12 @@ export class NanoTransactions {
             previous,
             representative: accountInfo.representative,
             balance,
-            link: tools.getPublicKey(toAddress)
+            link: recipientPublicKey
         };
 
-        const signature = tools.sign(JSON.stringify(block), privateKey);
+        const signature = tools.sign(privateKey, tools.blake2b(JSON.stringify(block)));
 
-        return this.rpcCall('process', {
+        return this.rpcCall<Block>('process', {
             json_block: 'true',
             subtype: 'send',
             block: {

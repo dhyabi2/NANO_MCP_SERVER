@@ -1,13 +1,19 @@
-import { tools } from 'nanocurrency';
-export function isValidXNOAddress(address) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.isValidXNOAddress = isValidXNOAddress;
+exports.isValidPrivateKey = isValidPrivateKey;
+exports.isValidHash = isValidHash;
+exports.isValidWork = isValidWork;
+const nanocurrency_1 = require("nanocurrency");
+function isValidXNOAddress(address) {
     try {
-        return tools.validateAddress(address);
+        return nanocurrency_1.tools.validateAddress(address);
     }
     catch {
         return false;
     }
 }
-export function isValidPrivateKey(privateKey) {
+function isValidPrivateKey(privateKey) {
     try {
         return /^[0-9A-F]{64}$/i.test(privateKey);
     }
@@ -15,7 +21,7 @@ export function isValidPrivateKey(privateKey) {
         return false;
     }
 }
-export function isValidHash(hash) {
+function isValidHash(hash) {
     try {
         return /^[0-9A-F]{64}$/i.test(hash);
     }
@@ -23,7 +29,7 @@ export function isValidHash(hash) {
         return false;
     }
 }
-export function isValidWork(work) {
+function isValidWork(work) {
     try {
         return /^[0-9A-F]{16}$/i.test(work);
     }

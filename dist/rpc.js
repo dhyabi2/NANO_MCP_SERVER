@@ -1,15 +1,22 @@
-import fetch from 'node-fetch';
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.setRPCConfig = setRPCConfig;
+exports.rpcCall = rpcCall;
+const node_fetch_1 = __importDefault(require("node-fetch"));
 let rpcConfig = {
     url: 'https://rpc.nano.to/',
     rpcKey: '',
     gpuKey: 'RPC-KEY-BAB822FCCDAE42ECB7A331CCAAAA23'
 };
-export function setRPCConfig(config) {
+function setRPCConfig(config) {
     rpcConfig = { ...rpcConfig, ...config };
 }
-export async function rpcCall(action, params = {}) {
+async function rpcCall(action, params = {}) {
     try {
-        const response = await fetch(rpcConfig.url, {
+        const response = await (0, node_fetch_1.default)(rpcConfig.url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -22,8 +29,9 @@ export async function rpcCall(action, params = {}) {
             })
         });
         const data = await response.json();
-        if (data.error) {
-            throw new Error(data.error);
+        // Type guard to check if data has error property
+        if (typeof data === 'object' && data !== null && 'error' in data) {
+            throw new Error(String(data.error));
         }
         return data;
     }

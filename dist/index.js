@@ -1,34 +1,24 @@
-export * from './utils/nano-transactions';
-export * from './mcp';
-export * from './rpc';
-// Only start the server if this file is run directly
-if (import.meta.url === new URL(process.argv[1], 'file:').href) {
-    const { NanoMCP } = await import('./mcp');
-    const server = new NanoMCP();
-    // Initialize request handler
-    server.setRequestHandler('initialize', async (request) => {
-        return {
-            version: '1.0.0',
-            capabilities: {
-                methods: [
-                    'getBalance',
-                    'getAccountInfo',
-                    'getBlockCount',
-                    'getVersion',
-                    'convertToNano',
-                    'convertFromNano',
-                ],
-            },
-        };
-    });
-    // Method call handler
-    server.setRequestHandler('call', async (request) => {
-        const { method, params } = request.params;
-        return await server.handleRequest(method, params);
-    });
-    // Start the server
-    server.start().catch(error => {
-        console.error('Failed to start MCP server:', error);
-        process.exit(1);
-    });
-}
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+// Export core MCP types and interfaces
+__exportStar(require("./types/mcp-types"), exports);
+// Export enhanced MCP server implementation
+__exportStar(require("./mcp-server"), exports);
+// Export utilities
+__exportStar(require("./utils/schema-validator"), exports);
+// Export example implementation
+__exportStar(require("./example/example-mcp-server"), exports);

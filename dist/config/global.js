@@ -1,8 +1,14 @@
-import dotenv from 'dotenv';
-import path from 'path';
-import fs from 'fs';
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.config = void 0;
+const dotenv_1 = __importDefault(require("dotenv"));
+const path_1 = __importDefault(require("path"));
+const fs_1 = __importDefault(require("fs"));
 // Load environment variables from .env file
-dotenv.config();
+dotenv_1.default.config();
 /**
  * Default RPC URL from nano.to
  * High-performance public enterprise node for the Nano blockchain
@@ -23,10 +29,8 @@ const DEFAULT_RPC_URL = 'https://rpc.nano.to/';
 const DEFAULT_REPRESENTATIVE = 'nano_3arg3asgtigae3xckabaaewkx3bzsh7nwz7jkmjos79ihyaxwphhm6qgjps4';
 const DEFAULT_RPC_KEY = 'RPC-KEY-BAB822FCCDAE42ECB7A331CCAAAA23';
 class GlobalConfig {
-    static instance;
-    config;
-    initialized = false;
     constructor() {
+        this.initialized = false;
         this.config = {
             rpcUrl: process.env.NANO_RPC_URL || DEFAULT_RPC_URL,
             rpcKey: process.env.NANO_RPC_KEY || DEFAULT_RPC_KEY,
@@ -102,8 +106,8 @@ NANO_GPU_KEY=your-gpu-key-here        # Required: Your GPU service key for work 
 # Select a representative with good uptime and reasonable voting weight
 NANO_DEFAULT_REPRESENTATIVE=${DEFAULT_REPRESENTATIVE}  # Optional: Default representative for new accounts
 `;
-        const envPath = path.join(process.cwd(), '.env.example');
-        fs.writeFileSync(envPath, template);
+        const envPath = path_1.default.join(process.cwd(), '.env.example');
+        fs_1.default.writeFileSync(envPath, template);
     }
     getConfigStatus() {
         const validation = this.validateConfig();
@@ -120,5 +124,5 @@ NANO_DEFAULT_REPRESENTATIVE=${DEFAULT_REPRESENTATIVE}  # Optional: Default repre
         return status;
     }
 }
-export const config = GlobalConfig.getInstance();
-export default GlobalConfig;
+exports.config = GlobalConfig.getInstance();
+exports.default = GlobalConfig;
