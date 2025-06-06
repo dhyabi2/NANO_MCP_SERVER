@@ -9,7 +9,6 @@ A Node.js implementation of a NANO cryptocurrency server with integrated wallet 
 - Transaction handling (send/receive)
 - Balance checking
 - Account initialization
-- QR code generation for payments
 - Comprehensive logging system
 - Interactive wallet testing
 
