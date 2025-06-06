@@ -1,5 +1,5 @@
-import { NanoMCP } from '@chainreactionom/nano-mcp-server';
-import { config } from '@chainreactionom/nano-mcp-server/dist/config/global';
+import { NanoMCP } from 'nano-mcp';
+import { config } from '../../src/config/global';
 
 describe('NANO MCP Integration Tests', () => {
     let mcp: NanoMCP;

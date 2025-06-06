@@ -1,4 +1,4 @@
-import { NanoMCP } from '@chainreactionom/nano-mcp-server';
+import { NanoMCP } from 'nano-mcp';
 
 async function testWalletOperations() {
     console.log('\n=== NANO Wallet Operations Test ===\n');

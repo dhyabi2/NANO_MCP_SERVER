@@ -1,4 +1,4 @@
-import { NanoMCP } from '@chainreactionom/nano-mcp-server';
+import { NanoMCP } from 'nano-mcp';
 
 describe('Basic MCP Tests', () => {
     let mcp: NanoMCP;

@@ -90,3 +90,5 @@ src/
 ## License
 
 MIT 
+
+import { NanoMCP } from 'nano-mcp'; 
