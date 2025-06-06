@@ -8,8 +8,9 @@ The `simple-nano-server.js` demonstrates basic usage of the nano-mcp package.
 
 ### Features Demonstrated
 - Server initialization
-- Wallet generation
-- Balance checking
+- Request handler setup
+- Basic RPC methods
+- Graceful shutdown handling
 
 ### How to Run
 
@@ -26,7 +27,18 @@ cd my-nano-server
 
 3. Copy the `simple-nano-server.js` file into your project directory.
 
-4. Run the example:
+4. Update the configuration:
+Replace these values with your own:
+```javascript
+const server = new NanoMCP({
+    publicKey: 'YOUR-PUBLIC-KEY',
+    rpcKey: 'YOUR-RPC-KEY',
+    port: 7076,
+    host: '127.0.0.1'
+});
+```
+
+5. Run the example:
 ```bash
 node simple-nano-server.js
 ```
@@ -34,23 +46,49 @@ node simple-nano-server.js
 ### Expected Output
 
 The script will:
-1. Initialize the server
-2. Generate a new wallet
-3. Check the wallet's balance
+1. Start the NANO MCP Server
+2. Set up the initialize request handler
+3. Start listening for RPC requests
+4. Handle graceful shutdown on CTRL+C
 
 You should see output similar to:
 ```
-Server initialized successfully
-Generated wallet: {
-  address: "nano_...",
-  privateKey: "...",
-  publicKey: "..."
-}
-Balance: {
-  balance: "0",
-  pending: "0"
-}
+Starting NANO MCP Server...
+Server started successfully!
 ```
+
+### Available Methods
+
+The server supports the following RPC methods:
+- `getBalance`
+- `getAccountInfo`
+- `getBlockCount`
+- `getVersion`
+- `convertToNano`
+- `convertFromNano`
+
+### Making RPC Requests
+
+You can make RPC requests to the server using any HTTP client. Example using curl:
+
+```bash
+curl -X POST http://127.0.0.1:7076 \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: YOUR-RPC-KEY" \
+  -d '{
+    "jsonrpc": "2.0",
+    "method": "initialize",
+    "params": {},
+    "id": 1
+  }'
+```
+
+### Error Handling
+
+The server includes proper error handling:
+- Graceful shutdown on CTRL+C
+- Error logging for server start failures
+- Process exit with appropriate status codes
 
 ### Common Issues
 

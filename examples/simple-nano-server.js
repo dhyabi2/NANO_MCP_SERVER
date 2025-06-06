@@ -1,58 +1,50 @@
-const { NanoMCPServer } = require('nano-mcp');
+const { NanoMCP } = require('./node_modules/nano-mcp/src/mcp.js');
 
-class SimpleNanoServer extends NanoMCPServer {
-  constructor() {
-    const config = {
-      name: 'Simple Nano Server',
-      description: 'A simple Nano MCP server implementation',
-      version: '1.0.0',
-      author: 'Example Author'
+console.log('Starting NANO MCP Server...');
+
+const server = new NanoMCP({
+    publicKey: 'PUBLIC-KEY-FA9CE81226BF478291D34836A09D8B06',
+    rpcKey: 'RPC-KEY-BAB822FCCDAE42ECB7A331CCAAAA23',
+    port: 7076,
+    host: '127.0.0.1'
+});
+
+// Initialize request handler
+server.setRequestHandler('initialize', async (request) => {
+    console.log('Initialization request received');
+    return {
+        version: '1.0.0',
+        capabilities: {
+            methods: [
+                'getBalance',
+                'getAccountInfo',
+                'getBlockCount',
+                'getVersion',
+                'convertToNano',
+                'convertFromNano',
+            ],
+        },
     };
+});
 
-    super(config);
-  }
-
-  // Implement required abstract methods
-  async executeTool(name, args) {
-    switch (name) {
-      case 'generateWallet':
-        return this.walletService.generateWallet();
-      case 'getBalance':
-        return this.walletService.getBalance(args.address);
-      default:
-        throw new Error(`Tool not implemented: ${name}`);
+// Start the server
+async function startServer() {
+    try {
+        await server.start();
+        console.log('Server started successfully!');
+        
+        // Keep the process running
+        process.stdin.resume();
+        
+        // Handle shutdown
+        process.on('SIGINT', () => {
+            console.log('\nShutting down server...');
+            process.exit(0);
+        });
+    } catch (error) {
+        console.error('Failed to start server:', error);
+        process.exit(1);
     }
-  }
-
-  async executePrompt(name, input) {
-    throw new Error('Prompts not implemented');
-  }
-
-  async fetchResource(uri) {
-    throw new Error('Resource fetching not implemented');
-  }
 }
 
-// Create and start the server
-const server = new SimpleNanoServer();
-
-// Start the server and handle errors
-server.initialize()
-  .then(() => {
-    console.log('Server initialized successfully');
-    
-    // Example of generating a wallet
-    return server.executeTool('generateWallet');
-  })
-  .then(wallet => {
-    console.log('Generated wallet:', wallet);
-    
-    // Example of checking balance
-    return server.executeTool('getBalance', { address: wallet.address });
-  })
-  .then(balance => {
-    console.log('Balance:', balance);
-  })
-  .catch(error => {
-    console.error('Error:', error);
-  }); 
+startServer(); 
