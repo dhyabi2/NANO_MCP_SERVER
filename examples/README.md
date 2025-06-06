@@ -33,7 +33,7 @@ Replace these values with your own:
 const server = new NanoMCP({
     publicKey: 'YOUR-PUBLIC-KEY',
     rpcKey: 'YOUR-RPC-KEY',
-    port: 7076,
+    port: 8000,
     host: '127.0.0.1'
 });
 ```
@@ -72,7 +72,7 @@ The server supports the following RPC methods:
 You can make RPC requests to the server using any HTTP client. Example using curl:
 
 ```bash
-curl -X POST http://127.0.0.1:7076 \
+curl -X POST http://127.0.0.1:8000 \
   -H "Content-Type: application/json" \
   -H "X-API-Key: YOUR-RPC-KEY" \
   -d '{

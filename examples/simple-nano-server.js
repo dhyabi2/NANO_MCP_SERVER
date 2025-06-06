@@ -5,7 +5,7 @@ console.log('Starting NANO MCP Server...');
 const server = new NanoMCP({
     publicKey: 'PUBLIC-KEY-FA9CE81226BF478291D34836A09D8B06',
     rpcKey: 'RPC-KEY-BAB822FCCDAE42ECB7A331CCAAAA23',
-    port: 7076,
+    port: 8000,
     host: '127.0.0.1'
 });
 
