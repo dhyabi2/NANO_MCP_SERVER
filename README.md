@@ -76,8 +76,17 @@ Response:
 {
   "jsonrpc": "2.0",
   "result": {
-    "status": "success",
-    "capabilities": ["wallet", "send", "receive", "balance"]
+    "version": "1.0.0",
+    "capabilities": {
+      "methods": [
+        "initialize",
+        "generateWallet",
+        "getBalance",
+        "initializeAccount",
+        "sendTransaction",
+        "receivePending"
+      ]
+    }
   },
   "id": 1
 }
@@ -100,9 +109,9 @@ Response:
 {
   "jsonrpc": "2.0",
   "result": {
-    "address": "nano_...",
-    "privateKey": "encrypted_key_here",
-    "publicKey": "public_key_here"
+    "publicKey": "public_key_here",
+    "privateKey": "private_key_here",
+    "address": "nano_..."
   },
   "id": 1
 }
@@ -128,7 +137,11 @@ Response:
   "jsonrpc": "2.0",
   "result": {
     "balance": "100000000000000000000000000000",
-    "pending": "0"
+    "pending": "0",
+    "receivable": "0",
+    "balance_nano": "100.000000",
+    "pending_nano": "0.000000",
+    "receivable_nano": "0.000000"
   },
   "id": 1
 }
@@ -144,7 +157,7 @@ curl -X POST http://localhost:8080 \
     "method": "initializeAccount",
     "params": {
       "address": "nano_...",
-      "privateKey": "encrypted_key_here"
+      "privateKey": "private_key_here"
     },
     "id": 1
   }'
@@ -154,8 +167,9 @@ Response:
 {
   "jsonrpc": "2.0",
   "result": {
-    "status": "success",
-    "initialized": true
+    "address": "nano_...",
+    "initialized": true,
+    "balance": "0"
   },
   "id": 1
 }
@@ -172,8 +186,8 @@ curl -X POST http://localhost:8080 \
     "params": {
       "fromAddress": "nano_...",
       "toAddress": "nano_...",
-      "amount": "1000000000000000000000000",
-      "privateKey": "encrypted_key_here"
+      "amountRaw": "1000000000000000000000000",
+      "privateKey": "private_key_here"
     },
     "id": 1
   }'
@@ -183,8 +197,10 @@ Response:
 {
   "jsonrpc": "2.0",
   "result": {
-    "status": "success",
-    "hash": "transaction_hash_here"
+    "success": true,
+    "hash": "transaction_hash_here",
+    "amount": "1000000000000000000000000",
+    "balance": "900000000000000000000000"
   },
   "id": 1
 }
@@ -200,7 +216,7 @@ curl -X POST http://localhost:8080 \
     "method": "receivePending",
     "params": {
       "address": "nano_...",
-      "privateKey": "encrypted_key_here"
+      "privateKey": "private_key_here"
     },
     "id": 1
   }'
@@ -213,7 +229,8 @@ Response:
     "received": [
       {
         "hash": "block_hash_here",
-        "amount": "1000000000000000000000000"
+        "amount": "1000000000000000000000000",
+        "source": "nano_source_address"
       }
     ]
   },
@@ -241,6 +258,15 @@ Common error codes:
 - `-32602`: Invalid params
 - `-32603`: Internal error
 - `-32000`: Server error
+
+Common error messages:
+- "Invalid sender address"
+- "Invalid recipient address"
+- "Invalid private key format"
+- "Insufficient balance"
+- "Account not found"
+- "Failed to generate work"
+- "Method not found"
 
 ## Environment Variables
 
