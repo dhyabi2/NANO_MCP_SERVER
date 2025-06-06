@@ -1,3 +1,0 @@
-{"timestamp":"2025-06-03T22:49:02.721Z","type":"WALLET_GENERATION","message":"{\n  \"entropy_length\": 64,\n  \"entropy_format\": \"hex\"\n}"}
-{"timestamp":"2025-06-03T22:49:03.083Z","type":"KEY_FORMAT","message":"{\n  \"original_length\": 64,\n  \"formatted_length\": 64\n}"}
-{"timestamp":"2025-06-03T22:49:03.131Z","type":"WALLET_GENERATION_ERROR","message":"{\n  \"message\": \"Public key mismatch after private key formatting\",\n  \"stack\": \"Error: Public key mismatch after private key formatting\\n    at WalletService.generateWallet (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/test-nano-mcp/wallet-test.js:139:23)\\n    at async runWalletTest (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/test-nano-mcp/wallet-test.js:485:25)\"\n}"}
