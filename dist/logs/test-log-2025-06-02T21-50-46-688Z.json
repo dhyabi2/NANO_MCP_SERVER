@@ -1,0 +1,40 @@
+[
+  {
+    "timestamp": "2025-06-02T21:50:46.693Z",
+    "type": "TEST_START",
+    "data": "Starting Wallet Transfer Test"
+  },
+  {
+    "timestamp": "2025-06-02T21:50:46.702Z",
+    "type": "WALLET1_CREATE",
+    "data": "Creating first wallet"
+  },
+  {
+    "timestamp": "2025-06-02T21:50:46.917Z",
+    "type": "WALLET1_CREATED",
+    "data": {
+      "address": "nano_1tpswggine3jxky8o5sx9q5dizbdsh3gpzpdrw815e88g9orpnaieydb4co7"
+    }
+  },
+  {
+    "timestamp": "2025-06-02T21:50:46.927Z",
+    "type": "WAITING_FOR_FUNDS",
+    "data": "Waiting for incoming transaction"
+  },
+  {
+    "timestamp": "2025-06-02T21:51:35.661Z",
+    "type": "CHECK_BALANCE_ERROR",
+    "data": {
+      "message": "data.error.includes is not a function",
+      "stack": "TypeError: data.error.includes is not a function\n    at rpc (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/dist/wallet-transfer-test-rpc.js:46:24)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async balance (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/dist/wallet-transfer-test-rpc.js:69:26)\n    at async testWalletTransfer (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/dist/wallet-transfer-test-rpc.js:251:37)"
+    }
+  },
+  {
+    "timestamp": "2025-06-02T21:51:45.696Z",
+    "type": "CHECK_BALANCE_ERROR",
+    "data": {
+      "message": "data.error.includes is not a function",
+      "stack": "TypeError: data.error.includes is not a function\n    at rpc (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/dist/wallet-transfer-test-rpc.js:46:24)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async balance (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/dist/wallet-transfer-test-rpc.js:69:26)\n    at async testWalletTransfer (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/dist/wallet-transfer-test-rpc.js:251:37)"
+    }
+  }
+]

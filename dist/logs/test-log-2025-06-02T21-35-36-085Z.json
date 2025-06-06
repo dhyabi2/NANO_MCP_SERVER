@@ -1,0 +1,40 @@
+[
+  {
+    "timestamp": "2025-06-02T21:35:36.091Z",
+    "type": "TEST_START",
+    "data": "Starting Wallet Transfer Test"
+  },
+  {
+    "timestamp": "2025-06-02T21:35:36.104Z",
+    "type": "WALLET1_CREATE",
+    "data": "Creating first wallet"
+  },
+  {
+    "timestamp": "2025-06-02T21:35:36.310Z",
+    "type": "WALLET1_CREATED",
+    "data": {
+      "address": "nano_1tjwwpcmycmi7yg5a44ftybc5i66exw9aq5gb134wzschtnqbkgcf689r8hr"
+    }
+  },
+  {
+    "timestamp": "2025-06-02T21:35:36.318Z",
+    "type": "WAITING_FOR_FUNDS",
+    "data": "Waiting for incoming transaction"
+  },
+  {
+    "timestamp": "2025-06-02T21:38:21.700Z",
+    "type": "CHECK_BALANCE_ERROR",
+    "data": {
+      "message": "429",
+      "stack": "Error: 429\n    at rpc (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/dist/wallet-transfer-test-rpc.js:32:15)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async balance (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/dist/wallet-transfer-test-rpc.js:41:18)\n    at async testWalletTransfer (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/dist/wallet-transfer-test-rpc.js:180:37)"
+    }
+  },
+  {
+    "timestamp": "2025-06-02T21:38:27.066Z",
+    "type": "CHECK_BALANCE_ERROR",
+    "data": {
+      "message": "429",
+      "stack": "Error: 429\n    at rpc (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/dist/wallet-transfer-test-rpc.js:32:15)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async balance (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/dist/wallet-transfer-test-rpc.js:41:18)\n    at async testWalletTransfer (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/dist/wallet-transfer-test-rpc.js:180:37)"
+    }
+  }
+]

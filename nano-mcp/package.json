@@ -1,0 +1,74 @@
+{
+  "name": "@chainreactionom/nano-mcp-server",
+  "version": "1.0.10",
+  "description": "Model Context Protocol (MCP) server for NANO cryptocurrency interactions",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --config jest.config.js",
+    "test:watch": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --config jest.config.js --watch",
+    "test:wallet": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --config jest.config.js src/__tests__/wallet.test.ts --testTimeout=300000",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "prepare": "npm run build"
+  },
+  "bin": {
+    "nano-mcp": "./dist/index.js"
+  },
+  "keywords": [
+    "mcp",
+    "nano",
+    "xno",
+    "cryptocurrency",
+    "blockchain",
+    "modelcontextprotocol",
+    "rpc",
+    "api"
+  ],
+  "author": {
+    "name": "Aldhiyabi",
+    "url": "https://github.com/dhyabi2"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.6.7",
+    "nanocurrency": "^2.5.0",
+    "nanocurrency-web": "^1.4.3",
+    "node-fetch": "^3.3.2",
+    "qrcode-terminal": "^0.12.0",
+    "tsx": "^4.19.4",
+    "dotenv": "^16.5.0"
+  },
+  "devDependencies": {
+    "@types/dotenv": "^6.1.1",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^20.17.57",
+    "@types/node-fetch": "^2.6.12",
+    "@types/qrcode-terminal": "^0.12.2",
+    "cross-env": "^7.0.3",
+    "jest": "^29.7.0",
+    "rimraf": "^6.0.1",
+    "ts-jest": "^29.3.4",
+    "typescript": "^5.8.3"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dhyabi2/NANO_MCP_SERVER.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dhyabi2/NANO_MCP_SERVER/issues"
+  },
+  "homepage": "https://github.com/dhyabi2/NANO_MCP_SERVER#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

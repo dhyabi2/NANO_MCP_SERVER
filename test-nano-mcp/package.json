@@ -1,0 +1,21 @@
+{
+  "name": "test-nano-mcp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@chainreactionom/nano-mcp-server": "^1.0.7",
+    "@types/node-fetch": "^2.6.12",
+    "dotenv": "^16.5.0",
+    "nanocurrency": "^2.5.0",
+    "nanocurrency-web": "^1.4.3",
+    "node-fetch": "^2.7.0"
+  }
+}

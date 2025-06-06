@@ -1,0 +1,20 @@
+[
+  {
+    "timestamp": "2025-06-02T21:33:19.990Z",
+    "type": "TEST_START",
+    "data": "Starting Wallet Transfer Test"
+  },
+  {
+    "timestamp": "2025-06-02T21:33:19.999Z",
+    "type": "WALLET1_CREATE",
+    "data": "Creating first wallet"
+  },
+  {
+    "timestamp": "2025-06-02T21:33:20.537Z",
+    "type": "TEST_FAILURE",
+    "data": {
+      "message": "Unsupported RPC Action. Only: market_data, email_login, blocks_info, checkout, nano_ninja, accounts_frontiers, account_weight, confirmation_quorum, blocks_info, pending, accounts_receivable, accounts_pending, accounts_balances, block_info, block_count, version, account_balance, frontiers, account_info, account_history, receivable, process, work_generate, work_validate, telemetry, representatives_online, account_key, update_name, nano_auth, nano_to_raw, raw_to_nano",
+      "stack": "Error: Unsupported RPC Action. Only: market_data, email_login, blocks_info, checkout, nano_ninja, accounts_frontiers, account_weight, confirmation_quorum, blocks_info, pending, accounts_receivable, accounts_pending, accounts_balances, block_info, block_count, version, account_balance, frontiers, account_info, account_history, receivable, process, work_generate, work_validate, telemetry, representatives_online, account_key, update_name, nano_auth, nano_to_raw, raw_to_nano\n    at rpc (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/dist/wallet-transfer-test-rpc.js:32:15)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async createAccount (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/dist/wallet-transfer-test-rpc.js:55:18)\n    at async testWalletTransfer (file:///C:/Users/Ahmed.aldhiyabi/Downloads/animatorPrompt/dist/wallet-transfer-test-rpc.js:109:32)"
+    }
+  }
+]

@@ -1,0 +1,138 @@
+{
+  "name": "Nano Example Workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "c3e3e6e5-5b5a-4f7d-b8c2-1234567890ab",
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "authentication": "public",
+        "resource": "account",
+        "operation": "getBalance",
+        "account": "nano_3t6k35gi95xu6tergt6p69ck76ogmitsa8mnijtpxm9fkcm736xtoncuohr3"
+      },
+      "id": "a1b2c3d4-5e6f-7a8b-9c0d-1234567890ab",
+      "name": "Get Account Balance",
+      "type": "n8n-nodes-base.nano",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "authentication": "public",
+        "resource": "utility",
+        "operation": "convertUnits",
+        "amount": "={{$node[\"Get Account Balance\"].json[\"balance\"]}}",
+        "fromUnit": "Nano",
+        "toUnit": "Mnano"
+      },
+      "id": "b2c3d4e5-6f7a-8b9c-0d1e-234567890abc",
+      "name": "Convert to Mnano",
+      "type": "n8n-nodes-base.nano",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "authentication": "public",
+        "resource": "account",
+        "operation": "getHistory",
+        "account": "nano_3t6k35gi95xu6tergt6p69ck76ogmitsa8mnijtpxm9fkcm736xtoncuohr3",
+        "count": 5
+      },
+      "id": "c3d4e5f6-7a8b-9c0d-1e2f-34567890abcd",
+      "name": "Get Transaction History",
+      "type": "n8n-nodes-base.nano",
+      "typeVersion": 1,
+      "position": [450, 500]
+    },
+    {
+      "parameters": {
+        "authentication": "public",
+        "resource": "network",
+        "operation": "getVersion"
+      },
+      "id": "d4e5f6a7-8b9c-0d1e-2f34-567890abcdef",
+      "name": "Get Node Version",
+      "type": "n8n-nodes-base.nano",
+      "typeVersion": 1,
+      "position": [450, 100]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "summary",
+              "value": "Account {{$node[\"Get Account Balance\"].json[\"account\"]}} has {{$node[\"Get Account Balance\"].json[\"balance\"]}} NANO ({{$node[\"Convert to Mnano\"].json[\"result\"]}} Mnano)"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e5f6a7b8-9c0d-1e2f-3456-7890abcdef01",
+      "name": "Format Output",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [850, 300]
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Get Account Balance",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Transaction History",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Node Version",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Account Balance": {
+      "main": [
+        [
+          {
+            "node": "Convert to Mnano",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to Mnano": {
+      "main": [
+        [
+          {
+            "node": "Format Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "1234abcd-5678-90ef-ghij-klmnopqrstuv",
+  "id": "1",
+  "meta": {
+    "instanceId": "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+  },
+  "tags": []
+} 

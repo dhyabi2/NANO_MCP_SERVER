@@ -1,0 +1,55 @@
+{
+  "name": "nano-mcp",
+  "version": "1.1.4",
+  "description": "(Not yet ready) NANO Wallet Service",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "server": "node src/index.js --server-only"
+  },
+  "keywords": [
+    "nano",
+    "cryptocurrency",
+    "mcp",
+    "server",
+    "json-rpc",
+    "blockchain"
+  ],
+  "author": "NANO MCP Server Contributors",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dhyabi2/NANO_MCP_SERVER.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dhyabi2/NANO_MCP_SERVER/issues"
+  },
+  "homepage": "https://github.com/dhyabi2/NANO_MCP_SERVER#readme",
+  "dependencies": {
+    "axios": "^1.6.7",
+    "dotenv": "^16.4.5",
+    "nanocurrency": "^2.5.0",
+    "nanocurrency-web": "^1.4.3",
+    "node-fetch": "^3.3.2",
+    "qrcode-terminal": "^0.12.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "files": [
+    "src/index.js",
+    "src/wallet-service.js",
+    "src/mcp.js",
+    "src/key-manager.js",
+    "src/logger.js",
+    "src/services/",
+    "src/wallet/",
+    "src/utils/",
+    "src/types/",
+    "src/config/",
+    "src/helpers/",
+    "LICENSE",
+    "README.md"
+  ]
+}
