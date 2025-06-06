@@ -6,8 +6,7 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
-    "server": "node src/index.js --server-only",
-    "test": "node src/wallet-service.js"
+    "server": "node src/index.js --server-only"
   },
   "keywords": [
     "nano",
@@ -39,7 +38,17 @@
     "node": ">=14.0.0"
   },
   "files": [
-    "src/",
+    "src/index.js",
+    "src/wallet-service.js",
+    "src/mcp.js",
+    "src/key-manager.js",
+    "src/logger.js",
+    "src/services/",
+    "src/wallet/",
+    "src/utils/",
+    "src/types/",
+    "src/config/",
+    "src/helpers/",
     "LICENSE",
     "README.md"
   ]
