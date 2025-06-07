@@ -16,6 +16,7 @@ server.setRequestHandler('initialize', async (request) => {
         version: '1.0.0',
         capabilities: {
             methods: [
+                'generateWallet',
                 'getBalance',
                 'getAccountInfo',
                 'getBlockCount',

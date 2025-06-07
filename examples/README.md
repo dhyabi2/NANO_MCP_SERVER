@@ -60,17 +60,45 @@ Server started successfully!
 ### Available Methods
 
 The server supports the following RPC methods:
-- `getBalance`
-- `getAccountInfo`
-- `getBlockCount`
-- `getVersion`
-- `convertToNano`
-- `convertFromNano`
+- `generateWallet` - Generate a new NANO wallet with address, private key, and public key
+- `getBalance` - Get the balance of a NANO address
+- `getAccountInfo` - Get detailed information about a NANO account
+- `getBlockCount` - Get the current block count
+- `getVersion` - Get the node version
+- `convertToNano` - Convert raw amount to NANO
+- `convertFromNano` - Convert NANO to raw amount
 
 ### Making RPC Requests
 
-You can make RPC requests to the server using any HTTP client. Example using curl:
+You can make RPC requests to the server using any HTTP client. Examples:
 
+1. Generate a new wallet:
+```bash
+curl -X POST http://127.0.0.1:8000 \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: YOUR-RPC-KEY" \
+  -d '{
+    "jsonrpc": "2.0",
+    "method": "generateWallet",
+    "params": {},
+    "id": 1
+  }'
+```
+
+Response:
+```json
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "address": "nano_...",
+    "privateKey": "...",
+    "publicKey": "..."
+  },
+  "id": 1
+}
+```
+
+2. Initialize the server:
 ```bash
 curl -X POST http://127.0.0.1:8000 \
   -H "Content-Type: application/json" \
