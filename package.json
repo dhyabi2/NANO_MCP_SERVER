@@ -1,0 +1,58 @@
+{
+  "name": "nano-mcp",
+  "version": "1.2.24",
+  "description": "MCP (Nano Cryptocurrency) Server for AI Assistants - A JSON-RPC 2.0 API server for Nano cryptocurrency operations",
+  "main": "src/index.js",
+  "bin": {
+    "nano-mcp": "./src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "nano",
+    "cryptocurrency",
+    "mcp",
+    "server",
+    "json-rpc",
+    "api",
+    "blockchain",
+    "wallet"
+  ],
+  "author": {
+    "name": "NANO MCP Team",
+    "url": "https://github.com/dhyabi2/NANO_MCP_SERVER"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "ajv": "^8.17.1",
+    "body-parser": "^2.2.0",
+    "express": "^5.1.0",
+    "nanocurrency": "^1.0.0",
+    "nanocurrency-web": "^1.0.0",
+    "node-fetch": "^2.6.1",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dhyabi2/NANO_MCP_SERVER.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dhyabi2/NANO_MCP_SERVER/issues"
+  },
+  "homepage": "https://github.com/dhyabi2/NANO_MCP_SERVER#readme",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "files": [
+    "src/",
+    "utils/",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}
