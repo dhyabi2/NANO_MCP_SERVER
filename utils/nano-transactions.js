@@ -376,5 +376,17 @@ class NanoTransactions {
             return { success: false, error: error.message };
         }
     }
+    /**
+     * Retrieves the balance for a given Nano account.
+     * @param {string} account - The Nano account address.
+     * @returns {Promise<Object>} - Balance information from the node.
+     */
+    async getBalance(account) {
+        const balance = await this.rpcCall('account_balance', { account });
+        return {
+            balance: balance.balance,
+            pending: balance.pending
+        };
+    }
 }
 exports.NanoTransactions = NanoTransactions;

@@ -1,36 +1,35 @@
 const readline = require('readline');
 
 class StdioTransport {
+    /**
+     * Creates a new stdio transport for NANO MCP Server
+     * @param {NanoMCPServer} server - The NANO MCP server instance
+     */
     constructor(server) {
         this.server = server;
-        this.rl = readline.createInterface({
-            input: process.stdin,
-            output: process.stdout,
-            terminal: false
-        });
     }
 
+    /**
+     * Starts the stdio transport
+     */
     start() {
-        // Log startup to stderr to keep stdout clean for JSON-RPC
-        console.error('MCP Server running in stdio mode');
-        
-        this.rl.on('line', async (line) => {
+        console.error('NANO MCP Server running in stdio mode');
+        process.stdin.setEncoding('utf8');
+        process.stdin.on('data', async (data) => {
             try {
-                const request = JSON.parse(line);
+                const request = JSON.parse(data);
                 const response = await this.server.handleRequest(request);
-                
-                // Write response as a single line with newline
-                process.stdout.write(JSON.stringify(response) + '\n');
+                console.log(JSON.stringify(response));
             } catch (error) {
-                // Write error response as a single line with newline
-                process.stdout.write(JSON.stringify({
+                console.error('Error processing request:', error);
+                console.log(JSON.stringify({
                     jsonrpc: "2.0",
                     error: {
-                        code: -32603,
-                        message: error.message
+                        code: -32700,
+                        message: "Parse error"
                     },
                     id: null
-                }) + '\n');
+                }));
             }
         });
 
@@ -42,7 +41,10 @@ class StdioTransport {
     }
 
     stop() {
-        this.rl.close();
+        // Close readline interface if it exists
+        if (this.rl) {
+            this.rl.close();
+        }
     }
 }
 

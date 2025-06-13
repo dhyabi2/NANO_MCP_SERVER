@@ -1,7 +1,7 @@
 {
-  "name": "mcp",
+  "name": "nano-mcp",
   "version": "1.2.28",
-  "description": "MCP (Nano Cryptocurrency) Server for AI Assistants - A JSON-RPC 2.0 API server for Nano cryptocurrency operations",
+  "description": "NANO MCP (Nano Cryptocurrency) Server for AI Assistants - A JSON-RPC 2.0 API server for Nano cryptocurrency operations",
   "main": "src/index.js",
   "bin": {
     "nano-mcp": "src/index.js"
@@ -13,7 +13,7 @@
   "keywords": [
     "nano",
     "cryptocurrency",
-    "mcp",
+    "nano-mcp",
     "server",
     "json-rpc",
     "api",
@@ -22,27 +22,27 @@
   ],
   "author": {
     "name": "NANO MCP Team",
-    "url": "https://github.com/dhyabi2/mcp-nano"
+    "url": "https://github.com/dhyabi2/nano-mcp"
   },
   "license": "MIT",
   "dependencies": {
     "ajv": "^8.17.1",
     "body-parser": "^2.2.0",
     "express": "^5.1.0",
-    "nanocurrency": "^1.0.0",
-    "nanocurrency-web": "^1.0.0",
-    "node-fetch": "^2.6.1",
+    "nanocurrency": "^1.12.0",
+    "nanocurrency-web": "^1.4.3",
+    "node-fetch": "^2.7.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dhyabi2/mcp-nano.git"
+    "url": "git+https://github.com/dhyabi2/nano-mcp.git"
   },
   "bugs": {
-    "url": "https://github.com/dhyabi2/mcp-nano/issues"
+    "url": "https://github.com/dhyabi2/nano-mcp/issues"
   },
-  "homepage": "https://github.com/dhyabi2/mcp-nano#readme",
+  "homepage": "https://github.com/dhyabi2/nano-mcp#readme",
   "engines": {
     "node": ">=16.0.0"
   },

@@ -12,7 +12,7 @@ function Invoke-RPC {
         [string]$JsonData
     )
     try {
-        $response = Invoke-RestMethod -Uri "http://localhost:8080/" `
+        $response = Invoke-RestMethod -Uri "http://localhost:3000/" `
             -Method Post `
             -Headers @{"Content-Type"="application/json"} `
             -Body $JsonData
@@ -59,7 +59,26 @@ function Save-Wallets {
             privateKey = $wallet2.privateKey
         }
     }
-    $wallets | ConvertTo-Json | Set-Content $walletsFile
+    $maxRetries = 5
+    $retryCount = 0
+    $success = $false
+
+    while (-not $success -and $retryCount -lt $maxRetries) {
+        try {
+            $wallets | ConvertTo-Json | Set-Content $walletsFile -ErrorAction Stop
+            $success = $true
+        }
+        catch {
+            $retryCount++
+            if ($retryCount -lt $maxRetries) {
+                Write-Host "Failed to save wallets, retrying in 1 second... (Attempt $retryCount of $maxRetries)" -ForegroundColor $Yellow
+                Start-Sleep -Seconds 1
+            }
+            else {
+                Write-Host "Failed to save wallets after $maxRetries attempts" -ForegroundColor $Red
+            }
+        }
+    }
 }
 
 # Function to convert raw to NANO
@@ -69,9 +88,18 @@ function Convert-RawToNano {
     )
     try {
         if ($rawAmount -eq "0") { return "0" }
-        $rawBigInt = [System.Numerics.BigInteger]::Parse($rawAmount)
-        $nanoBigInt = [System.Numerics.BigInteger]::Divide($rawBigInt, [System.Numerics.BigInteger]::Pow(10, 30))
-        return $nanoBigInt.ToString()
+        
+        # Remove any trailing zeros
+        $trimmed = $rawAmount.TrimEnd('0')
+        
+        # If length is less than 30, pad with zeros on the left
+        if ($trimmed.Length -lt 30) {
+            return "0." + $trimmed.PadLeft(30, '0')
+        }
+        
+        # If length is 30 or more, insert decimal point 30 places from the right
+        $decimalPos = $trimmed.Length - 30
+        return $trimmed.Insert($decimalPos, ".")
     }
     catch {
         return "Error converting amount"

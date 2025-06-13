@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const { MCPServer } = require('./server');
+const { NanoMCPServer } = require('./server');
 const { StdioTransport } = require('./stdio-transport');
 
 // Default configuration
@@ -13,18 +13,18 @@ const config = {
 };
 
 // Create and start server
-const server = new MCPServer(config);
+const server = new NanoMCPServer(config);
 
 if (config.transport === 'stdio') {
     const stdioTransport = new StdioTransport(server);
     stdioTransport.start();
-    console.error('MCP Server running in stdio mode');
+    console.error('NANO MCP Server running in stdio mode');
 } else {
     server.startHttp();
 }
 
 // Handle process termination
 process.on('SIGINT', () => {
-    console.error('\nShutting down MCP Server...');
+    console.error('\nShutting down NANO MCP Server...');
     process.exit(0);
 }); 

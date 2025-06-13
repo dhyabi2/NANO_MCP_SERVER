@@ -4,14 +4,18 @@ const options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'Nano MCP API',
-      version: '1.2.16',
-      description: 'JSON-RPC 2.0 API for Nano cryptocurrency operations',
+      title: 'NANO MCP API',
+      version: '1.0.0',
+      description: 'NANO MCP (NANO Cryptocurrency) Server API Documentation',
+      license: {
+        name: 'MIT',
+        url: 'https://github.com/dhyabi2/nano-mcp/blob/main/LICENSE'
+      }
     },
     servers: [
       {
         url: 'http://localhost:3000',
-        description: 'Local development server',
+        description: 'Development server'
       },
     ],
     components: {
@@ -683,25 +687,15 @@ const options = {
     paths: {
       '/': {
         post: {
-          summary: 'JSON-RPC 2.0 API endpoint',
-          description: 'Handles all MCP Server operations via JSON-RPC 2.0 protocol',
-          tags: ['Nano Operations'],
+          summary: 'JSON-RPC 2.0 endpoint',
+          description: 'Handles all NANO MCP Server operations via JSON-RPC 2.0 protocol',
+          tags: ['NANO Operations'],
           requestBody: {
             required: true,
             content: {
               'application/json': {
                 schema: {
-                  oneOf: [
-                    { $ref: '#/components/schemas/InitializeRequest' },
-                    { $ref: '#/components/schemas/GenerateWalletRequest' },
-                    { $ref: '#/components/schemas/GetBalanceRequest' },
-                    { $ref: '#/components/schemas/InitializeAccountRequest' },
-                    { $ref: '#/components/schemas/SendTransactionRequest' },
-                    { $ref: '#/components/schemas/ReceiveAllPendingRequest' },
-                    { $ref: '#/components/schemas/GetAccountInfoRequest' },
-                    { $ref: '#/components/schemas/GetPendingBlocksRequest' },
-                    { $ref: '#/components/schemas/GenerateWorkRequest' }
-                  ]
+                  $ref: '#/components/schemas/JsonRpcRequest'
                 },
                 examples: {
                   initialize: {
@@ -811,21 +805,11 @@ const options = {
           },
           responses: {
             '200': {
-              description: 'Successful operation',
+              description: 'JSON-RPC 2.0 response',
               content: {
                 'application/json': {
                   schema: {
-                    oneOf: [
-                      { $ref: '#/components/schemas/InitializeResponse' },
-                      { $ref: '#/components/schemas/GenerateWalletResponse' },
-                      { $ref: '#/components/schemas/GetBalanceResponse' },
-                      { $ref: '#/components/schemas/InitializeAccountResponse' },
-                      { $ref: '#/components/schemas/SendTransactionResponse' },
-                      { $ref: '#/components/schemas/ReceiveAllPendingResponse' },
-                      { $ref: '#/components/schemas/GetAccountInfoResponse' },
-                      { $ref: '#/components/schemas/GetPendingBlocksResponse' },
-                      { $ref: '#/components/schemas/GenerateWorkResponse' }
-                    ]
+                    $ref: '#/components/schemas/JsonRpcResponse'
                   },
                   examples: {
                     initialize: {
@@ -979,7 +963,7 @@ const options = {
       },
     },
   },
-  apis: ['./src/server.js'],
+  apis: ['./src/*.js']
 };
 
 module.exports = swaggerJsdoc(options); 

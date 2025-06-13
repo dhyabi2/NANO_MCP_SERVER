@@ -1,8 +1,8 @@
-# MCP (Nano Cryptocurrency) Server
+# NANO MCP (Nano Cryptocurrency) Server
 
 ## Overview
 
-MCP (NANO Cryptocurrency) Server provides a JSON-RPC 2.0 API for interacting with the NANO cryptocurrency network. This server supports both HTTP and stdio transports, making it versatile for different integration scenarios.
+NANO MCP (NANO Cryptocurrency) Server provides a JSON-RPC 2.0 API for interacting with the NANO cryptocurrency network. This server supports both HTTP and stdio transports, making it versatile for different integration scenarios.
 
 ## What is NANO Cryptocurrency?
 
@@ -31,7 +31,7 @@ node src/index.js
 ## 📁 Project Structure
 
 ```
-mcp-nano/
+nano-mcp/
 ├── src/
 │   ├── index.js          # Main server entry point
 │   ├── server.js         # MCP server implementation

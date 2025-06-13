@@ -2,7 +2,7 @@ const http = require('http');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpecs = require('./swagger');
 const { NanoTransactions } = require('../utils/nano-transactions');
-const { validateSchema } = require('../utils/schema-validator');
+const { SchemaValidator } = require('../utils/schema-validator');
 const path = require('path');
 const fs = require('fs');
 const express = require('express');
@@ -29,13 +29,13 @@ const corsHeaders = {
  *         description: API documentation
  */
 /**
- * MCP (NANO Cryptocurrency) Server implementation
+ * NANO MCP (NANO Cryptocurrency) Server implementation
  * Provides a JSON-RPC 2.0 interface for interacting with the NANO network
  * Supports both HTTP and stdio transports
  */
-class MCPServer {
+class NanoMCPServer {
     /**
-     * Creates a new MCP Server instance
+     * Creates a new NANO MCP Server instance
      * @param {Object} config - Server configuration
      * @param {number} [config.port=3000] - HTTP server port
      * @param {string} [config.apiUrl='https://rpc.nano.to'] - NANO RPC node URL
@@ -51,6 +51,7 @@ class MCPServer {
             ...config
         };
         this.nanoTransactions = new NanoTransactions(this.config);
+        this.schemaValidator = SchemaValidator.getInstance();
     }
 
     /**
@@ -89,23 +90,61 @@ class MCPServer {
                     result = await this.nanoTransactions.generateWallet();
                     break;
                 case 'getBalance':
-                    validateSchema('getBalance', params);
-                    result = await this.nanoTransactions.getBalance(params.address);
+                    this.schemaValidator.validate(params, {
+                        type: 'object',
+                        required: ['address'],
+                        properties: {
+                            address: { type: 'string' }
+                        }
+                    });
+                    const balanceInfo = await this.nanoTransactions.getAccountInfo(params.address);
+                    result = {
+                        balance: balanceInfo.balance || '0',
+                        pending: balanceInfo.pending || '0'
+                    };
                     break;
                 case 'getAccountInfo':
-                    validateSchema('getAccountInfo', params);
+                    this.schemaValidator.validate(params, {
+                        type: 'object',
+                        required: ['address'],
+                        properties: {
+                            address: { type: 'string' }
+                        }
+                    });
                     result = await this.nanoTransactions.getAccountInfo(params.address);
                     break;
                 case 'getPendingBlocks':
-                    validateSchema('getPendingBlocks', params);
+                    this.schemaValidator.validate(params, {
+                        type: 'object',
+                        required: ['address'],
+                        properties: {
+                            address: { type: 'string' }
+                        }
+                    });
                     result = await this.nanoTransactions.getPendingBlocks(params.address);
                     break;
                 case 'initializeAccount':
-                    validateSchema('initializeAccount', params);
+                    this.schemaValidator.validate(params, {
+                        type: 'object',
+                        required: ['address', 'privateKey'],
+                        properties: {
+                            address: { type: 'string' },
+                            privateKey: { type: 'string' }
+                        }
+                    });
                     result = await this.nanoTransactions.initializeAccount(params.address, params.privateKey);
                     break;
                 case 'sendTransaction':
-                    validateSchema('sendTransaction', params);
+                    this.schemaValidator.validate(params, {
+                        type: 'object',
+                        required: ['fromAddress', 'toAddress', 'amountRaw', 'privateKey'],
+                        properties: {
+                            fromAddress: { type: 'string' },
+                            toAddress: { type: 'string' },
+                            amountRaw: { type: 'string' },
+                            privateKey: { type: 'string' }
+                        }
+                    });
                     result = await this.nanoTransactions.sendTransaction(
                         params.fromAddress,
                         params.toAddress,
@@ -114,7 +153,14 @@ class MCPServer {
                     );
                     break;
                 case 'receiveAllPending':
-                    validateSchema('receiveAllPending', params);
+                    this.schemaValidator.validate(params, {
+                        type: 'object',
+                        required: ['address', 'privateKey'],
+                        properties: {
+                            address: { type: 'string' },
+                            privateKey: { type: 'string' }
+                        }
+                    });
                     result = await this.nanoTransactions.receiveAllPending(params.address, params.privateKey);
                     break;
                 default:
@@ -159,7 +205,7 @@ class MCPServer {
         // Start server
         const server = http.createServer(app);
         server.listen(this.config.port, () => {
-            console.log(`MCP Server running on port ${this.config.port}`);
+            console.log(`NANO MCP Server running on port ${this.config.port}`);
             console.log(`API documentation available at http://localhost:${this.config.port}/api-docs`);
         });
 
@@ -183,4 +229,4 @@ function getContentType(filePath) {
     return contentTypes[ext] || 'text/plain';
 }
 
-module.exports = { MCPServer }; 
+module.exports = { NanoMCPServer }; 
