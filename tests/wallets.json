@@ -1,0 +1,10 @@
+{
+    "wallet2":  {
+                    "privateKey":  "a4a3d0cd01cff28628e2bd187bdb6d39b42779cbc6ffe5ac5685ea58d4b16ae1",
+                    "address":  "nano_1ee6716of16rhrjdxu1ap561c1c5yuey97pewss5kpodytomrqhy9k8h46nz"
+                },
+    "wallet1":  {
+                    "privateKey":  "00b6dbc92e3f7a5a217645b9f257d2071838132fad786b3fddd5cb3a64cdd1f2",
+                    "address":  "nano_3eadyjzpjfocpigqauajzhe1y41z939rhbjdmbed5zxs75hzqswpojus3b3f"
+                }
+}
