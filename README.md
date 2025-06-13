@@ -59,41 +59,343 @@ Our MCP server implements JSON-RPC 2.0 protocol with the following request forma
 }
 ```
 
-### Type Definitions
+#### Method Specifications
 
+1. **initialize**
+   ```typescript
+   // Request
+   {
+     "jsonrpc": "2.0",
+     "method": "initialize",
+     "params": {},
+     "id": 1
+   }
+   
+   // Response
+   {
+     "jsonrpc": "2.0",
+     "result": {
+       "version": "1.0.0",
+       "capabilities": {
+         "methods": [
+           "initialize",
+           "generateWallet",
+           "getBalance",
+           "initializeAccount",
+           "sendTransaction",
+           "receiveAllPending",
+           "getAccountInfo",
+           "getPendingBlocks",
+           "generateWork"
+         ]
+       }
+     },
+     "id": 1
+   }
+   ```
+
+2. **generateWallet**
+   ```typescript
+   // Request
+   {
+     "jsonrpc": "2.0",
+     "method": "generateWallet",
+     "params": {},
+     "id": 1
+   }
+   
+   // Response
+   {
+     "jsonrpc": "2.0",
+     "result": {
+       "publicKey": string,    // 64 character hex string
+       "privateKey": string,   // 64 character hex string
+       "address": string       // nano_ prefixed address
+     },
+     "id": 1
+   }
+   ```
+
+3. **getBalance**
+   ```typescript
+   // Request
+   {
+     "jsonrpc": "2.0",
+     "method": "getBalance",
+     "params": {
+       "address": string      // nano_ prefixed address
+     },
+     "id": 1
+   }
+   
+   // Response
+   {
+     "jsonrpc": "2.0",
+     "result": {
+       "balance": string,     // Raw balance in string format
+       "pending": string      // Raw pending balance in string format
+     },
+     "id": 1
+   }
+   ```
+
+4. **getAccountInfo**
+   ```typescript
+   // Request
+   {
+     "jsonrpc": "2.0",
+     "method": "getAccountInfo",
+     "params": {
+       "address": string      // nano_ prefixed address
+     },
+     "id": 1
+   }
+   
+   // Response
+   {
+     "jsonrpc": "2.0",
+     "result": {
+       "frontier": string,    // Latest block hash
+       "open_block": string,  // First block hash
+       "representative_block": string,  // Representative block hash
+       "balance": string,     // Raw balance
+       "modified_timestamp": string,    // Last modified timestamp
+       "block_count": string, // Number of blocks
+       "representative": string,        // Representative address
+       "weight": string,      // Account weight
+       "pending": string      // Raw pending balance
+     },
+     "id": 1
+   }
+   ```
+
+5. **getPendingBlocks**
+   ```typescript
+   // Request
+   {
+     "jsonrpc": "2.0",
+     "method": "getPendingBlocks",
+     "params": {
+       "address": string      // nano_ prefixed address
+     },
+     "id": 1
+   }
+   
+   // Response
+   {
+     "jsonrpc": "2.0",
+     "result": {
+       "blocks": {
+         [blockHash: string]: {
+           "amount": string,  // Raw amount
+           "source": string   // Source address
+         }
+       }
+     },
+     "id": 1
+   }
+   ```
+
+6. **initializeAccount**
+   ```typescript
+   // Request
+   {
+     "jsonrpc": "2.0",
+     "method": "initializeAccount",
+     "params": {
+       "address": string,     // nano_ prefixed address
+       "privateKey": string   // 64 character hex string
+     },
+     "id": 1
+   }
+   
+   // Response
+   {
+     "jsonrpc": "2.0",
+     "result": {
+       "initialized": boolean,
+       "representative": string  // nano_ prefixed address
+     },
+     "id": 1
+   }
+   ```
+
+7. **sendTransaction**
+   ```typescript
+   // Request
+   {
+     "jsonrpc": "2.0",
+     "method": "sendTransaction",
+     "params": {
+       "fromAddress": string,    // nano_ prefixed address
+       "toAddress": string,      // nano_ prefixed address
+       "amountRaw": string,      // Raw amount in string format
+       "privateKey": string      // 64 character hex string
+     },
+     "id": 1
+   }
+   
+   // Response
+   {
+     "jsonrpc": "2.0",
+     "result": {
+       "success": boolean,
+       "hash": string,           // Transaction hash
+       "amount": string,         // Raw amount sent
+       "balance": string         // New balance after transaction
+     },
+     "id": 1
+   }
+   ```
+
+8. **receiveAllPending**
+   ```typescript
+   // Request
+   {
+     "jsonrpc": "2.0",
+     "method": "receiveAllPending",
+     "params": {
+       "address": string,     // nano_ prefixed address
+       "privateKey": string   // 64 character hex string
+     },
+     "id": 1
+   }
+   
+   // Response
+   {
+     "jsonrpc": "2.0",
+     "result": {
+       "received": Array<{
+         "hash": string,      // Block hash
+         "amount": string,    // Raw amount received
+         "source": string     // Source address
+       }>
+     },
+     "id": 1
+   }
+   ```
+
+9. **generateWork**
+   ```typescript
+   // Request
+   {
+     "jsonrpc": "2.0",
+     "method": "generateWork",
+     "params": {
+       "hash": string,        // Block hash to generate work for
+       "isOpen": boolean      // Whether this is an open block
+     },
+     "id": 1
+   }
+   
+   // Response
+   {
+     "jsonrpc": "2.0",
+     "result": {
+       "work": string        // 16 character hex string
+     },
+     "id": 1
+   }
+   ```
+
+#### Error Response Format
+All methods may return the following error format:
 ```typescript
-// Wallet Types
+{
+  "jsonrpc": "2.0",
+  "error": {
+    "code": number,      // Error code
+    "message": string    // Error description
+  },
+  "id": number | null
+}
+```
+
+Common error codes:
+- `-32700`: Parse error
+- `-32600`: Invalid request
+- `-32601`: Method not found
+- `-32602`: Invalid params
+- `-32603`: Internal error
+- `-32000`: Server error
+
+#### Type Definitions
+```typescript
+// Common Types
+type NanoAddress = string;  // nano_ prefixed address
+type PrivateKey = string;   // 64 character hex string
+type RawAmount = string;    // String representation of raw amount
+type BlockHash = string;    // 64 character hex string
+type Work = string;         // 16 character hex string
+
+// Response Types
+interface JsonRpcResponse<T> {
+  jsonrpc: "2.0";
+  result: T;
+  id: number;
+}
+
+interface JsonRpcError {
+  jsonrpc: "2.0";
+  error: {
+    code: number;
+    message: string;
+  };
+  id: number | null;
+}
+
+// Method-specific Types
 interface WalletResponse {
   publicKey: string;
   privateKey: string;
-  address: string;
+  address: NanoAddress;
 }
 
-// Balance Types
 interface BalanceResponse {
-  balance: string;  // Raw balance
-  pending: string;  // Pending balance
+  balance: RawAmount;
+  pending: RawAmount;
 }
 
-// Transaction Types
+interface AccountInfoResponse {
+  frontier: BlockHash;
+  open_block: BlockHash;
+  representative_block: BlockHash;
+  balance: RawAmount;
+  modified_timestamp: string;
+  block_count: string;
+  representative: NanoAddress;
+  weight: string;
+  pending: RawAmount;
+}
+
+interface PendingBlock {
+  amount: RawAmount;
+  source: NanoAddress;
+}
+
+interface PendingBlocksResponse {
+  blocks: {
+    [hash: BlockHash]: PendingBlock;
+  };
+}
+
 interface TransactionResponse {
   success: boolean;
-  hash: string;
-  amount: string;
-  balance: string;
+  hash: BlockHash;
+  amount: RawAmount;
+  balance: RawAmount;
 }
 
-// Account Types
-interface AccountInfoResponse {
-  initialized: boolean;
-  representative: string;
+interface ReceiveResponse {
+  received: Array<{
+    hash: BlockHash;
+    amount: RawAmount;
+    source: NanoAddress;
+  }>;
 }
 
-// Pending Blocks Types
-interface PendingBlock {
-  hash: string;
-  amount: string;
-  source: string;
+interface WorkResponse {
+  work: Work;
 }
 ```
 
