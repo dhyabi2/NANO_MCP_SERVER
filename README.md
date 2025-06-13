@@ -126,6 +126,167 @@ mcp-nano/
 }
 ```
 
+#### Get Balance
+```json
+// Request
+{
+    "jsonrpc": "2.0",
+    "method": "getBalance",
+    "params": {
+        "address": "nano_3qya5xpjfsbk3ndfebo9dsrj6iy6f6idmogqtn1mtzdtwnxu6rw3dz18i6xf"
+    },
+    "id": 1
+}
+
+// Response
+{
+    "jsonrpc": "2.0",
+    "result": {
+        "balance": "1000000000000000000000000",
+        "pending": "0"
+    },
+    "id": 1
+}
+```
+
+#### Initialize Account
+```json
+// Request
+{
+    "jsonrpc": "2.0",
+    "method": "initializeAccount",
+    "params": {
+        "address": "nano_3qya5xpjfsbk3ndfebo9dsrj6iy6f6idmogqtn1mtzdtwnxu6rw3dz18i6xf",
+        "privateKey": "4bc2e9c2df4be93e5cbeb41b52c2fc9efc1b4c0e67951fc6c5098c117913d25a"
+    },
+    "id": 1
+}
+
+// Response
+{
+    "jsonrpc": "2.0",
+    "result": {
+        "initialized": true,
+        "representative": "nano_3qya5xpjfsbk3ndfebo9dsrj6iy6f6idmogqtn1mtzdtwnxu6rw3dz18i6xf"
+    },
+    "id": 1
+}
+```
+
+#### Send Transaction
+```json
+// Request
+{
+    "jsonrpc": "2.0",
+    "method": "sendTransaction",
+    "params": {
+        "fromAddress": "nano_3qya5xpjfsbk3ndfebo9dsrj6iy6f6idmogqtn1mtzdtwnxu6rw3dz18i6xf",
+        "toAddress": "nano_1ipx847tk8o46pwxt5qjdbncjqcbwcc1rrmqnkztrfjy5k7z4imsrata9est",
+        "amountRaw": "1000000000000000000000000",
+        "privateKey": "4bc2e9c2df4be93e5cbeb41b52c2fc9efc1b4c0e67951fc6c5098c117913d25a"
+    },
+    "id": 1
+}
+
+// Response
+{
+    "jsonrpc": "2.0",
+    "result": {
+        "success": true,
+        "hash": "991CF190094C00F0B68E2E5F75F6BEE95A2E0BD93CEAA4A6734DB9F19B728948",
+        "amount": "1000000000000000000000000",
+        "balance": "0"
+    },
+    "id": 1
+}
+```
+
+#### Receive All Pending
+```json
+// Request
+{
+    "jsonrpc": "2.0",
+    "method": "receiveAllPending",
+    "params": {
+        "address": "nano_3qya5xpjfsbk3ndfebo9dsrj6iy6f6idmogqtn1mtzdtwnxu6rw3dz18i6xf",
+        "privateKey": "4bc2e9c2df4be93e5cbeb41b52c2fc9efc1b4c0e67951fc6c5098c117913d25a"
+    },
+    "id": 1
+}
+
+// Response
+{
+    "jsonrpc": "2.0",
+    "result": {
+        "received": [
+            {
+                "hash": "991CF190094C00F0B68E2E5F75F6BEE95A2E0BD93CEAA4A6734DB9F19B728948",
+                "amount": "1000000000000000000000000",
+                "source": "nano_1ipx847tk8o46pwxt5qjdbncjqcbwcc1rrmqnkztrfjy5k7z4imsrata9est"
+            }
+        ]
+    },
+    "id": 1
+}
+```
+
+#### Get Account Info
+```json
+// Request
+{
+    "jsonrpc": "2.0",
+    "method": "getAccountInfo",
+    "params": {
+        "address": "nano_3qya5xpjfsbk3ndfebo9dsrj6iy6f6idmogqtn1mtzdtwnxu6rw3dz18i6xf"
+    },
+    "id": 1
+}
+
+// Response
+{
+    "jsonrpc": "2.0",
+    "result": {
+        "frontier": "991CF190094C00F0B68E2E5F75F6BEE95A2E0BD93CEAA4A6734DB9F19B728948",
+        "open_block": "991CF190094C00F0B68E2E5F75F6BEE95A2E0BD93CEAA4A6734DB9F19B728948",
+        "representative_block": "991CF190094C00F0B68E2E5F75F6BEE95A2E0BD93CEAA4A6734DB9F19B728948",
+        "balance": "1000000000000000000000000",
+        "modified_timestamp": "1634567890",
+        "block_count": "1",
+        "representative": "nano_3qya5xpjfsbk3ndfebo9dsrj6iy6f6idmogqtn1mtzdtwnxu6rw3dz18i6xf",
+        "weight": "0",
+        "pending": "0"
+    },
+    "id": 1
+}
+```
+
+#### Get Pending Blocks
+```json
+// Request
+{
+    "jsonrpc": "2.0",
+    "method": "getPendingBlocks",
+    "params": {
+        "address": "nano_3qya5xpjfsbk3ndfebo9dsrj6iy6f6idmogqtn1mtzdtwnxu6rw3dz18i6xf"
+    },
+    "id": 1
+}
+
+// Response
+{
+    "jsonrpc": "2.0",
+    "result": {
+        "blocks": {
+            "991CF190094C00F0B68E2E5F75F6BEE95A2E0BD93CEAA4A6734DB9F19B728948": {
+                "amount": "1000000000000000000000000",
+                "source": "nano_1ipx847tk8o46pwxt5qjdbncjqcbwcc1rrmqnkztrfjy5k7z4imsrata9est"
+            }
+        }
+    },
+    "id": 1
+}
+```
+
 ## Configuration
 
 Environment variables:
