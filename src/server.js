@@ -28,207 +28,142 @@ const corsHeaders = {
  *       200:
  *         description: API documentation
  */
+/**
+ * MCP (NANO Cryptocurrency) Server implementation
+ * Provides a JSON-RPC 2.0 interface for interacting with the NANO network
+ * Supports both HTTP and stdio transports
+ */
 class MCPServer {
+    /**
+     * Creates a new MCP Server instance
+     * @param {Object} config - Server configuration
+     * @param {number} [config.port=3000] - HTTP server port
+     * @param {string} [config.apiUrl='https://rpc.nano.to'] - NANO RPC node URL
+     * @param {string} [config.rpcKey] - API key for authenticated RPC nodes
+     * @param {string} [config.defaultRepresentative] - Default representative for new accounts
+     */
     constructor(config = {}) {
-        this.port = config.port || DEFAULT_PORT;
-        this.nanoTransactions = new NanoTransactions({
-            apiUrl: config.apiUrl,
-            rpcKey: config.rpcKey,
-            defaultRepresentative: config.defaultRepresentative
-        });
-        this.server = null;
-        this.app = express();
-        
-        // Add middleware
-        this.app.use(bodyParser.json());
-        
-        // Add CORS middleware
-        this.app.use((req, res, next) => {
-            Object.entries(corsHeaders).forEach(([key, value]) => {
-                res.setHeader(key, value);
-            });
-            if (req.method === 'OPTIONS') {
-                res.sendStatus(204);
-                return;
-            }
-            next();
-        });
-
-        // Serve Swagger UI
-        this.app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs, {
-            explorer: true,
-            customCss: '.swagger-ui .topbar { display: none }',
-        }));
-
-        // Handle JSON-RPC requests
-        this.app.post('/', async (req, res) => {
-            try {
-                const requestData = req.body;
-                let result;
-
-                // Validate JSON-RPC 2.0 format
-                if (!requestData.jsonrpc || requestData.jsonrpc !== '2.0' || !requestData.method) {
-                    throw new Error('Invalid JSON-RPC 2.0 request');
-                }
-
-                switch(requestData.method) {
-                    case 'initialize':
-                        result = {
-                            version: '1.0.0',
-                            capabilities: {
-                                methods: [
-                                    'initialize',
-                                    'generateWallet',
-                                    'getBalance',
-                                    'initializeAccount',
-                                    'sendTransaction',
-                                    'receiveAllPending',
-                                    'getAccountInfo',
-                                    'getPendingBlocks',
-                                    'generateWork'
-                                ]
-                            }
-                        };
-                        break;
-
-                    case 'generateWallet':
-                        const wallet = await this.nanoTransactions.generateWallet();
-                        result = {
-                            publicKey: wallet.publicKey,
-                            privateKey: wallet.privateKey,
-                            address: wallet.address
-                        };
-                        break;
-
-                    case 'getAccountInfo':
-                        if (!requestData.params?.address) {
-                            throw new Error('Address is required');
-                        }
-                        const info = await this.nanoTransactions.getAccountInfo(requestData.params.address);
-                        result = info;
-                        break;
-
-                    case 'getPendingBlocks':
-                        if (!requestData.params?.address) {
-                            throw new Error('Address is required');
-                        }
-                        const pendingBlocks = await this.nanoTransactions.getPendingBlocks(requestData.params.address);
-                        result = pendingBlocks;
-                        break;
-
-                    case 'generateWork':
-                        if (!requestData.params?.hash) {
-                            throw new Error('Hash is required');
-                        }
-                        const workResult = await this.nanoTransactions.generateWork(
-                            requestData.params.hash,
-                            requestData.params?.isOpen || false
-                        );
-                        result = { work: workResult };
-                        break;
-
-                    case 'getBalance':
-                        if (!requestData.params?.address) {
-                            throw new Error('Address is required');
-                        }
-                        const balance = await this.nanoTransactions.makeRequest('account_balance', {
-                            account: requestData.params.address
-                        });
-                        result = {
-                            balance: balance.balance,
-                            pending: balance.pending
-                        };
-                        break;
-
-                    case 'initializeAccount':
-                        if (!requestData.params?.address || !requestData.params?.privateKey) {
-                            throw new Error('Address and private key are required');
-                        }
-                        const accountInfo = await this.nanoTransactions.makeRequest('account_info', {
-                            account: requestData.params.address,
-                            representative: true
-                        });
-                        result = {
-                            initialized: !accountInfo.error,
-                            representative: accountInfo.representative
-                        };
-                        break;
-
-                    case 'sendTransaction':
-                        if (!requestData.params?.fromAddress || !requestData.params?.privateKey || 
-                            !requestData.params?.toAddress || !requestData.params?.amountRaw) {
-                            throw new Error('Missing required transaction parameters');
-                        }
-                        const sendResult = await this.nanoTransactions.sendTransaction(
-                            requestData.params.fromAddress,
-                            requestData.params.privateKey,
-                            requestData.params.toAddress,
-                            requestData.params.amountRaw
-                        );
-                        result = {
-                            success: true,
-                            hash: sendResult.hash,
-                            amount: requestData.params.amountRaw,
-                            balance: sendResult.balance
-                        };
-                        break;
-
-                    case 'receiveAllPending':
-                        if (!requestData.params?.address || !requestData.params?.privateKey) {
-                            throw new Error('Address and private key are required');
-                        }
-                        const receiveResult = await this.nanoTransactions.receiveAllPending(
-                            requestData.params.address,
-                            requestData.params.privateKey
-                        );
-                        result = {
-                            received: receiveResult.map(block => ({
-                                hash: block.hash,
-                                amount: block.amount,
-                                source: block.source
-                            }))
-                        };
-                        break;
-
-                    default:
-                        throw new Error(`Method ${requestData.method} not supported`);
-                }
-
-                res.json({
-                    jsonrpc: '2.0',
-                    result,
-                    id: requestData.id
-                });
-            } catch (error) {
-                res.status(400).json({
-                    jsonrpc: '2.0',
-                    error: {
-                        code: -32603,
-                        message: error.message
-                    },
-                    id: null
-                });
-            }
-        });
+        this.config = {
+            port: process.env.MCP_PORT || 3000,
+            apiUrl: process.env.NANO_RPC_URL || 'https://rpc.nano.to',
+            rpcKey: process.env.NANO_RPC_KEY || 'RPC-KEY-BAB822FCCDAE42ECB7A331CCAAAA23',
+            defaultRepresentative: process.env.NANO_REPRESENTATIVE || 'nano_3qya5xpjfsbk3ndfebo9dsrj6iy6f6idmogqtn1mtzdtwnxu6rw3dz18i6xf',
+            ...config
+        };
+        this.nanoTransactions = new NanoTransactions(this.config);
     }
 
-    start() {
-        this.server = this.app.listen(this.port, () => {
-            console.log(`MCP Server running on port ${this.port}`);
-            console.log(`API documentation available at http://localhost:${this.port}/api-docs`);
-        });
-    }
+    /**
+     * Handles incoming JSON-RPC requests
+     * @param {Object} request - JSON-RPC request object
+     * @param {string} request.method - Method name to execute
+     * @param {Object} request.params - Method parameters
+     * @param {number} request.id - Request identifier
+     * @returns {Promise<Object>} JSON-RPC response object
+     * @throws {Error} When method is not found or parameters are invalid
+     */
+    async handleRequest(request) {
+        try {
+            const { method, params, id } = request;
+            let result;
 
-    stop() {
-        if (this.server) {
-            return new Promise((resolve) => {
-                this.server.close(() => {
-                    console.log('Server closed');
-                    resolve();
-                });
-            });
+            switch (method) {
+                case 'initialize':
+                    result = {
+                        version: "1.0.0",
+                        capabilities: {
+                            methods: [
+                                "initialize",
+                                "generateWallet",
+                                "getBalance",
+                                "initializeAccount",
+                                "sendTransaction",
+                                "receiveAllPending",
+                                "getAccountInfo",
+                                "getPendingBlocks"
+                            ]
+                        }
+                    };
+                    break;
+                case 'generateWallet':
+                    result = await this.nanoTransactions.generateWallet();
+                    break;
+                case 'getBalance':
+                    validateSchema('getBalance', params);
+                    result = await this.nanoTransactions.getBalance(params.address);
+                    break;
+                case 'getAccountInfo':
+                    validateSchema('getAccountInfo', params);
+                    result = await this.nanoTransactions.getAccountInfo(params.address);
+                    break;
+                case 'getPendingBlocks':
+                    validateSchema('getPendingBlocks', params);
+                    result = await this.nanoTransactions.getPendingBlocks(params.address);
+                    break;
+                case 'initializeAccount':
+                    validateSchema('initializeAccount', params);
+                    result = await this.nanoTransactions.initializeAccount(params.address, params.privateKey);
+                    break;
+                case 'sendTransaction':
+                    validateSchema('sendTransaction', params);
+                    result = await this.nanoTransactions.sendTransaction(
+                        params.fromAddress,
+                        params.toAddress,
+                        params.amountRaw,
+                        params.privateKey
+                    );
+                    break;
+                case 'receiveAllPending':
+                    validateSchema('receiveAllPending', params);
+                    result = await this.nanoTransactions.receiveAllPending(params.address, params.privateKey);
+                    break;
+                default:
+                    throw new Error(`Method ${method} not found`);
+            }
+
+            return {
+                jsonrpc: "2.0",
+                result,
+                id
+            };
+        } catch (error) {
+            return {
+                jsonrpc: "2.0",
+                error: {
+                    code: -32603,
+                    message: error.message
+                },
+                id: request.id
+            };
         }
-        return Promise.resolve();
+    }
+
+    /**
+     * Starts the HTTP server
+     * @returns {http.Server} The HTTP server instance
+     * @throws {Error} When server fails to start
+     */
+    startHttp() {
+        const app = express();
+        app.use(bodyParser.json());
+        
+        // Swagger documentation
+        app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
+
+        // JSON-RPC endpoint
+        app.post('/', async (req, res) => {
+            const response = await this.handleRequest(req.body);
+            res.json(response);
+        });
+
+        // Start server
+        const server = http.createServer(app);
+        server.listen(this.config.port, () => {
+            console.log(`MCP Server running on port ${this.config.port}`);
+            console.log(`API documentation available at http://localhost:${this.config.port}/api-docs`);
+        });
+
+        return server;
     }
 }
 

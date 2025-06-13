@@ -1,28 +1,30 @@
 #!/usr/bin/env node
 
 const { MCPServer } = require('./server');
+const { StdioTransport } = require('./stdio-transport');
 
 // Default configuration
 const config = {
     port: process.env.MCP_PORT || 3000,
     apiUrl: process.env.NANO_RPC_URL || 'https://rpc.nano.to',
-    rpcKey: process.env.NANO_RPC_KEY,
-    defaultRepresentative: process.env.NANO_REPRESENTATIVE || 'nano_3qya5xpjfsbk3ndfebo9dsrj6iy6f6idmogqtn1mtzdtwnxu6rw3dz18i6xf'
+    rpcKey: process.env.NANO_RPC_KEY || 'RPC-KEY-BAB822FCCDAE42ECB7A331CCAAAA23',
+    defaultRepresentative: process.env.NANO_REPRESENTATIVE || 'nano_3qya5xpjfsbk3ndfebo9dsrj6iy6f6idmogqtn1mtzdtwnxu6rw3dz18i6xf',
+    transport: process.env.MCP_TRANSPORT || 'http' // 'http' or 'stdio'
 };
 
-// Create and start the server
+// Create and start server
 const server = new MCPServer(config);
-server.start();
 
-// Handle graceful shutdown
-process.on('SIGTERM', async () => {
-    console.log('Received SIGTERM. Performing graceful shutdown...');
-    await server.stop();
-    process.exit(0);
-});
+if (config.transport === 'stdio') {
+    const stdioTransport = new StdioTransport(server);
+    stdioTransport.start();
+    console.error('MCP Server running in stdio mode');
+} else {
+    server.startHttp();
+}
 
-process.on('SIGINT', async () => {
-    console.log('Received SIGINT. Performing graceful shutdown...');
-    await server.stop();
+// Handle process termination
+process.on('SIGINT', () => {
+    console.error('\nShutting down MCP Server...');
     process.exit(0);
 }); 
