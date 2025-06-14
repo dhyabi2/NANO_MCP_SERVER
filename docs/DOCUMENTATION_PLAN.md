@@ -36,7 +36,7 @@
 ### 4. Configuration Documentation
 - [ ] Document all environment variables:
   ```env
-  MCP_PORT=3000          # Port for HTTP transport (default: 3000)
+  MCP_PORT=8080          # Port for HTTP transport (default: 8080)
   MCP_TRANSPORT=http     # Transport type: 'http' or 'stdio'
   NANO_RPC_URL          # NANO node RPC endpoint
   NANO_RPC_KEY          # API key for NANO node (if required)

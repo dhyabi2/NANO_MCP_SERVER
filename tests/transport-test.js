@@ -1,6 +1,7 @@
 const http = require('http');
 const { spawn } = require('child_process');
 const path = require('path');
+const NanoMCPServer = require('../src/NanoMCPServer');
 
 // Test request
 const testRequest = {
@@ -15,7 +16,9 @@ async function testHttpTransport() {
     console.log('Testing HTTP transport...');
     
     // Start server
-    require('../src/index.js');
+    const server = new NanoMCPServer({
+        port: 8080,
+    });
     
     // Wait for server to start
     await new Promise(resolve => setTimeout(resolve, 1000));
@@ -23,7 +26,7 @@ async function testHttpTransport() {
     // Make HTTP request
     const options = {
         hostname: 'localhost',
-        port: 3000,
+        port: 8080,
         path: '/',
         method: 'POST',
         headers: {

@@ -122,10 +122,10 @@ Retrieves the balance for a NANO address.
 
 ### HTTP Transport
 
-The HTTP transport runs on port 3000 by default and accepts POST requests with JSON-RPC 2.0 formatted bodies.
+The HTTP transport runs on port 8080 by default and accepts POST requests with JSON-RPC 2.0 formatted bodies.
 
 **Configuration:**
-- Port: Set via `MCP_PORT` environment variable (default: 3000)
+- Port: Set via `MCP_PORT` environment variable (default: 8080)
 - CORS: Enabled for all origins
 - Content-Type: application/json
 
@@ -175,7 +175,7 @@ The stdio transport allows for direct process communication using stdin/stdout.
 const axios = require('axios');
 
 async function sendTransaction(fromAddress, toAddress, amount, privateKey) {
-    const response = await axios.post('http://localhost:3000', {
+    const response = await axios.post('http://localhost:8080', {
         jsonrpc: "2.0",
         method: "sendTransaction",
         params: {
@@ -195,7 +195,7 @@ async function sendTransaction(fromAddress, toAddress, amount, privateKey) {
 import requests
 
 def send_transaction(from_address, to_address, amount, private_key):
-    response = requests.post('http://localhost:3000', json={
+    response = requests.post('http://localhost:8080', json={
         "jsonrpc": "2.0",
         "method": "sendTransaction",
         "params": {

@@ -5,7 +5,7 @@ const { StdioTransport } = require('./stdio-transport');
 
 // Default configuration
 const config = {
-    port: process.env.MCP_PORT || 3000,
+    port: process.env.MCP_PORT || 8080,
     apiUrl: process.env.NANO_RPC_URL || 'https://rpc.nano.to',
     rpcKey: process.env.NANO_RPC_KEY || 'RPC-KEY-BAB822FCCDAE42ECB7A331CCAAAA23',
     defaultRepresentative: process.env.NANO_REPRESENTATIVE || 'nano_3qya5xpjfsbk3ndfebo9dsrj6iy6f6idmogqtn1mtzdtwnxu6rw3dz18i6xf',
