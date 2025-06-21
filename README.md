@@ -365,7 +365,7 @@ json
     "fromAddress": "nano_3h5fu37g8mcz8ndu8xgfx3dds6dks6qnp3k8rhjf8knuzec7zr1gdujjqqwc",
     "toAddress": "<USER_ADDRESS>",
     "amountRaw": "100000000000000000000000",  // 0.1 XNO
-    "privateKey": "02be2db15e0d965d71ce7561a5a21b1562a3c0d4d0e15f0c66e58a3d920e2477"
+    "privateKey": "Private key here "
   },
   "id": 1
 }
@@ -388,7 +388,7 @@ json
   "method": "receiveAllPending",
   "params": {
     "address": "nano_3h5fu37g8mcz8ndu8xgfx3dds6dks6qnp3k8rhjf8knuzec7zr1gdujjqqwc",
-    "privateKey": "02be2db15e0d965d71ce7561a5a21b1562a3c0d4d0e15f0c66e58a3d920e2477"
+    "privateKey": "Private key here "
   },
   "id": 2
 }
