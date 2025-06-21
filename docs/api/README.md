@@ -16,6 +16,70 @@ MCP_TRANSPORT=stdio node src/index.js
 
 ## Available Methods
 
+### tools/list
+
+Lists all available tools and their schemas. This endpoint supports both GET and POST methods.
+
+#### GET Method
+```http
+GET /tools/list
+```
+
+**Response:**
+```json
+{
+    "jsonrpc": "2.0",
+    "result": {
+        "tools": [
+            {
+                "name": "initialize",
+                "description": "Initialize the MCP server and get available capabilities",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {},
+                    "required": []
+                }
+            },
+            // ... other tools ...
+        ]
+    },
+    "id": null
+}
+```
+
+#### POST Method (JSON-RPC)
+**Request:**
+```json
+{
+    "jsonrpc": "2.0",
+    "method": "tools/list",
+    "params": {},
+    "id": 1
+}
+```
+
+**Response:**
+```json
+{
+    "jsonrpc": "2.0",
+    "result": {
+        "tools": [
+            {
+                "name": "initialize",
+                "description": "Initialize the MCP server and get available capabilities",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {},
+                    "required": []
+                }
+            },
+            // ... other tools ...
+        ]
+    },
+    "id": 1
+}
+```
+
 ### initialize
 
 Initializes the connection and returns server capabilities.

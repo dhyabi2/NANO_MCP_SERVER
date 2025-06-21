@@ -158,6 +158,16 @@ const MCP_TOOLS = [
  *         description: API documentation
  */
 /**
+ * @swagger
+ * /tools/list:
+ *   get:
+ *     summary: Get list of available tools
+ *     description: Returns a list of all available tools and their schemas
+ *     responses:
+ *       200:
+ *         description: List of tools
+ */
+/**
  * NANO MCP (NANO Cryptocurrency) Server implementation
  * Provides a JSON-RPC 2.0 interface for interacting with the NANO network
  * Supports both HTTP and stdio transports
@@ -339,6 +349,19 @@ class NanoMCPServer {
             } else {
                 res.status(404).send('Privacy page not found');
             }
+        });
+
+        // GET endpoint for tools/list
+        app.get('/tools/list', (req, res) => {
+            // Add CORS headers
+            res.set(corsHeaders);
+            res.json({
+                jsonrpc: '2.0',
+                result: {
+                    tools: MCP_TOOLS
+                },
+                id: null
+            });
         });
 
         // JSON-RPC endpoint at root path
