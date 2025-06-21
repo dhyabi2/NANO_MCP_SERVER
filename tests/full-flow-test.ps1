@@ -12,7 +12,7 @@ function Invoke-RPC {
         [string]$JsonData
     )
     try {
-        $response = Invoke-RestMethod -Uri "http://localhost:3000/" `
+        $response = Invoke-RestMethod -Uri "http://localhost:8080/" `
             -Method Post `
             -Headers @{"Content-Type"="application/json"} `
             -Body $JsonData

@@ -19,6 +19,135 @@ const corsHeaders = {
 };
 
 /**
+ * Tool definitions for the MCP server
+ * Each tool includes its name, description, and input schema
+ */
+const MCP_TOOLS = [
+    {
+        name: 'initialize',
+        description: 'Initialize the MCP server and get available capabilities',
+        inputSchema: {
+            type: 'object',
+            properties: {},
+            required: []
+        }
+    },
+    {
+        name: 'generateWallet',
+        description: 'Generate a new NANO wallet with address and private key',
+        inputSchema: {
+            type: 'object',
+            properties: {},
+            required: []
+        }
+    },
+    {
+        name: 'getBalance',
+        description: 'Get the balance and pending amounts for a NANO address',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                address: {
+                    type: 'string',
+                    description: 'NANO address to check balance for'
+                }
+            },
+            required: ['address']
+        }
+    },
+    {
+        name: 'getAccountInfo',
+        description: 'Get detailed account information for a NANO address',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                address: {
+                    type: 'string',
+                    description: 'NANO address to get information for'
+                }
+            },
+            required: ['address']
+        }
+    },
+    {
+        name: 'getPendingBlocks',
+        description: 'Get pending blocks (incoming transactions) for a NANO address',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                address: {
+                    type: 'string',
+                    description: 'NANO address to get pending blocks for'
+                }
+            },
+            required: ['address']
+        }
+    },
+    {
+        name: 'initializeAccount',
+        description: 'Initialize a NANO account by publishing the first receive block',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                address: {
+                    type: 'string',
+                    description: 'NANO address to initialize'
+                },
+                privateKey: {
+                    type: 'string',
+                    description: 'Private key of the NANO address'
+                }
+            },
+            required: ['address', 'privateKey']
+        }
+    },
+    {
+        name: 'sendTransaction',
+        description: 'Send NANO from one address to another',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                fromAddress: {
+                    type: 'string',
+                    description: 'NANO address to send from'
+                },
+                toAddress: {
+                    type: 'string',
+                    description: 'NANO address to send to'
+                },
+                amountRaw: {
+                    type: 'string',
+                    description: 'Amount to send in raw units'
+                },
+                privateKey: {
+                    type: 'string',
+                    description: 'Private key of the sending address'
+                }
+            },
+            required: ['fromAddress', 'toAddress', 'amountRaw', 'privateKey']
+        }
+    },
+    {
+        name: 'receiveAllPending',
+        description: 'Receive all pending transactions for a NANO address',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                address: {
+                    type: 'string',
+                    description: 'NANO address to receive pending transactions for'
+                },
+                privateKey: {
+                    type: 'string',
+                    description: 'Private key of the NANO address'
+                }
+            },
+            required: ['address', 'privateKey']
+        }
+    }
+];
+
+/**
  * @swagger
  * /api-docs:
  *   get:
@@ -69,11 +198,17 @@ class NanoMCPServer {
             let result;
 
             switch (method) {
+                case 'tools/list':
+                    result = {
+                        tools: MCP_TOOLS
+                    };
+                    break;
                 case 'initialize':
                     result = {
                         version: "1.0.0",
                         capabilities: {
                             methods: [
+                                "tools/list",
                                 "initialize",
                                 "generateWallet",
                                 "getBalance",
@@ -206,8 +341,30 @@ class NanoMCPServer {
             }
         });
 
-        // JSON-RPC endpoint
+        // JSON-RPC endpoint at root path
         app.post('/', async (req, res) => {
+            // Add CORS headers
+            res.set(corsHeaders);
+
+            // Handle preflight requests
+            if (req.method === 'OPTIONS') {
+                res.status(200).end();
+                return;
+            }
+
+            // Validate JSON-RPC request
+            if (!req.body || !req.body.jsonrpc || req.body.jsonrpc !== '2.0' || !req.body.method) {
+                res.json({
+                    jsonrpc: '2.0',
+                    error: {
+                        code: -32600,
+                        message: 'Invalid Request'
+                    },
+                    id: req.body?.id || null
+                });
+                return;
+            }
+
             const response = await this.handleRequest(req.body);
             res.json(response);
         });
