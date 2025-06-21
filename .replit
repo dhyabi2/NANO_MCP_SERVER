@@ -1,0 +1,18 @@
+modules = ["nodejs-16", "bash"]
+run = "npm run start"
+
+[nix]
+channel = "stable-24_05"
+packages = ["psmisc"]
+
+[deployment]
+run = ["sh", "-c", "npm run start"]
+deploymentTarget = "cloudrun"
+
+[[ports]]
+localPort = 8080
+externalPort = 80
+
+[[ports]]
+localPort = 8080
+externalPort = 8080

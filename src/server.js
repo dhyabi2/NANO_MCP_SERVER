@@ -37,7 +37,7 @@ class NanoMCPServer {
     /**
      * Creates a new NANO MCP Server instance
      * @param {Object} config - Server configuration
-     * @param {number} [config.port=8080] - HTTP server port
+     * @param {number} [config.port=3000] - HTTP server port
      * @param {string} [config.apiUrl='https://rpc.nano.to'] - NANO RPC node URL
      * @param {string} [config.rpcKey] - API key for authenticated RPC nodes
      * @param {string} [config.defaultRepresentative] - Default representative for new accounts
@@ -147,9 +147,9 @@ class NanoMCPServer {
                     });
                     result = await this.nanoTransactions.sendTransaction(
                         params.fromAddress,
+                        params.privateKey,
                         params.toAddress,
-                        params.amountRaw,
-                        params.privateKey
+                        params.amountRaw
                     );
                     break;
                 case 'receiveAllPending':
@@ -192,9 +192,19 @@ class NanoMCPServer {
     startHttp() {
         const app = express();
         app.use(bodyParser.json());
-        
+
         // Swagger documentation
         app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
+
+        // Serve privacy.html page
+        app.get('/privacy.html', (req, res) => {
+            const privacyPath = path.join(__dirname, '..', 'privacy.html');
+            if (fs.existsSync(privacyPath)) {
+                res.sendFile(privacyPath);
+            } else {
+                res.status(404).send('Privacy page not found');
+            }
+        });
 
         // JSON-RPC endpoint
         app.post('/', async (req, res) => {
@@ -204,9 +214,9 @@ class NanoMCPServer {
 
         // Start server
         const server = http.createServer(app);
-        server.listen(this.config.port, () => {
+        server.listen(this.config.port, '0.0.0.0', () => {
             console.log(`NANO MCP Server running on port ${this.config.port}`);
-            console.log(`API documentation available at http://localhost:${this.config.port}/api-docs`);
+            console.log(`API documentation available at http://0.0.0.0:${this.config.port}/api-docs`);
         });
 
         return server;
@@ -229,4 +239,4 @@ function getContentType(filePath) {
     return contentTypes[ext] || 'text/plain';
 }
 
-module.exports = { NanoMCPServer }; 
+module.exports = { NanoMCPServer };

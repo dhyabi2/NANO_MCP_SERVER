@@ -4,10 +4,6 @@
 
 NANO MCP (NANO Cryptocurrency) Server provides a JSON-RPC 2.0 API for interacting with the NANO cryptocurrency network. This server supports both HTTP and stdio transports, making it versatile for different integration scenarios.
 
-## Experimental Hosted Instance
-
-@https://nano-mcp.replit.app (Expermintal hosted nano-mcp, dont use it on live server or real transactions)
-
 ## What is NANO Cryptocurrency?
 
 NANO is a sustainable digital currency with instant transactions and zero fees, making it ideal for AI systems and automated transactions. Unlike traditional cryptocurrencies, NANO uses a unique block-lattice architecture and a Delegated Proof of Stake (DPoS) consensus mechanism called Open Representative Voting (ORV).
@@ -295,17 +291,17 @@ nano-mcp/
 
 Environment variables:
 ```bash
-NANO_RPC_URL=https://rpc.nano.to  # NANO node RPC URL
-NANO_RPC_KEY=your-key-here        # API key for authenticated nodes
-MCP_PORT=8080          # HTTP server port
+MCP_PORT=3000          # HTTP server port
 MCP_TRANSPORT=http     # Transport type (http/stdio)
+NANO_RPC_URL          # NANO node RPC endpoint
+NANO_RPC_KEY          # API key for node (if required)
 NANO_REPRESENTATIVE   # Default representative
 ```
 
 ## Transport Options
 
 ### 1. HTTP Transport (default)
-- REST API on port 8080
+- REST API on port 3000
 - JSON-RPC 2.0 protocol
 - Swagger docs at /api-docs
 - CORS enabled for all origins
@@ -324,7 +320,7 @@ NANO_REPRESENTATIVE   # Default representative
 const axios = require('axios');
 
 async function sendTransaction(fromAddress, toAddress, amount, privateKey) {
-    const response = await axios.post('http://localhost:8080', {
+    const response = await axios.post('http://localhost:3000', {
         jsonrpc: "2.0",
         method: "sendTransaction",
         params: {
@@ -344,7 +340,7 @@ async function sendTransaction(fromAddress, toAddress, amount, privateKey) {
 import requests
 
 def send_transaction(from_address, to_address, amount, private_key):
-    response = requests.post('http://localhost:8080', json={
+    response = requests.post('http://localhost:3000', json={
         "jsonrpc": "2.0",
         "method": "sendTransaction",
         "params": {
@@ -526,7 +522,7 @@ interface TransactionResponse {
 4. Port Already in Use
    - Stop any existing MCP server instances
    - Change port using MCP_PORT environment variable
-   - Check for other services using port 8080
+   - Check for other services using port 3000
 
 5. RPC Node Issues
    - Verify NANO_RPC_URL is accessible

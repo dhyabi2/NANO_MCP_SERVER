@@ -295,10 +295,11 @@ class NanoTransactions {
      */
     async sendTransaction(fromAddress, privateKey, toAddress, amountRaw) {
         try {
-            const formattedFromAddress = fromAddress.replace('xrb_', 'nano_');
-            const formattedToAddress = toAddress.replace('xrb_', 'nano_');
-            // Ensure amountRaw is a string
-            const amountRawString = amountRaw.toString();
+            // Ensure all parameters are properly typed
+            const formattedFromAddress = String(fromAddress).replace('xrb_', 'nano_');
+            const formattedToAddress = String(toAddress).replace('xrb_', 'nano_');
+            const privateKeyString = String(privateKey);
+            const amountRawString = String(amountRaw);
 
             // Get account info for current balance and frontier
             const accountInfo = await this.makeRequest('account_info', {
@@ -356,7 +357,7 @@ class NanoTransactions {
             console.log('Block data for send:', blockData);
 
             // Sign the block using nanocurrency-web
-            const signedBlock = nanocurrency_web_1.block.send(blockData, privateKey);
+            const signedBlock = nanocurrency_web_1.block.send(blockData, privateKeyString);
             console.log('Signed block:', signedBlock);
 
             // Process the block

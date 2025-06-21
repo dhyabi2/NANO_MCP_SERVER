@@ -198,7 +198,7 @@ async function sendNano(
     };
 
     // Make the request to the MCP server
-    const response = await fetch("http://localhost:8080", {
+    const response = await fetch("http://localhost:3000", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -225,7 +225,7 @@ async function checkBalance(address: NanoAddress): Promise<BalanceResponse> {
         id: 1
     };
 
-    const response = await fetch("http://localhost:8080", {
+    const response = await fetch("http://localhost:3000", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
