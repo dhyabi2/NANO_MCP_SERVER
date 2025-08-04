@@ -7,16 +7,9 @@ const path = require('path');
 const fs = require('fs');
 const express = require('express');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 
 const DEFAULT_PORT = 8080;
-
-// CORS headers configuration
-const corsHeaders = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    'Access-Control-Max-Age': '86400' // 24 hours
-};
 
 /**
  * Tool definitions for the MCP server
@@ -336,6 +329,7 @@ class NanoMCPServer {
      */
     startHttp() {
         const app = express();
+        app.use(cors());
         app.use(bodyParser.json());
 
         // Swagger documentation
@@ -353,8 +347,6 @@ class NanoMCPServer {
 
         // GET endpoint for tools/list
         app.get('/tools/list', (req, res) => {
-            // Add CORS headers
-            res.set(corsHeaders);
             res.json({
                 jsonrpc: '2.0',
                 result: {
@@ -366,15 +358,6 @@ class NanoMCPServer {
 
         // JSON-RPC endpoint at root path
         app.post('/', async (req, res) => {
-            // Add CORS headers
-            res.set(corsHeaders);
-
-            // Handle preflight requests
-            if (req.method === 'OPTIONS') {
-                res.status(200).end();
-                return;
-            }
-
             // Validate JSON-RPC request
             if (!req.body || !req.body.jsonrpc || req.body.jsonrpc !== '2.0' || !req.body.method) {
                 res.json({
