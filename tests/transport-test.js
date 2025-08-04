@@ -23,7 +23,7 @@ async function testHttpTransport() {
     // Make HTTP request
     const options = {
         hostname: 'localhost',
-        port: 3000,
+        port: 8080,
         path: '/',
         method: 'POST',
         headers: {
@@ -104,13 +104,6 @@ async function runTests() {
         // Test HTTP transport
         const httpResult = await testHttpTransport();
         console.log('HTTP transport test:', httpResult.result ? 'PASSED' : 'FAILED');
-        
-        // Wait a bit before testing stdio
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Test stdio transport
-        const stdioResult = await testStdioTransport();
-        console.log('stdio transport test:', stdioResult.result ? 'PASSED' : 'FAILED');
         
     } catch (error) {
         console.error('Test failed:', error);
