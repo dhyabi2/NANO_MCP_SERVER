@@ -210,17 +210,7 @@ class NanoMCPServer {
                     result = {
                         version: "1.0.0",
                         capabilities: {
-                            methods: [
-                                "tools/list",
-                                "initialize",
-                                "generateWallet",
-                                "getBalance",
-                                "initializeAccount",
-                                "sendTransaction",
-                                "receiveAllPending",
-                                "getAccountInfo",
-                                "getPendingBlocks"
-                            ]
+                            methods: MCP_TOOLS.map(tool => tool.name)
                         }
                     };
                     break;
