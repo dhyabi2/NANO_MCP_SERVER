@@ -20,7 +20,8 @@ class NanoTransactions {
      */
     constructor(customConfig, config) {
         const globalConfig = config?.getNanoConfig() || {};
-        this.apiUrl = customConfig?.apiUrl || globalConfig.rpcUrl || 'https://rpc.nano.to';
+        this.rpcNodes = customConfig?.rpcNodes || [customConfig?.apiUrl] || [globalConfig.rpcUrl] || ['https://rpc.nano.to'];
+        this.currentNodeIndex = 0;
         this.rpcKey = customConfig?.rpcKey || globalConfig.rpcKey || 'RPC-KEY-BAB822FCCDAE42ECB7A331CCAAAA23';
         this.gpuKey = customConfig?.gpuKey || globalConfig.gpuKey;
         this.defaultRepresentative = customConfig?.defaultRepresentative || globalConfig.defaultRepresentative || 'nano_3qya5xpjfsbk3ndfebo9dsrj6iy6f6idmogqtn1mtzdtwnxu6rw3dz18i6xf';
@@ -31,7 +32,19 @@ class NanoTransactions {
                 throw new Error(`Configuration errors: ${errors.join(', ')}`);
             }
         }
+        this.failoverAttempts = 0;
+        this.maxFailoverAttempts = this.rpcNodes.length * 2; // Try each node twice before giving up
     }
+
+    async getCurrentRpcNode() {
+        return this.rpcNodes[this.currentNodeIndex];
+    }
+
+    switchToNextNode() {
+        this.currentNodeIndex = (this.currentNodeIndex + 1) % this.rpcNodes.length;
+        console.log(`Switching to RPC node: ${this.rpcNodes[this.currentNodeIndex]}`);
+    }
+
     /**
      * Makes a generic RPC call to the configured Nano node.
      * @param {string} action - The RPC action to perform.
@@ -39,24 +52,54 @@ class NanoTransactions {
      * @returns {Promise<Object>} - The response from the Nano node.
      */
     async rpcCall(action, params = {}) {
-        console.log('Making RPC call:', { action, ...params });
-        const response = await (0, node_fetch_1.default)(this.apiUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                action,
-                ...params,
-                key: this.rpcKey
-            })
-        });
-        if (!response.ok) {
-            throw new Error(`RPC call failed: ${response.statusText}`);
+        let lastError = null;
+        this.failoverAttempts = 0;
+
+        while (this.failoverAttempts < this.maxFailoverAttempts) {
+            const currentNode = await this.getCurrentRpcNode();
+            console.log(`Making RPC call to ${currentNode}:`, { action, ...params });
+
+            try {
+                const response = await node_fetch_1.default(currentNode, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action,
+                        ...params,
+                        key: this.rpcKey
+                    })
+                });
+
+                // Check for rate limiting response
+                if (response.status === 429) {
+                    console.log('Rate limit hit, switching nodes...');
+                    this.switchToNextNode();
+                    this.failoverAttempts++;
+                    continue;
+                }
+
+                if (!response.ok) {
+                    throw new Error(`RPC call failed: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                console.log('RPC Response:', data);
+
+                // Reset failover attempts on successful call
+                this.failoverAttempts = 0;
+                return data;
+            } catch (error) {
+                console.error(`Error with RPC node ${currentNode}:`, error.message);
+                lastError = error;
+                this.switchToNextNode();
+                this.failoverAttempts++;
+            }
         }
-        const data = await response.json();
-        console.log('RPC Response:', data);
-        return data;
+
+        // If we've tried all nodes and still failed, throw the last error
+        throw new Error(`All RPC nodes failed. Last error: ${lastError?.message}`);
     }
     /**
      * Validates the provided configuration and throws if errors are found.
