@@ -6,7 +6,12 @@ const { StdioTransport } = require('./stdio-transport');
 // Default configuration
 const config = {
     port: 8080,
-    apiUrl: process.env.NANO_RPC_URL || 'https://rpc.nano.to',
+    rpcNodes: [
+        'https://www.bitrequest.app:8020',
+        'https://rainstorm.city/api',
+        'https://node.somenano.com/proxy',
+        'https://nanoslo.0x.no/proxy'
+    ],
     rpcKey: process.env.NANO_RPC_KEY || 'RPC-KEY-BAB822FCCDAE42ECB7A331CCAAAA23',
     defaultRepresentative: process.env.NANO_REPRESENTATIVE || 'nano_3qya5xpjfsbk3ndfebo9dsrj6iy6f6idmogqtn1mtzdtwnxu6rw3dz18i6xf',
     transport: process.env.MCP_TRANSPORT || 'http' // 'http' or 'stdio'
