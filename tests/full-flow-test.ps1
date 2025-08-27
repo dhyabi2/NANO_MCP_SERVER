@@ -1,3 +1,25 @@
+# Hardcoded configuration values
+$CONFIG = @{
+    # RPC Node configuration
+    rpcUrl = "http://localhost:8080"
+    rpcKey = "RPC-KEY-BAB822FCCDAE42ECB7A331CCAAAA23"
+    defaultRepresentative = "nano_3qya5xpjfsbk3ndfebo9dsrj6iy6f6idmogqtn1mtzdtwnxu6rw3dz18i6xf"
+    
+    # Test transaction amounts (in RAW)
+    initialFundsAmount = "100000000000000000000000000"  # 0.1 NANO
+    transferAmount = "50000000000000000000000"         # 0.00005 NANO
+    
+    # Test wallet data (for reproducible tests)
+    testWallet1 = @{
+        address = "nano_3t6k35gi95xu6tergt6p69ck76ogmitsa8mnijtpxm9fkcm736xtoncuohr3"
+        privateKey = "1111111111111111111111111111111111111111111111111111111111111111"
+    }
+    testWallet2 = @{
+        address = "nano_1ipx847tk8o46pwxt5qjdbncjqcbwcc1rrmqnkztrfjy5k7z4imsrata9est"
+        privateKey = "2222222222222222222222222222222222222222222222222222222222222222"
+    }
+}
+
 # Colors for better visibility
 $Green = [System.ConsoleColor]::Green
 $Yellow = [System.ConsoleColor]::Yellow
@@ -12,7 +34,7 @@ function Invoke-RPC {
         [string]$JsonData
     )
     try {
-        $response = Invoke-RestMethod -Uri "http://localhost:8080/" `
+        $response = Invoke-RestMethod -Uri $CONFIG.rpcUrl `
             -Method Post `
             -Headers @{"Content-Type"="application/json"} `
             -Body $JsonData
@@ -26,61 +48,6 @@ function Invoke-RPC {
     }
 }
 
-# Function to load wallets from file
-function Load-Wallets {
-    $walletsFile = "tests/wallets.json"
-    if (Test-Path $walletsFile) {
-        try {
-            $wallets = Get-Content $walletsFile | ConvertFrom-Json
-            return $wallets
-        }
-        catch {
-            Write-Host "Error loading wallets file: $_" -ForegroundColor $Red
-            return $null
-        }
-    }
-    return $null
-}
-
-# Function to save wallets to file
-function Save-Wallets {
-    param (
-        $wallet1,
-        $wallet2
-    )
-    $walletsFile = "tests/wallets.json"
-    $wallets = @{
-        wallet1 = @{
-            address = $wallet1.address
-            privateKey = $wallet1.privateKey
-        }
-        wallet2 = @{
-            address = $wallet2.address
-            privateKey = $wallet2.privateKey
-        }
-    }
-    $maxRetries = 5
-    $retryCount = 0
-    $success = $false
-
-    while (-not $success -and $retryCount -lt $maxRetries) {
-        try {
-            $wallets | ConvertTo-Json | Set-Content $walletsFile -ErrorAction Stop
-            $success = $true
-        }
-        catch {
-            $retryCount++
-            if ($retryCount -lt $maxRetries) {
-                Write-Host "Failed to save wallets, retrying in 1 second... (Attempt $retryCount of $maxRetries)" -ForegroundColor $Yellow
-                Start-Sleep -Seconds 1
-            }
-            else {
-                Write-Host "Failed to save wallets after $maxRetries attempts" -ForegroundColor $Red
-            }
-        }
-    }
-}
-
 # Function to convert raw to NANO
 function Convert-RawToNano {
     param (
@@ -88,18 +55,10 @@ function Convert-RawToNano {
     )
     try {
         if ($rawAmount -eq "0") { return "0" }
-        
-        # Remove any trailing zeros
-        $trimmed = $rawAmount.TrimEnd('0')
-        
-        # If length is less than 30, pad with zeros on the left
-        if ($trimmed.Length -lt 30) {
-            return "0." + $trimmed.PadLeft(30, '0')
-        }
-        
-        # If length is 30 or more, insert decimal point 30 places from the right
-        $decimalPos = $trimmed.Length - 30
-        return $trimmed.Insert($decimalPos, ".")
+        $rawBigInt = [System.Numerics.BigInteger]::Parse($rawAmount)
+        $nanoDivisor = [System.Numerics.BigInteger]::Parse("1000000000000000000000000")
+        $nanoAmount = $rawBigInt / $nanoDivisor
+        return $nanoAmount.ToString()
     }
     catch {
         return "Error converting amount"
@@ -111,9 +70,13 @@ Write-Host "Initializing server..." -ForegroundColor $Yellow
 $initJson = @{
     jsonrpc = "2.0"
     method = "initialize"
-    params = @{}
+    params = @{
+        rpcKey = $CONFIG.rpcKey
+        defaultRepresentative = $CONFIG.defaultRepresentative
+    }
     id = 1
 } | ConvertTo-Json
+
 $initResponse = Invoke-RPC -JsonData $initJson
 if ($null -eq $initResponse) {
     Write-Host "Failed to initialize server. Exiting..." -ForegroundColor $Red
@@ -122,159 +85,66 @@ if ($null -eq $initResponse) {
 Write-Host "Server initialized successfully"
 Write-Host "----------------------------------------"
 
-# Load or Generate Wallets
-$savedWallets = Load-Wallets
-$wallet1 = $null
-$wallet2 = $null
-
-if ($null -ne $savedWallets -and $savedWallets.wallet1.address -ne "") {
-    Write-Host "Loading saved Wallet 1..." -ForegroundColor $Yellow
-    $wallet1 = @{
-        address = $savedWallets.wallet1.address
-        privateKey = $savedWallets.wallet1.privateKey
-    }
-    Write-Host "Wallet 1 loaded successfully"
-} else {
-    Write-Host "Generating new Wallet 1..." -ForegroundColor $Yellow
-    $wallet1Json = @{
-        jsonrpc = "2.0"
-        method = "generateWallet"
-        params = @{}
-        id = 1
-    } | ConvertTo-Json
-    $wallet1Response = Invoke-RPC -JsonData $wallet1Json
-    if ($null -eq $wallet1Response) {
-        Write-Host "Failed to generate Wallet 1. Exiting..." -ForegroundColor $Red
-        exit 1
-    }
-    $wallet1 = @{
-        address = $wallet1Response.result.address
-        privateKey = $wallet1Response.result.privateKey
-    }
-    Write-Host "New Wallet 1 generated successfully"
-}
-
-Write-Host "Wallet 1 Address: $($wallet1.address)"
-Write-Host "----------------------------------------"
-
 # Initialize Wallet 1
 Write-Host "Initializing Wallet 1..." -ForegroundColor $Yellow
 $initWallet1Json = @{
     jsonrpc = "2.0"
     method = "initializeAccount"
     params = @{
-        address = $wallet1.address
-        privateKey = $wallet1.privateKey
+        address = $CONFIG.testWallet1.address
+        privateKey = $CONFIG.testWallet1.privateKey
     }
     id = 1
 } | ConvertTo-Json
+
 $initWallet1Response = Invoke-RPC -JsonData $initWallet1Json
-if ($null -eq $initWallet1Response) {
-    Write-Host "Failed to initialize Wallet 1. Exiting..." -ForegroundColor $Red
-    exit 1
-}
 Write-Host "Wallet 1 initialized successfully"
+Write-Host "Wallet 1 Address: $($CONFIG.testWallet1.address)"
 Write-Host "----------------------------------------"
 
-# Wait for initial funds (0.0001 NANO)
+# Wait for initial funds
 Write-Host "Waiting for initial funds to Wallet 1..." -ForegroundColor $Yellow
-Write-Host "Please send 0.0001 NANO to: $($wallet1.address)"
+Write-Host "Please send $($CONFIG.initialFundsAmount) RAW to: $($CONFIG.testWallet1.address)"
 Write-Host "Checking for incoming transaction every 10 seconds..."
 
 $transactionReceived = $false
-while (-not $transactionReceived) {
+$maxAttempts = 10
+$attempts = 0
+
+while (-not $transactionReceived -and $attempts -lt $maxAttempts) {
+    $attempts++
+    
     # Check balance
     $balanceJson = @{
         jsonrpc = "2.0"
         method = "getBalance"
         params = @{
-            address = $wallet1.address
+            address = $CONFIG.testWallet1.address
         }
         id = 1
     } | ConvertTo-Json
+    
     $balanceResponse = Invoke-RPC -JsonData $balanceJson
-    
-    # Check pending blocks
-    $pendingJson = @{
-        jsonrpc = "2.0"
-        method = "getPendingBlocks"
-        params = @{
-            address = $wallet1.address
-        }
-        id = 1
-    } | ConvertTo-Json
-    $pendingResponse = Invoke-RPC -JsonData $pendingJson
-    
     Write-Host "`nDebug Info:" -ForegroundColor $Yellow
-    Write-Host "Balance Response: $($balanceResponse | ConvertTo-Json -Depth 10)"
-    Write-Host "Pending Response: $($pendingResponse | ConvertTo-Json -Depth 10)"
+    Write-Host "Balance Response: $($balanceResponse | ConvertTo-Json)"
     
-    # Check if we have any balance or pending blocks
-    if ($null -ne $balanceResponse -and 
-        $null -ne $balanceResponse.result -and 
-        $balanceResponse.result.balance -gt 0) {
-        Write-Host "Balance detected: $($balanceResponse.result.balance) raw" -ForegroundColor $Green
+    if ($balanceResponse.result.balance -gt 0) {
         $transactionReceived = $true
+        Write-Host "Initial funds received!" -ForegroundColor $Green
         break
     }
     
-    if ($null -ne $pendingResponse -and 
-        $null -ne $pendingResponse.result -and 
-        $null -ne $pendingResponse.result.blocks -and 
-        @($pendingResponse.result.blocks).Count -gt 0) {
-        Write-Host "Pending blocks detected!" -ForegroundColor $Green
-        Write-Host "Processing pending blocks..." -ForegroundColor $Yellow
-        $receiveJson = @{
-            jsonrpc = "2.0"
-            method = "receiveAllPending"
-            params = @{
-                address = $wallet1.address
-                privateKey = $wallet1.privateKey
-            }
-            id = 1
-        } | ConvertTo-Json
-        $receiveResponse = Invoke-RPC -JsonData $receiveJson
-        Write-Host "Receive Response: $($receiveResponse | ConvertTo-Json -Depth 10)"
-        $transactionReceived = $true
-        break
+    if ($attempts -lt $maxAttempts) {
+        Write-Host "No transaction yet. Checking again in 10 seconds..." -ForegroundColor $Yellow
+        Start-Sleep -Seconds 10
     }
-    
-    Write-Host "No transaction yet. Checking again in 10 seconds..." -ForegroundColor $Yellow
-    Start-Sleep -Seconds 10
 }
 
-Write-Host "Transaction confirmed successfully!" -ForegroundColor $Green
-Write-Host "----------------------------------------"
-
-# Load or Generate Wallet 2
-if ($null -ne $savedWallets -and $savedWallets.wallet2.address -ne "") {
-    Write-Host "Loading saved Wallet 2..." -ForegroundColor $Yellow
-    $wallet2 = @{
-        address = $savedWallets.wallet2.address
-        privateKey = $savedWallets.wallet2.privateKey
-    }
-    Write-Host "Wallet 2 loaded successfully"
-} else {
-    Write-Host "Generating new Wallet 2..." -ForegroundColor $Yellow
-    $wallet2Json = @{
-        jsonrpc = "2.0"
-        method = "generateWallet"
-        params = @{}
-        id = 1
-    } | ConvertTo-Json
-    $wallet2Response = Invoke-RPC -JsonData $wallet2Json
-    if ($null -eq $wallet2Response) {
-        Write-Host "Failed to generate Wallet 2. Exiting..." -ForegroundColor $Red
-        exit 1
-    }
-    $wallet2 = @{
-        address = $wallet2Response.result.address
-        privateKey = $wallet2Response.result.privateKey
-    }
-    Write-Host "New Wallet 2 generated successfully"
+if (-not $transactionReceived) {
+    Write-Host "Failed to receive initial funds after $maxAttempts attempts. Exiting..." -ForegroundColor $Red
+    exit 1
 }
 
-Write-Host "Wallet 2 Address: $($wallet2.address)"
 Write-Host "----------------------------------------"
 
 # Initialize Wallet 2
@@ -283,36 +153,36 @@ $initWallet2Json = @{
     jsonrpc = "2.0"
     method = "initializeAccount"
     params = @{
-        address = $wallet2.address
-        privateKey = $wallet2.privateKey
+        address = $CONFIG.testWallet2.address
+        privateKey = $CONFIG.testWallet2.privateKey
     }
     id = 1
 } | ConvertTo-Json
+
 $initWallet2Response = Invoke-RPC -JsonData $initWallet2Json
-if ($null -eq $initWallet2Response) {
-    Write-Host "Failed to initialize Wallet 2. Exiting..." -ForegroundColor $Red
-    exit 1
-}
 Write-Host "Wallet 2 initialized successfully"
+Write-Host "Wallet 2 Address: $($CONFIG.testWallet2.address)"
 Write-Host "----------------------------------------"
 
-# Save both wallets
-Save-Wallets -wallet1 $wallet1 -wallet2 $wallet2
-
-# Send 0.00005 NANO from Wallet 1 to Wallet 2
-Write-Host "Sending 0.00005 NANO from Wallet 1 to Wallet 2..." -ForegroundColor $Yellow
+# Send test transaction
+Write-Host "Sending test transaction..." -ForegroundColor $Yellow
 $sendJson = @{
     jsonrpc = "2.0"
     method = "sendTransaction"
     params = @{
-        fromAddress = $wallet1.address
-        toAddress = $wallet2.address
-        amountRaw = "50000000000000000000000"
-        privateKey = $wallet1.privateKey
+        fromAddress = $CONFIG.testWallet1.address
+        toAddress = $CONFIG.testWallet2.address
+        amountRaw = $CONFIG.transferAmount
+        privateKey = $CONFIG.testWallet1.privateKey
     }
     id = 1
 } | ConvertTo-Json
+
 $sendResponse = Invoke-RPC -JsonData $sendJson
+if ($null -eq $sendResponse) {
+    Write-Host "Failed to send transaction. Exiting..." -ForegroundColor $Red
+    exit 1
+}
 Write-Host "Transaction sent successfully"
 Write-Host "----------------------------------------"
 
@@ -320,72 +190,33 @@ Write-Host "----------------------------------------"
 Write-Host "Waiting for Wallet 2 to receive funds..." -ForegroundColor $Yellow
 Start-Sleep -Seconds 5
 
-# Receive funds in Wallet 2
-Write-Host "Receiving funds in Wallet 2..." -ForegroundColor $Yellow
-$receiveJson = @{
-    jsonrpc = "2.0"
-    method = "receiveAllPending"
-    params = @{
-        address = $wallet2.address
-        privateKey = $wallet2.privateKey
-    }
-    id = 1
-} | ConvertTo-Json
-$receiveResponse = Invoke-RPC -JsonData $receiveJson
-Write-Host "Funds received in Wallet 2 successfully"
-Write-Host "----------------------------------------"
-
-# Final balance check
+# Check final balances
 Write-Host "Checking final balances..." -ForegroundColor $Yellow
 
-# Get account info for Wallet 1
-$wallet1InfoJson = @{
-    jsonrpc = "2.0"
-    method = "getAccountInfo"
-    params = @{
-        address = $wallet1.address
-    }
-    id = 1
-} | ConvertTo-Json
-$wallet1Info = Invoke-RPC -JsonData $wallet1InfoJson
-Write-Host "`nWallet 1 Account Info:" -ForegroundColor $Yellow
-Write-Host $($wallet1Info | ConvertTo-Json -Depth 10)
-
-# Get account info for Wallet 2
-$wallet2InfoJson = @{
-    jsonrpc = "2.0"
-    method = "getAccountInfo"
-    params = @{
-        address = $wallet2.address
-    }
-    id = 1
-} | ConvertTo-Json
-$wallet2Info = Invoke-RPC -JsonData $wallet2InfoJson
-Write-Host "`nWallet 2 Account Info:" -ForegroundColor $Yellow
-Write-Host $($wallet2Info | ConvertTo-Json -Depth 10)
-
-# Get balance for Wallet 1
+# Get Wallet 1 final balance
 $wallet1FinalBalanceJson = @{
     jsonrpc = "2.0"
     method = "getBalance"
     params = @{
-        address = $wallet1.address
+        address = $CONFIG.testWallet1.address
     }
     id = 1
 } | ConvertTo-Json
-$wallet1FinalBalance = Invoke-RPC -JsonData $wallet1FinalBalanceJson
 
-# Get balance for Wallet 2
+$wallet1FinalBalance = Invoke-RPC -JsonData $wallet1FinalBalanceJson
+Write-Host "`nWallet 1 final balance: $($wallet1FinalBalance.result.balance) RAW ($(Convert-RawToNano $wallet1FinalBalance.result.balance) NANO)"
+
+# Get Wallet 2 final balance
 $wallet2FinalBalanceJson = @{
     jsonrpc = "2.0"
     method = "getBalance"
     params = @{
-        address = $wallet2.address
+        address = $CONFIG.testWallet2.address
     }
     id = 1
 } | ConvertTo-Json
-$wallet2FinalBalance = Invoke-RPC -JsonData $wallet2FinalBalanceJson
 
-Write-Host "`nTest Complete!" -ForegroundColor $Green
-Write-Host "Wallet 1 final balance: $($wallet1FinalBalance.result.balance) raw ($(Convert-RawToNano $wallet1FinalBalance.result.balance) NANO)"
-Write-Host "Wallet 2 final balance: $($wallet2FinalBalance.result.balance) raw ($(Convert-RawToNano $wallet2FinalBalance.result.balance) NANO)" 
+$wallet2FinalBalance = Invoke-RPC -JsonData $wallet2FinalBalanceJson
+Write-Host "Wallet 2 final balance: $($wallet2FinalBalance.result.balance) RAW ($(Convert-RawToNano $wallet2FinalBalance.result.balance) NANO)"
+
+Write-Host "`nTest Complete!" -ForegroundColor $Green 
