@@ -4,7 +4,7 @@ $headers = @{ "Content-Type" = "application/json" }
 # Test the new pending receive endpoint
 $body = @{
     account = "nano_3ri1mmjo7p7yonn9ynf836y6tkr4bsp6c7ozgzkrzceo6m1qpq83rppcttkj"
-    privateKey = "3ff30bb04a99a405408a8b6a9d9f5e48f2c10bb223e53545e14dab9783a996c5"
+    privateKey = "xxx"
 } | ConvertTo-Json
 
 Write-Host "Testing pending receive endpoint..."
