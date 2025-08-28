@@ -322,6 +322,23 @@ class NanoMCPServer {
         app.use(cors());
         app.use(bodyParser.json());
 
+        // Initialize the isolated pending receive interface
+        const pendingReceiveInterface = require('./interfaces/pending-receive.interface');
+
+        // Add isolated endpoint for pending receive operations
+        app.post('/pending/receive', async (req, res) => {
+            const request = {
+                jsonrpc: "2.0",
+                method: "pending/receive",
+                params: req.body,
+                id: Date.now()
+            };
+            const response = await pendingReceiveInterface.handleRequest(request);
+            res.json(response);
+        });
+
+
+
         // Swagger documentation
         app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
 
@@ -393,3 +410,9 @@ function getContentType(filePath) {
 }
 
 module.exports = { NanoMCPServer };
+
+// Start the server if this file is run directly
+if (require.main === module) {
+    const server = new NanoMCPServer();
+    server.startHttp();
+}
