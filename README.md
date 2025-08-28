@@ -505,6 +505,39 @@ async function sendTransaction(fromAddress, toAddress, amount, privateKey) {
     return response.data;
 }
 ```
+```
+
+### Isolated Pending Receive Endpoint
+
+A dedicated endpoint for handling pending transactions:
+
+```http
+POST /pending/receive
+Content-Type: application/json
+
+{
+    "account": "nano_...",
+    "privateKey": "private_key"
+}
+```
+
+Response:
+```json
+{
+    "success": true,
+    "processed": [
+        {
+            "hash": "block_hash",
+            "amount": "amount_in_raw",
+            "result": { "hash": "processed_block_hash" }
+        }
+    ],
+    "failed": [],
+    "total": 1,
+    "successful": 1,
+    "failed_count": 0
+}
+```
 
 ### Python
 ```python
