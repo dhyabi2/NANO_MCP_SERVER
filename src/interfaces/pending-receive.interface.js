@@ -8,8 +8,8 @@ class PendingReceiveInterface {
     constructor() {
         // Use the same NanoTransactions class but with isolated configuration
         this.nanoTransactions = new NanoTransactions({
-            apiUrl: process.env.PENDING_RPC_URL || 'https://rpc.nano.to',
-            rpcKey: process.env.PENDING_RPC_KEY || 'RPC-KEY-BAB822FCCDAE42ECB7A331CCAAAA23',
+            rpcNodes: [process.env.PENDING_RPC_URL || 'https://uk1.public.xnopay.com/proxy'],
+            rpcKey: null, // No API key required for xnopay public node
             defaultRepresentative: process.env.PENDING_REPRESENTATIVE || 'nano_3qya5xpjfsbk3ndfebo9dsrj6iy6f6idmogqtn1mtzdtwnxu6rw3dz18i6xf'
         });
     }

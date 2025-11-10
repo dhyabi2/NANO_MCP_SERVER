@@ -2,6 +2,13 @@
 // Any changes to this file may affect the compatibility of nano-mcp.
 // Please refer to the documentation for any updates or modifications.
 
+// ⚠️⚠️⚠️ CRITICAL: RPC NODE CONFIGURATION ⚠️⚠️⚠️
+// ⚠️ DO NOT CHANGE THE RPC NODE: https://uk1.public.xnopay.com/proxy
+// ⚠️ DO NOT add fallback nodes or alternative RPC endpoints
+// ⚠️ This node has been specifically configured by the user
+// ⚠️ Work generation is done LOCALLY - not on the RPC node
+// ⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
+
 "use strict";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -22,7 +29,8 @@ class NanoTransactions {
         const globalConfig = config?.getNanoConfig() || {};
         this.rpcNodes = customConfig?.rpcNodes || [customConfig?.apiUrl] || [globalConfig.rpcUrl] || ['https://rpc.nano.to'];
         this.currentNodeIndex = 0;
-        this.rpcKey = customConfig?.rpcKey || globalConfig.rpcKey || 'RPC-KEY-BAB822FCCDAE42ECB7A331CCAAAA23';
+        // Allow null rpcKey to be explicitly set
+        this.rpcKey = customConfig?.hasOwnProperty('rpcKey') ? customConfig.rpcKey : (globalConfig.rpcKey || null);
         this.gpuKey = customConfig?.gpuKey || globalConfig.gpuKey;
         this.defaultRepresentative = customConfig?.defaultRepresentative || globalConfig.defaultRepresentative || 'nano_3qya5xpjfsbk3ndfebo9dsrj6iy6f6idmogqtn1mtzdtwnxu6rw3dz18i6xf';
         this.config = config;
@@ -60,16 +68,22 @@ class NanoTransactions {
             console.log(`Making RPC call to ${currentNode}:`, { action, ...params });
 
             try {
+                const requestBody = {
+                    action,
+                    ...params
+                };
+                
+                // Only include key if it's not null
+                if (this.rpcKey) {
+                    requestBody.key = this.rpcKey;
+                }
+                
                 const response = await node_fetch_1.default(currentNode, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({
-                        action,
-                        ...params,
-                        key: this.rpcKey
-                    })
+                    body: JSON.stringify(requestBody)
                 });
 
                 // Check for rate limiting response
@@ -136,6 +150,8 @@ class NanoTransactions {
     }
     /**
      * Generates proof-of-work for a given hash, with difficulty based on block type.
+     * Uses LOCAL computation - does NOT rely on RPC node for work generation.
+     * ⚠️ DO NOT change this to use remote work generation from RPC nodes.
      * @param {string} hash - The hash to generate work for.
      * @param {boolean} isOpen - Whether this is for an open block (lower difficulty).
      * @returns {Promise<string>} - The generated work value.
@@ -144,16 +160,31 @@ class NanoTransactions {
         if (!hash) {
             throw new Error('Hash is required for work generation');
         }
-        console.log('Generating work for hash:', hash);
-        const workResult = await this.rpcCall('work_generate', {
-            hash,
-            key: this.rpcKey,
-            difficulty: isOpen ? 'fffffe0000000000' : 'fffffff800000000' // Use lower difficulty for receive blocks
-        });
-        if (!workResult.work) {
-            throw new Error('Failed to generate work');
+        console.log('Generating work LOCALLY for hash:', hash);
+        
+        try {
+            // Ensure nanocurrency library is initialized
+            if (!nanocurrency.isReady()) {
+                console.log('Initializing nanocurrency library...');
+                await nanocurrency.init();
+                console.log('Nanocurrency library initialized');
+            }
+            
+            // Use nanocurrency's local work generation (CPU-based)
+            // This computes work locally without relying on RPC nodes
+            console.log('Computing work (this may take a few seconds)...');
+            const work = await nanocurrency.work(hash);
+            
+            if (!work) {
+                throw new Error('Work generation returned null - threshold not met');
+            }
+            
+            console.log('Work generated locally:', work);
+            return work;
+        } catch (error) {
+            console.error('Local work generation failed:', error);
+            throw new Error(`Failed to generate work locally: ${error.message}`);
         }
-        return workResult.work;
     }
     /**
      * Creates and processes a receive (or open) block for a pending transaction.
@@ -186,15 +217,11 @@ class NanoTransactions {
             
             console.log('Using work hash:', workHash);
 
-            // Generate work with appropriate difficulty
-            const work = await this.rpcCall('work_generate', {
-                hash: workHash,
-                difficulty: !accountInfo || accountInfo.error ? 'fffffe0000000000' : 'fffffff800000000' // Lower difficulty for open blocks
-            });
-
-            if (!work.work) {
-                throw new Error('Failed to generate work');
-            }
+            // Generate work LOCALLY - does not use RPC node
+            console.log('Generating work locally...');
+            const workValue = await this.generateWork(workHash, !accountInfo || accountInfo.error);
+            
+            const work = { work: workValue };
 
             // Ensure account is in nano_ format
             const nanoAccount = account.replace('xrb_', 'nano_');
@@ -274,11 +301,8 @@ class NanoTransactions {
         if (pending.blocks && Object.keys(pending.blocks).length > 0) {
             for (const [hash, blockInfo] of Object.entries(pending.blocks)) {
                 try {
-                    // Convert raw amount to nano for display
-                    const rawToNanoResult = await this.rpcCall('raw_to_nano', {
-                        amount: blockInfo.amount
-                    });
-                    console.log(`Receiving ${rawToNanoResult.nano} NANO from block ${hash}`);
+                    // Log the raw amount (avoid RPC call for conversion)
+                    console.log(`Receiving ${blockInfo.amount} raw from block ${hash}`);
 
                     const result = await this.createReceiveBlock(
                         address,
@@ -304,6 +328,79 @@ class NanoTransactions {
             }
         }
         return results;
+    }
+    /**
+     * Initializes a NANO account by receiving the first pending block.
+     * This is used to open/activate a new account that has received funds.
+     * @param {string} address - The Nano account address to initialize.
+     * @param {string} privateKey - The private key for signing the block.
+     * @returns {Promise<Object>} - Initialization result with status and details.
+     */
+    async initializeAccount(address, privateKey) {
+        try {
+            // Check if account is already initialized
+            let accountInfo;
+            try {
+                accountInfo = await this.getAccountInfo(address);
+                if (accountInfo && !accountInfo.error) {
+                    return {
+                        initialized: true,
+                        alreadyInitialized: true,
+                        message: 'Account is already initialized',
+                        representative: accountInfo.representative,
+                        balance: accountInfo.balance,
+                        frontier: accountInfo.frontier
+                    };
+                }
+            } catch (error) {
+                // Account doesn't exist yet, which is expected
+                console.log('Account not yet initialized, checking for pending blocks...');
+            }
+
+            // Get pending blocks to initialize the account
+            const pending = await this.getPendingBlocks(address);
+            
+            if (!pending.blocks || Object.keys(pending.blocks).length === 0) {
+                return {
+                    initialized: false,
+                    message: 'No pending blocks to initialize the account. Send some NANO to this address first.',
+                    address: address
+                };
+            }
+
+            // Process the first pending block to initialize the account
+            const firstBlockHash = Object.keys(pending.blocks)[0];
+            const firstBlockInfo = pending.blocks[firstBlockHash];
+            
+            console.log(`Initializing account with pending block ${firstBlockHash}...`);
+            
+            const result = await this.createReceiveBlock(
+                address,
+                privateKey,
+                firstBlockHash,
+                firstBlockInfo.amount,
+                null // null accountInfo indicates this is a new account
+            );
+
+            if (result.hash) {
+                // Get updated account info
+                const updatedAccountInfo = await this.getAccountInfo(address);
+                return {
+                    initialized: true,
+                    alreadyInitialized: false,
+                    message: 'Account successfully initialized',
+                    blockHash: result.hash,
+                    representative: updatedAccountInfo.representative || this.defaultRepresentative,
+                    balance: updatedAccountInfo.balance,
+                    frontier: updatedAccountInfo.frontier
+                };
+            } else {
+                throw new Error('Failed to process initialization block');
+            }
+        } catch (error) {
+            console.error('Error initializing account:', error);
+            throw new Error(`Failed to initialize account: ${error.message}`);
+        }
     }
     /**
      * Generates a new Nano wallet (seed, account, private/public key).
@@ -344,6 +441,21 @@ class NanoTransactions {
             const privateKeyString = String(privateKey);
             const amountRawString = String(amountRaw);
 
+            // IMPORTANT: Check for pending blocks and receive them first
+            console.log('Checking for pending blocks before sending...');
+            const pending = await this.getPendingBlocks(formattedFromAddress);
+            
+            if (pending.blocks && Object.keys(pending.blocks).length > 0) {
+                console.log(`Found ${Object.keys(pending.blocks).length} pending block(s). Receiving them first...`);
+                const receiveResults = await this.receiveAllPending(formattedFromAddress, privateKeyString);
+                console.log('Received all pending blocks:', receiveResults);
+                
+                // Wait a moment for the account to update
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            } else {
+                console.log('No pending blocks to receive.');
+            }
+
             // Get account info for current balance and frontier
             const accountInfo = await this.makeRequest('account_info', {
                 account: formattedFromAddress,
@@ -369,11 +481,10 @@ class NanoTransactions {
             console.log('Send amount:', sendAmount.toString());
             console.log('New balance after send:', newBalance);
 
-            // Generate work
-            const workData = await this.makeRequest('work_generate', {
-                hash: accountInfo.frontier,
-                difficulty: 'fffffff800000000'  // Higher difficulty for send blocks
-            });
+            // Generate work LOCALLY - does not use RPC node
+            console.log('Generating work locally for send transaction...');
+            const workValue = await this.generateWork(accountInfo.frontier, false);
+            const workData = { work: workValue };
 
             if (!workData || !workData.work) {
                 throw new Error('Failed to generate work');
