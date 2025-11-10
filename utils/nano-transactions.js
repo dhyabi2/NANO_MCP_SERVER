@@ -543,5 +543,57 @@ class NanoTransactions {
             pending: balance.pending
         };
     }
+
+    /**
+     * Generate QR code for Nano payment
+     * @param {string} address - Nano address to receive payment
+     * @param {string} amount - Amount in decimal XNO (e.g., "0.140366")
+     * @returns {Promise<Object>} - QR code data with base64 image and payment string
+     */
+    async generateQrCode(address, amount) {
+        try {
+            // Validate address format
+            if (!address || !address.startsWith('nano_')) {
+                throw new Error('Invalid Nano address format. Address must start with "nano_"');
+            }
+
+            // Validate amount
+            const amountNum = parseFloat(amount);
+            if (isNaN(amountNum) || amountNum <= 0) {
+                throw new Error('Invalid amount. Must be a positive number');
+            }
+
+            // Use format: nano:nano_address?amount=0.140366 (decimal, not raw)
+            const paymentString = `nano:${address}?amount=${amount}`;
+            
+            console.log('Generating QR code for payment:', paymentString);
+
+            // Generate QR code using the qrcode library
+            const QRCode = require('qrcode');
+            const qrDataUrl = await QRCode.toDataURL(paymentString, {
+                errorCorrectionLevel: 'L',
+                width: 400,
+                margin: 4,
+                color: {
+                    dark: '#000000',
+                    light: '#FFFFFF',
+                },
+            });
+
+            console.log('QR code generated successfully');
+
+            return {
+                success: true,
+                qrCode: qrDataUrl,
+                paymentString: paymentString,
+                address: address,
+                amount: amount,
+                format: 'base64 Data URL (PNG)'
+            };
+        } catch (error) {
+            console.error('Error generating QR code:', error);
+            throw new Error(`Failed to generate QR code: ${error.message}`);
+        }
+    }
 }
 exports.NanoTransactions = NanoTransactions;

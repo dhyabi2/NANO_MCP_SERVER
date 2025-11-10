@@ -1,7 +1,7 @@
 {
   "name": "nano-mcp",
-  "version": "1.3.0",
-  "description": "NANO MCP (Nano Cryptocurrency) Server for AI Assistants - A JSON-RPC 2.0 API server for Nano cryptocurrency operations with local work generation and auto-receive pending blocks",
+  "version": "1.4.0",
+  "description": "NANO MCP (Nano Cryptocurrency) Server for AI Assistants - A JSON-RPC 2.0 API server for Nano cryptocurrency operations with QR code generation, local work generation and auto-receive pending blocks",
   "main": "src/index.js",
   "bin": {
     "nano-mcp": "src/index.js"
@@ -33,6 +33,7 @@
     "nanocurrency": "^1.12.0",
     "nanocurrency-web": "^1.4.3",
     "node-fetch": "^2.7.0",
+    "qrcode": "^1.5.3",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0"
   },

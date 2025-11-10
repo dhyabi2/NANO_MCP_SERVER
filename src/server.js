@@ -73,6 +73,15 @@ const REQUEST_TEMPLATES = {
             privateKey: "your_private_key_here"
         },
         id: 1
+    },
+    generateQrCode: {
+        jsonrpc: "2.0",
+        method: "generateQrCode",
+        params: {
+            address: "nano_3xxxxx...",
+            amount: "0.1"
+        },
+        id: 1
     }
 };
 
@@ -201,6 +210,24 @@ const MCP_TOOLS = [
                 }
             },
             required: ['address', 'privateKey']
+        }
+    },
+    {
+        name: 'generateQrCode',
+        description: 'Generate a QR code for a NANO payment with address and amount',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                address: {
+                    type: 'string',
+                    description: 'NANO address to receive payment'
+                },
+                amount: {
+                    type: 'string',
+                    description: 'Amount in decimal XNO (e.g., "0.1" for 0.1 NANO)'
+                }
+            },
+            required: ['address', 'amount']
         }
     }
 ];
@@ -355,6 +382,17 @@ class NanoMCPServer {
                         }
                     });
                     result = await this.nanoTransactions.receiveAllPending(params.address, params.privateKey);
+                    break;
+                case 'generateQrCode':
+                    this.schemaValidator.validate(params, {
+                        type: 'object',
+                        required: ['address', 'amount'],
+                        properties: {
+                            address: { type: 'string' },
+                            amount: { type: 'string' }
+                        }
+                    });
+                    result = await this.nanoTransactions.generateQrCode(params.address, params.amount);
                     break;
                 default:
                     throw new Error(`Method ${method} not found`);
