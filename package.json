@@ -22,7 +22,7 @@
   ],
   "author": {
     "name": "NANO MCP Team",
-    "url": "https://github.com/dhyabi2/nano-mcp"
+    "url": "https://github.com/dhyabi2/NANO_MCP_SERVER"
   },
   "license": "MIT",
   "dependencies": {
@@ -38,12 +38,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dhyabi2/nano-mcp.git"
+    "url": "git+https://github.com/dhyabi2/NANO_MCP_SERVER.git"
   },
   "bugs": {
-    "url": "https://github.com/dhyabi2/nano-mcp/issues"
+    "url": "https://github.com/dhyabi2/NANO_MCP_SERVER/issues"
   },
-  "homepage": "https://github.com/dhyabi2/nano-mcp#readme",
+  "homepage": "https://github.com/dhyabi2/NANO_MCP_SERVER#readme",
   "engines": {
     "node": ">=16.0.0"
   },

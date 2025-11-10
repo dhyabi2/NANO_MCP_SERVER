@@ -12,6 +12,71 @@ const cors = require('cors');
 const DEFAULT_PORT = 8080;
 
 /**
+ * Request templates for each method to help users with correct format
+ */
+const REQUEST_TEMPLATES = {
+    generateWallet: {
+        jsonrpc: "2.0",
+        method: "generateWallet",
+        params: {},
+        id: 1
+    },
+    getBalance: {
+        jsonrpc: "2.0",
+        method: "getBalance",
+        params: {
+            address: "nano_3xxxxx..."
+        },
+        id: 1
+    },
+    getAccountInfo: {
+        jsonrpc: "2.0",
+        method: "getAccountInfo",
+        params: {
+            address: "nano_3xxxxx..."
+        },
+        id: 1
+    },
+    getPendingBlocks: {
+        jsonrpc: "2.0",
+        method: "getPendingBlocks",
+        params: {
+            address: "nano_3xxxxx..."
+        },
+        id: 1
+    },
+    initializeAccount: {
+        jsonrpc: "2.0",
+        method: "initializeAccount",
+        params: {
+            address: "nano_3xxxxx...",
+            privateKey: "your_private_key_here"
+        },
+        id: 1
+    },
+    sendTransaction: {
+        jsonrpc: "2.0",
+        method: "sendTransaction",
+        params: {
+            fromAddress: "nano_3xxxxx...",
+            toAddress: "nano_1xxxxx...",
+            amountRaw: "1000000000000000000000000000",
+            privateKey: "your_private_key_here"
+        },
+        id: 1
+    },
+    receiveAllPending: {
+        jsonrpc: "2.0",
+        method: "receiveAllPending",
+        params: {
+            address: "nano_3xxxxx...",
+            privateKey: "your_private_key_here"
+        },
+        id: 1
+    }
+};
+
+/**
  * Tool definitions for the MCP server
  * Each tool includes its name, description, and input schema
  */
@@ -301,13 +366,86 @@ class NanoMCPServer {
                 id
             };
         } catch (error) {
+            // Determine error type and provide helpful template
+            let errorCode = -32603; // Internal error
+            let errorMessage = error.message || 'Internal server error';
+            let helpfulInfo = {};
+
+            // Check for schema validation errors (from SchemaValidator)
+            if (error.code === -32602 || error.message === 'Invalid parameters') {
+                errorCode = -32602; // Invalid params
+                const method = request.method;
+                
+                // Extract validation details
+                if (error.details && error.details.errors) {
+                    errorMessage = 'Invalid parameters: ';
+                    const missingFields = error.details.errors
+                        .filter(e => e.message && e.message.includes('required'))
+                        .map(e => e.params?.missingProperty || 'unknown');
+                    
+                    if (missingFields.length > 0) {
+                        errorMessage += `Missing required field(s): ${missingFields.join(', ')}`;
+                    } else {
+                        errorMessage += error.details.errors.map(e => e.message).join(', ');
+                    }
+                }
+                
+                if (REQUEST_TEMPLATES[method]) {
+                    helpfulInfo = {
+                        correctFormat: REQUEST_TEMPLATES[method],
+                        hint: `Please use the correct format shown in 'correctFormat'. Ensure all required parameters are included.`,
+                        yourRequest: {
+                            method: method,
+                            params: request.params || {}
+                        }
+                    };
+                }
+            } 
+            // Check for generic validation errors
+            else if (error.message && (error.message.includes('required') || error.message.includes('Missing') || error.message.includes('Invalid'))) {
+                errorCode = -32602; // Invalid params
+                const method = request.method;
+                
+                if (REQUEST_TEMPLATES[method]) {
+                    helpfulInfo = {
+                        correctFormat: REQUEST_TEMPLATES[method],
+                        hint: `Please use the correct format shown in 'correctFormat'. Ensure all required parameters are included.`
+                    };
+                }
+            } 
+            // Method not found
+            else if (error.message && error.message.includes('not found')) {
+                errorCode = -32601;
+                helpfulInfo = {
+                    availableMethods: Object.keys(REQUEST_TEMPLATES),
+                    exampleRequest: REQUEST_TEMPLATES['generateWallet'],
+                    hint: "Please use one of the available methods listed above. See 'exampleRequest' for proper JSON-RPC format."
+                };
+            }
+            // Missing jsonrpc or invalid request structure
+            else if (!request.method) {
+                errorCode = -32600; // Invalid Request
+                errorMessage = "Invalid JSON-RPC request. Missing 'method' field.";
+                helpfulInfo = {
+                    correctFormat: {
+                        jsonrpc: "2.0",
+                        method: "methodName",
+                        params: { /* method parameters */ },
+                        id: 1
+                    },
+                    availableMethods: Object.keys(REQUEST_TEMPLATES),
+                    hint: "All requests must include: jsonrpc, method, params (if required), and id"
+                };
+            }
+
             return {
                 jsonrpc: "2.0",
                 error: {
-                    code: -32603,
-                    message: error.message
+                    code: errorCode,
+                    message: errorMessage,
+                    data: Object.keys(helpfulInfo).length > 0 ? helpfulInfo : undefined
                 },
-                id: request.id
+                id: request.id || null
             };
         }
     }
