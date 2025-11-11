@@ -4,19 +4,31 @@
 
 ---
 
+## 🌐 Production Server URL
+
+**USE THIS URL:** `https://nano-mcp.replit.app`
+
+**All requests go to:** `https://nano-mcp.replit.app` (POST requests with JSON-RPC 2.0 format)
+
+**Quick Example:**
+```bash
+curl -X POST https://nano-mcp.replit.app \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","method":"initialize","params":{},"id":1}'
+```
+
+---
+
 ## 🤖 Quick Start for AI Agents
 
-### Step 1: Install and Run (2 minutes)
-```bash
-cd NANO_MCP_SERVER
-npm install
-npm start
-```
-Server runs on: `http://localhost:8080`
+### Production Server (RECOMMENDED)
+**Server URL:** `https://nano-mcp.replit.app`
 
-### Step 2: Test Connection
+**No installation needed!** The server is already running. Just start making requests.
+
+### Step 1: Test Connection
 ```json
-POST http://localhost:8080
+POST https://nano-mcp.replit.app
 {
     "jsonrpc": "2.0",
     "method": "initialize",
@@ -25,8 +37,19 @@ POST http://localhost:8080
 }
 ```
 
-### Step 3: You're Ready!
+### Step 2: You're Ready!
 The server responds with all available methods. Start using them immediately.
+
+---
+
+### Local Development (Optional)
+If you need to run locally for development:
+```bash
+cd NANO_MCP_SERVER
+npm install
+npm start
+```
+Local server runs on: `http://localhost:8080`
 
 ---
 
@@ -46,28 +69,31 @@ The server responds with all available methods. Start using them immediately.
 
 ---
 
-## 📋 Available MCP Functions
+## 📋 Available MCP Functions (16 Total)
+
+### Initialization (1)
+1. `initialize` - Get server capabilities and all available functions
 
 ### Core Functions (8)
-1. `generateWallet` - Create new NANO wallet
-2. `getBalance` - Check account balance
-3. `getAccountInfo` - Get detailed account data
-4. `getPendingBlocks` - List pending transactions
-5. `initializeAccount` - Open/activate new account
-6. `sendTransaction` - Send NANO (with enhanced errors)
-7. `receiveAllPending` - Receive all pending blocks
-8. `generateQrCode` - Create payment QR code
+2. `generateWallet` - Create new NANO wallet
+3. `getBalance` - Check account balance
+4. `getAccountInfo` - Get detailed account data
+5. `getPendingBlocks` - List pending transactions
+6. `initializeAccount` - Open/activate new account
+7. `sendTransaction` - Send NANO (with enhanced errors)
+8. `receiveAllPending` - Receive all pending blocks
+9. `generateQrCode` - Create payment QR code with base64 PNG
 
 ### Helper Functions (2) - For Autonomous Agents
-9. **`convertBalance`** - Convert NANO ↔ raw units
-10. **`getAccountStatus`** - One call shows: balance, pending, capabilities, what actions needed
+10. **`convertBalance`** - Convert NANO ↔ raw units
+11. **`getAccountStatus`** - One call shows: balance, pending, capabilities, what actions needed
 
-### Test Wallet Functions (5)
-11. `setupTestWallets` - Generate two test wallets
-12. `getTestWallets` - Retrieve test wallet info
-13. `updateTestWalletBalance` - Update wallet balance tracking
-14. `checkTestWalletsFunding` - Check if wallets are ready
-15. `resetTestWallets` - Delete and start fresh
+### Test Wallet Functions (5) - For Development
+12. `setupTestWallets` - Generate two test wallets (requires human funding)
+13. `getTestWallets` - Retrieve test wallet info
+14. `updateTestWalletBalance` - Update wallet balance tracking
+15. `checkTestWalletsFunding` - Check if wallets are ready
+16. `resetTestWallets` - Delete and start fresh
 
 ---
 
@@ -77,7 +103,7 @@ The server responds with all available methods. Start using them immediately.
 
 ```javascript
 // Step 1: Check account status first (ALWAYS DO THIS)
-POST http://localhost:8080
+POST https://nano-mcp.replit.app
 {
     "jsonrpc": "2.0",
     "method": "getAccountStatus",
@@ -280,18 +306,72 @@ Receive Error
 ## 🧪 Test Wallet System (For Development)
 
 ### Quick Setup
+
+**Step 1: Generate Test Wallets**
 ```json
-// 1. Generate test wallets
-{"jsonrpc": "2.0", "method": "setupTestWallets", "params": {}, "id": 1}
-
-// Response includes two wallets with addresses
-// Copy addresses and fund them with test NANO
-
-// 2. Check funding status
-{"jsonrpc": "2.0", "method": "checkTestWalletsFunding", "params": {}, "id": 2}
-
-// 3. When both funded, start testing!
+POST https://nano-mcp.replit.app
+{
+    "jsonrpc": "2.0",
+    "method": "setupTestWallets",
+    "params": {},
+    "id": 1
+}
 ```
+
+**Response (Save These Addresses!):**
+```json
+{
+    "jsonrpc": "2.0",
+    "result": {
+        "wallet1": {
+            "address": "nano_3h3m6kfckrxpc4t33jn36eu8smfpukwuq1zq4hy35dh4a7drs6ormhwhkncn",
+            "privateKey": "6b84f1b17dd0a6176df2b500b40ce17c0db5bd8042ca8ac04173dd74bac303b8",
+            "publicKey": "bc33249aa963b650b410c68123366ccdb6dcb9bb83f713fc11ade241578c92b8",
+            "seed": "cbce4f1ec09296e245f4125b8f89930cc490599f30697491bc03e4915041c146",
+            "balance": "0",
+            "funded": false
+        },
+        "wallet2": {
+            "address": "nano_39isqp67xsse8cj5igtonuiwicqy8p6txa57mbjd8bcyip7ggrai4bby1x1w",
+            "privateKey": "9279a138a0000ac09477be901210b58b80e503835744f08c70690d94d57e70b9",
+            "publicKey": "9e19bd885ee72c32a2383b55a6e1c82afe3589aea0659a62b3255e858ae76110",
+            "seed": "bf69ae134c00c0e24aabb97ac4a0a7e1933fdd28672a1b0caf9b1c7ea193d917",
+            "balance": "0",
+            "funded": false
+        },
+        "created": "2025-11-11T15:25:23.161Z",
+        "status": "awaiting_funding",
+        "fundingInstructions": [
+            "Send test NANO to Wallet 1: nano_3h3m6kfckrxpc4t33jn36eu8smfpukwuq1zq4hy35dh4a7drs6ormhwhkncn",
+            "Send test NANO to Wallet 2: nano_39isqp67xsse8cj5igtonuiwicqy8p6txa57mbjd8bcyip7ggrai4bby1x1w",
+            "After funding, use checkFundingStatus to verify both wallets are funded",
+            "Recommended test amount: 0.1 NANO or more per wallet"
+        ]
+    },
+    "id": 1
+}
+```
+
+**⚠️ IMPORTANT - ACTION REQUIRED:**
+**HUMAN MUST FUND THESE WALLETS!**
+1. **Copy Wallet 1 Address:** `nano_3h3m6kfckrxpc4t33jn36eu8smfpukwuq1zq4hy35dh4a7drs6ormhwhkncn`
+2. **Copy Wallet 2 Address:** `nano_39isqp67xsse8cj5igtonuiwicqy8p6txa57mbjd8bcyip7ggrai4bby1x1w`
+3. **Send test NANO to BOTH addresses** (0.1 NANO recommended per wallet)
+4. **Use a NANO faucet or your own wallet** to send test funds
+5. **Wait for confirmation** (usually < 5 seconds)
+
+**Step 2: Check Funding Status**
+```json
+{
+    "jsonrpc": "2.0",
+    "method": "checkTestWalletsFunding",
+    "params": {},
+    "id": 2
+}
+```
+
+**Step 3: When Both Funded, Start Testing!**
+Response will show `"bothFunded": true` when ready.
 
 ### Test Wallet Workflow
 ```
@@ -407,6 +487,22 @@ npm test
 
 ## 📚 Complete Function Reference
 
+### initialize
+**Purpose:** Initialize the MCP server and get list of all available capabilities/functions
+**Parameters:** None
+**Returns:** Server information and list of all available MCP tools with their descriptions
+```json
+{"jsonrpc": "2.0", "method": "initialize", "params": {}, "id": 1}
+```
+
+**Response includes:**
+- `protocolVersion` - MCP protocol version
+- `serverInfo` - Server name and version
+- `capabilities` - Server capabilities
+- `tools` - Complete list of all available MCP functions with descriptions and parameter schemas
+
+**Use Case:** First call to discover what the server can do and what functions are available
+
 ### generateWallet
 **Purpose:** Create new NANO wallet
 **Parameters:** None
@@ -464,12 +560,50 @@ npm test
 ```
 
 ### generateQrCode
-**Purpose:** Create QR code for payment
-**Parameters:** `address`, `amount` (in NANO)
-**Returns:** `qrCode` (base64), `paymentString`
+**Purpose:** Generate payment QR code for receiving NANO
+**Parameters:** 
+- `address` (string, required) - NANO address to receive payment
+- `amount` (string, optional) - Amount in NANO (decimal format, e.g., "0.1")
+
+**Returns:** 
+- `qrCode` (string) - Base64 encoded PNG image
+- `paymentString` (string) - NANO URI for payment (nano:address?amount=...)
+- `address` (string) - The NANO address
+- `amount` (string) - The amount in NANO (if provided)
+
+**Example Request:**
 ```json
-{"jsonrpc": "2.0", "method": "generateQrCode", "params": {"address": "nano_xxx", "amount": "0.1"}, "id": 1}
+{
+    "jsonrpc": "2.0",
+    "method": "generateQrCode",
+    "params": {
+        "address": "nano_3h3m6kfckrxpc4t33jn36eu8smfpukwuq1zq4hy35dh4a7drs6ormhwhkncn",
+        "amount": "0.1"
+    },
+    "id": 1
+}
 ```
+
+**Example Response:**
+```json
+{
+    "jsonrpc": "2.0",
+    "result": {
+        "qrCode": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...[long base64 string]",
+        "paymentString": "nano:nano_3h3m6kfckrxpc4t33jn36eu8smfpukwuq1zq4hy35dh4a7drs6ormhwhkncn?amount=100000000000000000000000000000",
+        "address": "nano_3h3m6kfckrxpc4t33jn36eu8smfpukwuq1zq4hy35dh4a7drs6ormhwhkncn",
+        "amount": "0.1"
+    },
+    "id": 1
+}
+```
+
+**Use Cases:**
+- Display QR code in web/mobile apps for payment collection
+- Generate payment links for invoicing
+- Create shareable payment requests
+- The `qrCode` can be directly embedded in HTML: `<img src="data:image/png;base64,..." />`
+- The `paymentString` can be used as a clickable link or deep link for NANO wallets
 
 ### convertBalance (Helper)
 **Purpose:** Convert between NANO and raw units
@@ -486,6 +620,61 @@ npm test
 ```json
 {"jsonrpc": "2.0", "method": "getAccountStatus", "params": {"address": "nano_xxx"}, "id": 1}
 ```
+
+### setupTestWallets (Test Wallet)
+**Purpose:** Generate two test wallets with all credentials
+**Parameters:** None
+**Returns:** `wallet1`, `wallet2` (with address, privateKey, publicKey, seed), `fundingInstructions`
+**⚠️ Action Required:** Human must fund both wallet addresses with test NANO
+```json
+{"jsonrpc": "2.0", "method": "setupTestWallets", "params": {}, "id": 1}
+```
+
+**Response includes:**
+- Two complete wallet credentials (address, private key, public key, seed)
+- Funding instructions with exact addresses to fund
+- Status indicating "awaiting_funding"
+- Recommended test amount (0.1 NANO per wallet)
+
+### getTestWallets (Test Wallet)
+**Purpose:** Retrieve current test wallet information
+**Parameters:** None
+**Returns:** `wallet1`, `wallet2` (with addresses, balances, funding status)
+```json
+{"jsonrpc": "2.0", "method": "getTestWallets", "params": {}, "id": 1}
+```
+
+**Use Case:** Get wallet credentials after generating them, or check current state
+
+### updateTestWalletBalance (Test Wallet)
+**Purpose:** Update tracked balance for a test wallet
+**Parameters:** `walletName` ("wallet1" or "wallet2"), `balance` (raw), `funded` (boolean)
+**Returns:** Updated wallet info
+```json
+{"jsonrpc": "2.0", "method": "updateTestWalletBalance", "params": {"walletName": "wallet1", "balance": "100000000000000000000000000000", "funded": true}, "id": 1}
+```
+
+**Use Case:** Manually track balance changes or mark wallet as funded
+
+### checkTestWalletsFunding (Test Wallet)
+**Purpose:** Check if both test wallets have been funded (have balance > 0)
+**Parameters:** None
+**Returns:** `wallet1` (balance, funded), `wallet2` (balance, funded), `bothFunded`, `status`
+```json
+{"jsonrpc": "2.0", "method": "checkTestWalletsFunding", "params": {}, "id": 1}
+```
+
+**Use Case:** Verify wallets are ready for testing after human funding
+
+### resetTestWallets (Test Wallet)
+**Purpose:** Delete test wallets and start fresh
+**Parameters:** None
+**Returns:** Confirmation message
+```json
+{"jsonrpc": "2.0", "method": "resetTestWallets", "params": {}, "id": 1}
+```
+
+**Use Case:** Clean up and generate new test wallets
 
 ---
 
@@ -552,16 +741,25 @@ Located in `NANO_MCP_SERVER/`:
 
 ## ⚡ Quick Test (Copy-Paste)
 
+**Production Server (No Setup Required):**
 ```bash
-# 1. Start server
+# Test the production server immediately:
+curl -X POST https://nano-mcp.replit.app \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","method":"initialize","params":{},"id":1}'
+
+# You should see list of all 16 available methods
+```
+
+**Local Development (Optional):**
+```bash
+# 1. Start local server
 cd NANO_MCP_SERVER && npm start
 
 # 2. In another terminal, test:
 curl -X POST http://localhost:8080 \
   -H "Content-Type: application/json" \
   -d '{"jsonrpc":"2.0","method":"initialize","params":{},"id":1}'
-
-# 3. You should see list of available methods
 ```
 
 ---
