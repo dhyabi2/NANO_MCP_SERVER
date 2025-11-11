@@ -246,6 +246,62 @@ class EnhancedErrorHandler {
     }
 
     /**
+     * Create an insufficient work error with detailed guidance
+     * @param {string} hash - The hash that work was generated for
+     * @param {string} work - The work value that was rejected
+     * @param {string} blockType - Type of block (send, receive, open, change)
+     * @returns {Object} Enhanced error object
+     */
+    static insufficientWork(hash, work, blockType = 'unknown') {
+        console.log('[EnhancedErrorHandler] Creating insufficient work error');
+        
+        const expectedThreshold = (blockType === 'receive' || blockType === 'open') 
+            ? 'fffffe0000000000' 
+            : 'fffffff800000000';
+        
+        return {
+            success: false,
+            error: "Block work is insufficient - work does not meet NANO network difficulty threshold",
+            errorCode: "INSUFFICIENT_WORK",
+            details: {
+                hash: hash,
+                generatedWork: work,
+                blockType: blockType,
+                expectedThreshold: expectedThreshold,
+                reason: "The Proof-of-Work (PoW) computation did not meet the network's difficulty requirement"
+            },
+            nextSteps: [
+                "Step 1: This is likely a transient issue - SIMPLY RETRY the same operation",
+                "Step 2: Work generation now uses correct NANO network difficulty thresholds:",
+                `   • Send/Change blocks: fffffff800000000 (takes 10-15 seconds)`,
+                `   • Receive/Open blocks: fffffe0000000000 (takes 4-6 seconds)`,
+                "Step 3: If retrying fails repeatedly, possible causes:",
+                "   • CPU too slow for reliable work generation",
+                "   • nanocurrency library not properly initialized",
+                "Step 4: Solutions if issue persists:",
+                "   • Wait a few moments and retry (work generation is probabilistic)",
+                "   • Use a more powerful machine",
+                "   • Implement GPU-accelerated work generation",
+                "   • Use an external work generation service"
+            ],
+            relatedFunctions: ["sendTransaction", "receiveAllPending", "initializeAccount"],
+            technicalDetails: {
+                workGenerationMethod: "Local CPU (nanocurrency library)",
+                timeEstimate: blockType === 'send' ? "10-15 seconds" : "4-6 seconds",
+                cpuIntensive: true,
+                probabilistic: true
+            },
+            exampleRetry: {
+                jsonrpc: "2.0",
+                method: blockType === 'send' ? "sendTransaction" : "receiveAllPending",
+                params: {},
+                id: 1,
+                note: "Simply retry the EXACT same request - work will be regenerated automatically"
+            }
+        };
+    }
+
+    /**
      * Create a generic blockchain error with context
      * @param {string} originalError - Original error message
      * @param {string} context - Context about what operation was being performed
@@ -256,6 +312,15 @@ class EnhancedErrorHandler {
         console.log('[EnhancedErrorHandler] Creating blockchain error');
         
         // Try to detect specific error types
+        if (originalError.toLowerCase().includes('work') && originalError.toLowerCase().includes('insufficient')) {
+            // Work insufficient error - provide specific guidance
+            return EnhancedErrorHandler.insufficientWork(
+                additionalInfo.hash || 'unknown',
+                additionalInfo.work || 'unknown',
+                additionalInfo.blockType || context.includes('send') ? 'send' : 'receive'
+            );
+        }
+        
         if (originalError.toLowerCase().includes('insufficient')) {
             // This should be caught earlier, but just in case
             return {

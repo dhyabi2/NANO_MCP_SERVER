@@ -325,7 +325,79 @@ All errors follow a consistent structure designed for autonomous agents:
 
 ---
 
-### 2. Account Not Initialized
+### 2. Insufficient Work (Proof-of-Work)
+
+**Error Code:**
+- `INSUFFICIENT_WORK` - Generated work doesn't meet NANO network difficulty threshold
+
+**Example Error:**
+```json
+{
+    "success": false,
+    "error": "Block work is insufficient - work does not meet NANO network difficulty threshold",
+    "errorCode": "INSUFFICIENT_WORK",
+    "details": {
+        "hash": "3F8E9A2B1C4D5E6F...",
+        "generatedWork": "7a2c5b3d...",
+        "blockType": "send",
+        "expectedThreshold": "fffffff800000000",
+        "reason": "The Proof-of-Work (PoW) computation did not meet the network's difficulty requirement"
+    },
+    "nextSteps": [
+        "Step 1: This is likely a transient issue - SIMPLY RETRY the same operation",
+        "Step 2: Work generation now uses correct NANO network difficulty thresholds:",
+        "   • Send/Change blocks: fffffff800000000 (takes 10-15 seconds)",
+        "   • Receive/Open blocks: fffffe0000000000 (takes 4-6 seconds)",
+        "Step 3: If retrying fails repeatedly, possible causes:",
+        "   • CPU too slow for reliable work generation",
+        "   • nanocurrency library not properly initialized",
+        "Step 4: Solutions if issue persists:",
+        "   • Wait a few moments and retry (work generation is probabilistic)",
+        "   • Use a more powerful machine",
+        "   • Implement GPU-accelerated work generation",
+        "   • Use an external work generation service"
+    ],
+    "relatedFunctions": ["sendTransaction", "receiveAllPending", "initializeAccount"],
+    "technicalDetails": {
+        "workGenerationMethod": "Local CPU (nanocurrency library)",
+        "timeEstimate": "10-15 seconds",
+        "cpuIntensive": true,
+        "probabilistic": true
+    },
+    "exampleRetry": {
+        "jsonrpc": "2.0",
+        "method": "sendTransaction",
+        "params": {},
+        "id": 1,
+        "note": "Simply retry the EXACT same request - work will be regenerated automatically"
+    }
+}
+```
+
+**Smart Features:**
+- Shows **expected difficulty threshold** for block type
+- Provides **time estimates** for work generation
+- Explains that work generation is **probabilistic** (may fail occasionally)
+- Indicates **auto-fix is available** (just retry)
+
+**What AI Agent Should Do:**
+1. **SIMPLY RETRY THE EXACT SAME REQUEST** - work will be regenerated
+2. Wait a few moments (2-3 seconds) before retrying if needed
+3. If 3+ retries fail, consider:
+   - CPU may be too slow for reliable work generation
+   - Implement exponential backoff (3s, 6s, 12s delays)
+   - Consider alternative work generation methods
+4. This error is **extremely rare** after the fix (work now uses correct thresholds)
+
+**Critical Fix Applied (2025-11-11):**
+- Work generation now uses **correct NANO network difficulty thresholds**
+- Send/Change blocks: `fffffff800000000` (higher difficulty)
+- Receive/Open blocks: `fffffe0000000000` (lower difficulty)
+- This error should be **very rare** and **transient** (just retry once)
+
+---
+
+### 3. Account Not Initialized
 
 **Error Codes:**
 - `ACCOUNT_NOT_INITIALIZED` - Account not initialized, but has pending blocks

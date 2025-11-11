@@ -172,10 +172,16 @@ class NanoTransactions {
                 console.log('Nanocurrency library initialized');
             }
             
-            // Use nanocurrency's local work generation (CPU-based)
-            // This computes work locally without relying on RPC nodes
-            console.log('Computing work (this may take a few seconds)...');
-            const work = await nanocurrency.work(hash);
+            // NANO network difficulty thresholds
+            // Receive/Open blocks: lower difficulty (fffffe0000000000)
+            // Send/Change blocks: higher difficulty (fffffff800000000)
+            const threshold = isOpen ? 'fffffe0000000000' : 'fffffff800000000';
+            
+            console.log(`Computing work with ${isOpen ? 'RECEIVE/OPEN' : 'SEND/CHANGE'} difficulty threshold: ${threshold}`);
+            console.log('This may take 10-15 seconds for SEND blocks, 4-6 seconds for RECEIVE blocks...');
+            
+            // Use nanocurrency's local work generation with proper threshold
+            const work = await nanocurrency.work(hash, threshold);
             
             if (!work) {
                 throw new Error('Work generation returned null - threshold not met');
@@ -271,12 +277,32 @@ class NanoTransactions {
             });
 
             if (processResult.error) {
-                throw new Error(`Failed to process block: ${processResult.error}`);
+                // Handle blockchain errors with enhanced messaging
+                const errorResult = EnhancedErrorHandler.blockchainError(
+                    processResult.error,
+                    'receive block',
+                    {
+                        account: account,
+                        pendingBlock: pendingBlock,
+                        pendingAmount: pendingAmount,
+                        hash: workHash,
+                        work: workValue,
+                        blockType: accountInfo && !accountInfo.error ? 'receive' : 'open'
+                    }
+                );
+                // For createReceiveBlock, throw the enhanced error so it can be caught by caller
+                const error = new Error(errorResult.error);
+                error.enhancedError = errorResult;
+                throw error;
             }
 
             return processResult;
         } catch (error) {
             console.error('Error in createReceiveBlock:', error);
+            // If it's an enhanced error, return it directly
+            if (error.enhancedError) {
+                throw error.enhancedError;
+            }
             throw error;
         }
     }
@@ -325,7 +351,12 @@ class NanoTransactions {
                     }
                 } catch (error) {
                     console.error('Failed to process pending block:', error);
-                    results.push({ error: error.message });
+                    // If it's an enhanced error object, include it directly
+                    if (error.errorCode) {
+                        results.push(error);
+                    } else {
+                        results.push({ error: error.message });
+                    }
                 }
             }
         }
@@ -545,7 +576,10 @@ class NanoTransactions {
                         fromAddress: formattedFromAddress,
                         toAddress: formattedToAddress,
                         amountRaw: amountRawString,
-                        currentBalance: accountInfo.balance
+                        currentBalance: accountInfo.balance,
+                        hash: accountInfo.frontier,
+                        work: workData.work,
+                        blockType: 'send'
                     }
                 );
             }

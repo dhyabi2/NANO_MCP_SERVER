@@ -380,6 +380,7 @@ Returns: Complete status + what to do next
 
 **Blockchain Errors:**
 - `INSUFFICIENT_BALANCE` - Not enough NANO to send
+- `INSUFFICIENT_WORK` - **[CRITICAL]** Work doesn't meet difficulty threshold (FIXED - just retry)
 - `ACCOUNT_NOT_INITIALIZED` - Account needs to receive first transaction
 - `ACCOUNT_NOT_INITIALIZED_NO_PENDING` - Account has no pending blocks
 - `PENDING_BLOCKS_NOT_RECEIVED` - Should receive pending first
@@ -504,6 +505,7 @@ if (response.errorCode === "AMOUNT_WRONG_UNIT") {
 | Error Code | What It Means | Auto-Fix Available | Action |
 |------------|---------------|-------------------|--------|
 | `INSUFFICIENT_BALANCE` | Not enough NANO | Partial (shows shortfall) | Reduce amount or fund |
+| `INSUFFICIENT_WORK` | PoW below threshold | **YES (auto-retry)** | **Simply retry request** |
 | `ACCOUNT_NOT_INITIALIZED` | Account not opened | Yes (2 solutions) | Call initializeAccount |
 | `AMOUNT_WRONG_UNIT` | Used NANO not raw | **YES (auto-converts)** | Use suggestedCorrection |
 | `INVALID_ADDRESS_*` | Bad address format | Yes (shows format) | Fix address format |
@@ -516,7 +518,7 @@ if (response.errorCode === "AMOUNT_WRONG_UNIT") {
 **For detailed error handling guide:** See `docs/AI_AGENT_ERROR_HANDLING.md`
 
 Topics covered:
-- All 28 error codes explained
+- All 29 error codes explained (including INSUFFICIENT_WORK)
 - Smart auto-correction examples
 - Decision trees for error recovery
 - Best practices for AI agents
