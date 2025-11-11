@@ -5,6 +5,7 @@ const { NanoTransactions } = require('../utils/nano-transactions');
 const { SchemaValidator } = require('../utils/schema-validator');
 const { TestWalletManager } = require('../utils/test-wallet-manager');
 const { BalanceConverter } = require('../utils/balance-converter');
+const { EnhancedErrorHandler } = require('../utils/error-handler');
 const path = require('path');
 const fs = require('fs');
 const express = require('express');
@@ -461,13 +462,18 @@ class NanoMCPServer {
                     result = await this.nanoTransactions.generateWallet();
                     break;
                 case 'getBalance':
-                    this.schemaValidator.validate(params, {
-                        type: 'object',
-                        required: ['address'],
-                        properties: {
-                            address: { type: 'string' }
-                        }
-                    });
+                    // Validate address parameter
+                    if (!params || !params.address) {
+                        return EnhancedErrorHandler.missingParameter('address', 'getBalance', {
+                            address: "nano_3h3m6kfckrxpc4t33jn36eu8smfpukwuq1zq4hy35dh4a7drs6ormhwhkncn"
+                        });
+                    }
+                    
+                    const balanceAddressError = EnhancedErrorHandler.validateAddress(params.address, 'address');
+                    if (balanceAddressError) {
+                        return balanceAddressError;
+                    }
+                    
                     const balanceInfo = await this.nanoTransactions.getAccountInfo(params.address);
                     result = {
                         balance: balanceInfo.balance || '0',
@@ -475,47 +481,125 @@ class NanoMCPServer {
                     };
                     break;
                 case 'getAccountInfo':
-                    this.schemaValidator.validate(params, {
-                        type: 'object',
-                        required: ['address'],
-                        properties: {
-                            address: { type: 'string' }
-                        }
-                    });
+                    // Validate address parameter
+                    if (!params || !params.address) {
+                        return EnhancedErrorHandler.missingParameter('address', 'getAccountInfo', {
+                            address: "nano_3h3m6kfckrxpc4t33jn36eu8smfpukwuq1zq4hy35dh4a7drs6ormhwhkncn"
+                        });
+                    }
+                    
+                    const accountInfoAddressError = EnhancedErrorHandler.validateAddress(params.address, 'address');
+                    if (accountInfoAddressError) {
+                        return accountInfoAddressError;
+                    }
+                    
                     result = await this.nanoTransactions.getAccountInfo(params.address);
                     break;
                 case 'getPendingBlocks':
-                    this.schemaValidator.validate(params, {
-                        type: 'object',
-                        required: ['address'],
-                        properties: {
-                            address: { type: 'string' }
-                        }
-                    });
+                    // Validate address parameter
+                    if (!params || !params.address) {
+                        return EnhancedErrorHandler.missingParameter('address', 'getPendingBlocks', {
+                            address: "nano_3h3m6kfckrxpc4t33jn36eu8smfpukwuq1zq4hy35dh4a7drs6ormhwhkncn"
+                        });
+                    }
+                    
+                    const pendingAddressError = EnhancedErrorHandler.validateAddress(params.address, 'address');
+                    if (pendingAddressError) {
+                        return pendingAddressError;
+                    }
+                    
                     result = await this.nanoTransactions.getPendingBlocks(params.address);
                     break;
                 case 'initializeAccount':
-                    this.schemaValidator.validate(params, {
-                        type: 'object',
-                        required: ['address', 'privateKey'],
-                        properties: {
-                            address: { type: 'string' },
-                            privateKey: { type: 'string' }
-                        }
-                    });
+                    // Validate address parameter
+                    if (!params || !params.address) {
+                        return EnhancedErrorHandler.missingParameter('address', 'initializeAccount', {
+                            address: "nano_3h3m6kfckrxpc4t33jn36eu8smfpukwuq1zq4hy35dh4a7drs6ormhwhkncn",
+                            privateKey: "your_private_key_here"
+                        });
+                    }
+                    
+                    const initAddressError = EnhancedErrorHandler.validateAddress(params.address, 'address');
+                    if (initAddressError) {
+                        return initAddressError;
+                    }
+                    
+                    // Validate privateKey parameter
+                    if (!params.privateKey) {
+                        return EnhancedErrorHandler.missingParameter('privateKey', 'initializeAccount', {
+                            address: params.address,
+                            privateKey: "your_64_character_hexadecimal_private_key"
+                        });
+                    }
+                    
+                    const initKeyError = EnhancedErrorHandler.validatePrivateKey(params.privateKey);
+                    if (initKeyError) {
+                        return initKeyError;
+                    }
+                    
                     result = await this.nanoTransactions.initializeAccount(params.address, params.privateKey);
                     break;
                 case 'sendTransaction':
-                    this.schemaValidator.validate(params, {
-                        type: 'object',
-                        required: ['fromAddress', 'toAddress', 'amountRaw', 'privateKey'],
-                        properties: {
-                            fromAddress: { type: 'string' },
-                            toAddress: { type: 'string' },
-                            amountRaw: { type: 'string' },
-                            privateKey: { type: 'string' }
-                        }
-                    });
+                    // Validate fromAddress parameter
+                    if (!params || !params.fromAddress) {
+                        return EnhancedErrorHandler.missingParameter('fromAddress', 'sendTransaction', {
+                            fromAddress: "nano_3sender_address_here",
+                            toAddress: "nano_3receiver_address_here",
+                            amountRaw: "100000000000000000000000000000",
+                            privateKey: "your_private_key_here"
+                        });
+                    }
+                    
+                    const fromAddressError = EnhancedErrorHandler.validateAddress(params.fromAddress, 'fromAddress');
+                    if (fromAddressError) {
+                        return fromAddressError;
+                    }
+                    
+                    // Validate toAddress parameter
+                    if (!params.toAddress) {
+                        return EnhancedErrorHandler.missingParameter('toAddress', 'sendTransaction', {
+                            fromAddress: params.fromAddress,
+                            toAddress: "nano_3receiver_address_here",
+                            amountRaw: "100000000000000000000000000000",
+                            privateKey: "your_private_key_here"
+                        });
+                    }
+                    
+                    const toAddressError = EnhancedErrorHandler.validateAddress(params.toAddress, 'toAddress');
+                    if (toAddressError) {
+                        return toAddressError;
+                    }
+                    
+                    // Validate amountRaw parameter
+                    if (!params.amountRaw) {
+                        return EnhancedErrorHandler.missingParameter('amountRaw', 'sendTransaction', {
+                            fromAddress: params.fromAddress,
+                            toAddress: params.toAddress,
+                            amountRaw: "100000000000000000000000000000",
+                            privateKey: "your_private_key_here"
+                        });
+                    }
+                    
+                    const amountError = EnhancedErrorHandler.validateAmountRaw(params.amountRaw, 'amountRaw');
+                    if (amountError) {
+                        return amountError;
+                    }
+                    
+                    // Validate privateKey parameter
+                    if (!params.privateKey) {
+                        return EnhancedErrorHandler.missingParameter('privateKey', 'sendTransaction', {
+                            fromAddress: params.fromAddress,
+                            toAddress: params.toAddress,
+                            amountRaw: params.amountRaw,
+                            privateKey: "your_64_character_hexadecimal_private_key"
+                        });
+                    }
+                    
+                    const sendKeyError = EnhancedErrorHandler.validatePrivateKey(params.privateKey);
+                    if (sendKeyError) {
+                        return sendKeyError;
+                    }
+                    
                     result = await this.nanoTransactions.sendTransaction(
                         params.fromAddress,
                         params.privateKey,
@@ -524,25 +608,116 @@ class NanoMCPServer {
                     );
                     break;
                 case 'receiveAllPending':
-                    this.schemaValidator.validate(params, {
-                        type: 'object',
-                        required: ['address', 'privateKey'],
-                        properties: {
-                            address: { type: 'string' },
-                            privateKey: { type: 'string' }
-                        }
-                    });
+                    // Validate address parameter
+                    if (!params || !params.address) {
+                        return EnhancedErrorHandler.missingParameter('address', 'receiveAllPending', {
+                            address: "nano_3h3m6kfckrxpc4t33jn36eu8smfpukwuq1zq4hy35dh4a7drs6ormhwhkncn",
+                            privateKey: "your_private_key_here"
+                        });
+                    }
+                    
+                    const receiveAddressError = EnhancedErrorHandler.validateAddress(params.address, 'address');
+                    if (receiveAddressError) {
+                        return receiveAddressError;
+                    }
+                    
+                    // Validate privateKey parameter
+                    if (!params.privateKey) {
+                        return EnhancedErrorHandler.missingParameter('privateKey', 'receiveAllPending', {
+                            address: params.address,
+                            privateKey: "your_64_character_hexadecimal_private_key"
+                        });
+                    }
+                    
+                    const receiveKeyError = EnhancedErrorHandler.validatePrivateKey(params.privateKey);
+                    if (receiveKeyError) {
+                        return receiveKeyError;
+                    }
+                    
                     result = await this.nanoTransactions.receiveAllPending(params.address, params.privateKey);
                     break;
                 case 'generateQrCode':
-                    this.schemaValidator.validate(params, {
-                        type: 'object',
-                        required: ['address', 'amount'],
-                        properties: {
-                            address: { type: 'string' },
-                            amount: { type: 'string' }
-                        }
-                    });
+                    // Validate address parameter
+                    if (!params || !params.address) {
+                        return EnhancedErrorHandler.missingParameter('address', 'generateQrCode', {
+                            address: "nano_3h3m6kfckrxpc4t33jn36eu8smfpukwuq1zq4hy35dh4a7drs6ormhwhkncn",
+                            amount: "0.1"
+                        });
+                    }
+                    
+                    const qrAddressError = EnhancedErrorHandler.validateAddress(params.address, 'address');
+                    if (qrAddressError) {
+                        return qrAddressError;
+                    }
+                    
+                    // Validate amount parameter (in NANO format)
+                    if (!params.amount) {
+                        return EnhancedErrorHandler.missingParameter('amount', 'generateQrCode', {
+                            address: params.address,
+                            amount: "0.1"
+                        });
+                    }
+                    
+                    if (typeof params.amount !== 'string') {
+                        return {
+                            success: false,
+                            error: "Invalid amount parameter",
+                            errorCode: "INVALID_AMOUNT_TYPE",
+                            details: {
+                                parameter: "amount",
+                                providedValue: params.amount,
+                                providedType: typeof params.amount,
+                                expectedType: "string",
+                                expectedFormat: "Decimal string in NANO (e.g., '0.1', '1.5')"
+                            },
+                            nextSteps: [
+                                "Step 1: Provide amount as a string",
+                                "Step 2: Amount should be in NANO format (decimal allowed)",
+                                "Step 3: Examples: '0.1', '1.0', '5.5'",
+                                "Step 4: Do NOT use raw format for QR codes"
+                            ],
+                            exampleRequest: {
+                                jsonrpc: "2.0",
+                                method: "generateQrCode",
+                                params: {
+                                    address: params.address,
+                                    amount: "0.1"
+                                },
+                                id: 1
+                            }
+                        };
+                    }
+                    
+                    // Validate amount is a valid decimal
+                    if (!/^\d+\.?\d*$/.test(params.amount.trim())) {
+                        return {
+                            success: false,
+                            error: "Invalid amount format for QR code",
+                            errorCode: "INVALID_QR_AMOUNT_FORMAT",
+                            details: {
+                                parameter: "amount",
+                                providedValue: params.amount,
+                                expectedFormat: "Decimal string in NANO (e.g., '0.1', '1.5')",
+                                issue: "Amount must be a valid decimal number"
+                            },
+                            nextSteps: [
+                                "Step 1: Use decimal NANO format (not raw)",
+                                "Step 2: Examples: '0.1', '1.0', '5.5', '100'",
+                                "Step 3: No special characters except decimal point",
+                                "Step 4: Amount must be positive"
+                            ],
+                            exampleRequest: {
+                                jsonrpc: "2.0",
+                                method: "generateQrCode",
+                                params: {
+                                    address: params.address,
+                                    amount: "0.1"
+                                },
+                                id: 1
+                            }
+                        };
+                    }
+                    
                     result = await this.nanoTransactions.generateQrCode(params.address, params.amount);
                     break;
                 case 'setupTestWallets':
@@ -581,48 +756,164 @@ class NanoMCPServer {
                     result = await this.testWalletManager.resetTestWallets();
                     break;
                 case 'convertBalance':
-                    this.schemaValidator.validate(params, {
-                        type: 'object',
-                        required: ['amount', 'from', 'to'],
-                        properties: {
-                            amount: { type: 'string' },
-                            from: { type: 'string' },
-                            to: { type: 'string' }
-                        }
-                    });
+                    // Validate amount parameter
+                    if (!params || !params.amount) {
+                        return EnhancedErrorHandler.missingParameter('amount', 'convertBalance', {
+                            amount: "0.1",
+                            from: "nano",
+                            to: "raw"
+                        });
+                    }
+                    
+                    if (typeof params.amount !== 'string') {
+                        return {
+                            success: false,
+                            error: "Invalid amount parameter",
+                            errorCode: "INVALID_AMOUNT_TYPE",
+                            details: {
+                                parameter: "amount",
+                                providedType: typeof params.amount,
+                                expectedType: "string"
+                            },
+                            nextSteps: [
+                                "Step 1: Provide amount as a string",
+                                "Step 2: Example: '0.1' or '100000000000000000000000000000'",
+                                "Step 3: Do not use number type, use string"
+                            ]
+                        };
+                    }
+                    
+                    // Validate from parameter
+                    if (!params.from) {
+                        return EnhancedErrorHandler.missingParameter('from', 'convertBalance', {
+                            amount: params.amount,
+                            from: "nano",
+                            to: "raw"
+                        });
+                    }
+                    
+                    // Validate to parameter
+                    if (!params.to) {
+                        return EnhancedErrorHandler.missingParameter('to', 'convertBalance', {
+                            amount: params.amount,
+                            from: params.from,
+                            to: "raw"
+                        });
+                    }
+                    
                     const from = params.from.toLowerCase();
                     const to = params.to.toLowerCase();
                     
-                    if (from === 'nano' && to === 'raw') {
-                        const raw = BalanceConverter.nanoToRaw(params.amount);
-                        result = {
-                            original: params.amount,
-                            originalUnit: 'NANO',
-                            converted: raw,
-                            convertedUnit: 'raw',
-                            formula: 'raw = NANO × 10^30'
+                    // Validate from and to values
+                    if (!['nano', 'raw'].includes(from) || !['nano', 'raw'].includes(to)) {
+                        return {
+                            success: false,
+                            error: "Invalid conversion units",
+                            errorCode: "INVALID_CONVERSION_UNITS",
+                            details: {
+                                providedFrom: params.from,
+                                providedTo: params.to,
+                                allowedValues: ['nano', 'raw']
+                            },
+                            nextSteps: [
+                                "Step 1: 'from' parameter must be either 'nano' or 'raw'",
+                                "Step 2: 'to' parameter must be either 'nano' or 'raw'",
+                                "Step 3: Supported conversions: nano→raw or raw→nano",
+                                "Step 4: Parameter values are case-insensitive"
+                            ],
+                            exampleRequests: [
+                                {
+                                    description: "Convert NANO to raw",
+                                    request: {
+                                        jsonrpc: "2.0",
+                                        method: "convertBalance",
+                                        params: { amount: "0.1", from: "nano", to: "raw" },
+                                        id: 1
+                                    }
+                                },
+                                {
+                                    description: "Convert raw to NANO",
+                                    request: {
+                                        jsonrpc: "2.0",
+                                        method: "convertBalance",
+                                        params: { amount: "100000000000000000000000000000", from: "raw", to: "nano" },
+                                        id: 1
+                                    }
+                                }
+                            ]
                         };
-                    } else if (from === 'raw' && to === 'nano') {
-                        const nano = BalanceConverter.rawToNano(params.amount);
-                        result = {
-                            original: params.amount,
-                            originalUnit: 'raw',
-                            converted: nano,
-                            convertedUnit: 'NANO',
-                            formula: 'NANO = raw ÷ 10^30'
+                    }
+                    
+                    if (from === to) {
+                        return {
+                            success: false,
+                            error: "Conversion units are the same",
+                            errorCode: "SAME_CONVERSION_UNITS",
+                            details: {
+                                from: from,
+                                to: to,
+                                issue: "Cannot convert to the same unit"
+                            },
+                            nextSteps: [
+                                "Step 1: 'from' and 'to' must be different units",
+                                "Step 2: Use 'nano' and 'raw' for conversion",
+                                "Step 3: Example: from='nano' to='raw' or from='raw' to='nano'"
+                            ]
                         };
-                    } else {
-                        throw new Error(`Invalid conversion: from="${from}" to="${to}". Must be nano→raw or raw→nano`);
+                    }
+                    
+                    try {
+                        if (from === 'nano' && to === 'raw') {
+                            const raw = BalanceConverter.nanoToRaw(params.amount);
+                            result = {
+                                original: params.amount,
+                                originalUnit: 'NANO',
+                                converted: raw,
+                                convertedUnit: 'raw',
+                                formula: 'raw = NANO × 10^30'
+                            };
+                        } else if (from === 'raw' && to === 'nano') {
+                            const nano = BalanceConverter.rawToNano(params.amount);
+                            result = {
+                                original: params.amount,
+                                originalUnit: 'raw',
+                                converted: nano,
+                                convertedUnit: 'NANO',
+                                formula: 'NANO = raw ÷ 10^30'
+                            };
+                        }
+                    } catch (error) {
+                        return {
+                            success: false,
+                            error: "Conversion failed",
+                            errorCode: "CONVERSION_ERROR",
+                            details: {
+                                originalError: error.message,
+                                amount: params.amount,
+                                from: from,
+                                to: to
+                            },
+                            nextSteps: [
+                                "Step 1: Verify the amount format is correct",
+                                "Step 2: For NANO: use decimal format (e.g., '0.1', '1.5')",
+                                "Step 3: For raw: use integer string (e.g., '100000000000000000000000000000')",
+                                "Step 4: Ensure amount is positive and within valid range"
+                            ]
+                        };
                     }
                     break;
                 case 'getAccountStatus':
-                    this.schemaValidator.validate(params, {
-                        type: 'object',
-                        required: ['address'],
-                        properties: {
-                            address: { type: 'string' }
-                        }
-                    });
+                    // Validate address parameter
+                    if (!params || !params.address) {
+                        return EnhancedErrorHandler.missingParameter('address', 'getAccountStatus', {
+                            address: "nano_3h3m6kfckrxpc4t33jn36eu8smfpukwuq1zq4hy35dh4a7drs6ormhwhkncn"
+                        });
+                    }
+                    
+                    const statusAddressError = EnhancedErrorHandler.validateAddress(params.address, 'address');
+                    if (statusAddressError) {
+                        return statusAddressError;
+                    }
                     
                     // Get comprehensive account status
                     let accountInfo;
@@ -698,7 +989,7 @@ class NanoMCPServer {
                     };
                     break;
                 default:
-                    throw new Error(`Method ${method} not found`);
+                    return EnhancedErrorHandler.methodNotFound(method, MCP_TOOLS.map(t => t.name));
             }
 
             return {
