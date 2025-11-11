@@ -97,13 +97,24 @@ POST https://nano-mcp.replit.app
 |----------|---------------|---------------------|
 | setupTestWallets | < 1s | 5s |
 | getAccountStatus | 1-3s | 10s |
-| **initializeAccount** | **8-12s** | **30s** |
-| **sendTransaction** | **10-15s** | **30s** |
-| **receiveAllPending** | **5-15s per block** | **60s** |
+| **initializeAccount** | **8-60s (varies)** | **60s** |
+| **sendTransaction** | **10-60s (varies)** | **60s** |
+| **receiveAllPending** | **5-60s per block** | **60s** |
 | convertBalance | < 500ms | 5s |
 | generateQrCode | < 2s | 10s |
 
-**⚠️ Important:** Work generation (PoW) takes time. Always set 30s+ timeout for transactions.
+**⚠️ CRITICAL: Work Generation Performance**
+
+Proof-of-Work (PoW) generation time **varies significantly by system**:
+- Fast systems: 10-15 seconds
+- Slower systems: 30-60 seconds
+- **ALWAYS set 60-second timeout minimum** for transaction functions (initializeAccount, sendTransaction, receiveAllPending)
+
+**If experiencing timeouts:**
+1. Increase timeout to 90-120 seconds
+2. Check system CPU availability
+3. Don't retry immediately - work might still be processing
+4. Check account status after timeout - transaction may have completed
 
 ### ❌ DON'T Do These (Time Wasters)
 
@@ -154,8 +165,10 @@ await Promise.all([
 1. **Use `getAccountStatus` for everything** - It replaces getBalance, getAccountInfo, getPendingBlocks
 2. **Follow `needsAction` array** - Auto-recovery without trial-and-error
 3. **Batch independent calls** - Use Promise.all or batch requests
-4. **Set proper timeouts** - 30s for transactions, 10s for queries
+4. **Set generous timeouts** - **60s minimum** for transactions (system performance varies)
 5. **Save setupTestWallets response** - Don't call getTestWallets unless retrieving
+6. **Don't retry on timeout** - Check account status first, transaction may have completed
+7. **Expect work generation variability** - 10-60s depending on system load
 
 ### 📊 Optimization Impact
 
