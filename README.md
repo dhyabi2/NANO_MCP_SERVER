@@ -1,744 +1,596 @@
-# NANO MCP (Nano Cryptocurrency) Server
+# NANO MCP Server - AI Agent Integration Guide
 
-## Overview
+> **For AI Agents**: This server is designed specifically for autonomous agents. All errors are self-documenting with step-by-step guidance. No external documentation needed.
 
-NANO MCP (NANO Cryptocurrency) Server provides a JSON-RPC 2.0 API for interacting with the NANO cryptocurrency network. This server supports both HTTP and stdio transports, making it versatile for different integration scenarios.
+---
 
-## What is NANO Cryptocurrency?
+## 🤖 Quick Start for AI Agents
 
-NANO is a sustainable digital currency with instant transactions and zero fees, making it ideal for AI systems and automated transactions. Unlike traditional cryptocurrencies, NANO uses a unique block-lattice architecture and a Delegated Proof of Stake (DPoS) consensus mechanism called Open Representative Voting (ORV).
-
-### Why NANO is Unique for AI Applications:
-
-1. **Instant Transactions**: Perfect for real-time AI decision-making and automated systems
-2. **Zero Fees**: Enables micro-transactions and continuous AI-driven operations without cost overhead
-3. **Energy Efficient**: Uses minimal computational resources, making it environmentally friendly
-4. **Scalability**: Block-lattice architecture allows parallel processing of transactions
-5. **Deterministic Finality**: Provides immediate transaction confirmation, crucial for AI systems
-6. **Asynchronous Operations**: Ideal for distributed AI systems and parallel processing
-
-## Quick Start
-
+### Step 1: Install and Run (2 minutes)
 ```bash
-# Using npx
-npx -y nano-mcp
-
-# Or install and run
-npm install nano-mcp
-node src/index.js
+cd NANO_MCP_SERVER
+npm install
+npm start
 ```
+Server runs on: `http://localhost:8080`
 
-## 📁 Project Structure
-
-```
-nano-mcp/
-├── src/
-│   ├── index.js          # Main server entry point
-│   ├── server.js         # MCP server implementation
-│   └── swagger.js        # API documentation
-├── utils/
-│   └── nano-transactions.js  # Nano transaction handling
-├── tests/
-│   └── full-flow-test.ps1    # Integration tests
-├── package.json
-└── README.md
-```
-
-## 🚀 Prerequisites
-
-- Node.js 16+ (as specified in package.json)
-- Express.js for HTTP server
-- Nano cryptocurrency libraries:
-  - nanocurrency
-  - nanocurrency-web
-- Additional dependencies:
-  - body-parser
-  - swagger-ui-express
-  - swagger-jsdoc
-  - ajv (for schema validation)
-
-## JSON-RPC API Reference
-
-### Available Methods
-
-1. `initialize` - Get server capabilities
-2. `generateWallet` - Create new NANO wallet
-3. `getBalance` - Check account balance
-4. `initializeAccount` - Initialize account for transactions
-5. `sendTransaction` - Send NANO to another address
-6. `receiveAllPending` - Process pending receive blocks
-7. `getAccountInfo` - Get detailed account information
-8. `getPendingBlocks` - Check pending transactions
-
-### Method Examples
-
-#### Initialize
+### Step 2: Test Connection
 ```json
-// Request
+POST http://localhost:8080
 {
     "jsonrpc": "2.0",
     "method": "initialize",
     "params": {},
     "id": 1
 }
-
-// Response
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "version": "1.0.0",
-        "capabilities": {
-            "methods": [
-                "initialize",
-                "generateWallet",
-                "getBalance",
-                "initializeAccount",
-                "sendTransaction",
-                "receiveAllPending",
-                "getAccountInfo",
-                "getPendingBlocks"
-            ]
-        }
-    },
-    "id": 1
-}
 ```
 
-#### Generate Wallet
-```json
-// Request
-{
-    "jsonrpc": "2.0",
-    "method": "generateWallet",
-    "params": {},
-    "id": 1
-}
+### Step 3: You're Ready!
+The server responds with all available methods. Start using them immediately.
 
-// Response
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "address": "nano_3qya5xpjfsbk3ndfebo9dsrj6iy6f6idmogqtn1mtzdtwnxu6rw3dz18i6xf",
-        "privateKey": "4bc2e9c2df4be93e5cbeb41b52c2fc9efc1b4c0e67951fc6c5098c117913d25a",
-        "publicKey": "3qya5xpjfsbk3ndfebo9dsrj6iy6f6idmogqtn1mtzdtwnxu6rw3dz18i6xf"
-    },
-    "id": 1
-}
-```
+---
 
-#### Get Balance
-```json
-// Request
+## 🎯 What This Server Does
+
+**NANO MCP Server** provides JSON-RPC 2.0 API for NANO cryptocurrency operations with:
+- ✅ **Self-documenting errors** - Every error tells you exactly what to do next
+- ✅ **Helper functions** - Convert units, check account status automatically
+- ✅ **Test wallet system** - Generate and manage test wallets for development
+- ✅ **No external docs needed** - All information in API responses
+
+**NANO Cryptocurrency Features:**
+- Instant transactions (< 1 second)
+- Zero fees
+- Eco-friendly (minimal energy)
+- Perfect for automated AI systems
+
+---
+
+## 📋 Available MCP Functions
+
+### Core Functions (8)
+1. `generateWallet` - Create new NANO wallet
+2. `getBalance` - Check account balance
+3. `getAccountInfo` - Get detailed account data
+4. `getPendingBlocks` - List pending transactions
+5. `initializeAccount` - Open/activate new account
+6. `sendTransaction` - Send NANO (with enhanced errors)
+7. `receiveAllPending` - Receive all pending blocks
+8. `generateQrCode` - Create payment QR code
+
+### Helper Functions (2) - For Autonomous Agents
+9. **`convertBalance`** - Convert NANO ↔ raw units
+10. **`getAccountStatus`** - One call shows: balance, pending, capabilities, what actions needed
+
+### Test Wallet Functions (5)
+11. `setupTestWallets` - Generate two test wallets
+12. `getTestWallets` - Retrieve test wallet info
+13. `updateTestWalletBalance` - Update wallet balance tracking
+14. `checkTestWalletsFunding` - Check if wallets are ready
+15. `resetTestWallets` - Delete and start fresh
+
+---
+
+## 🚀 Complete Workflow for AI Agents
+
+### Workflow: Send NANO Transaction
+
+```javascript
+// Step 1: Check account status first (ALWAYS DO THIS)
+POST http://localhost:8080
 {
     "jsonrpc": "2.0",
-    "method": "getBalance",
+    "method": "getAccountStatus",
     "params": {
-        "address": "nano_3qya5xpjfsbk3ndfebo9dsrj6iy6f6idmogqtn1mtzdtwnxu6rw3dz18i6xf"
+        "address": "nano_your_address"
     },
     "id": 1
 }
 
-// Response
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "balance": "1000000000000000000000000",
-        "pending": "0"
-    },
-    "id": 1
-}
-```
+// Response shows:
+// - initialized: true/false
+// - balance: {raw, nano}
+// - pending: {count, amount}
+// - needsAction: [array of required actions]
+// - readyForTesting: true/false
 
-#### Initialize Account
-```json
-// Request
+// Step 2: Handle any required actions
+// If needsAction includes "initializeAccount":
 {
     "jsonrpc": "2.0",
     "method": "initializeAccount",
     "params": {
-        "address": "nano_3qya5xpjfsbk3ndfebo9dsrj6iy6f6idmogqtn1mtzdtwnxu6rw3dz18i6xf",
-        "privateKey": "4bc2e9c2df4be93e5cbeb41b52c2fc9efc1b4c0e67951fc6c5098c117913d25a"
+        "address": "nano_your_address",
+        "privateKey": "your_private_key"
     },
-    "id": 1
+    "id": 2
 }
 
-// Response
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "initialized": true,
-        "representative": "nano_3qya5xpjfsbk3ndfebo9dsrj6iy6f6idmogqtn1mtzdtwnxu6rw3dz18i6xf"
-    },
-    "id": 1
-}
-```
-
-#### Send Transaction
-```json
-// Request
-{
-    "jsonrpc": "2.0",
-    "method": "sendTransaction",
-    "params": {
-        "fromAddress": "nano_3qya5xpjfsbk3ndfebo9dsrj6iy6f6idmogqtn1mtzdtwnxu6rw3dz18i6xf",
-        "toAddress": "nano_1ipx847tk8o46pwxt5qjdbncjqcbwcc1rrmqnkztrfjy5k7z4imsrata9est",
-        "amountRaw": "1000000000000000000000000",
-        "privateKey": "4bc2e9c2df4be93e5cbeb41b52c2fc9efc1b4c0e67951fc6c5098c117913d25a"
-    },
-    "id": 1
-}
-
-// Response
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "success": true,
-        "hash": "991CF190094C00F0B68E2E5F75F6BEE95A2E0BD93CEAA4A6734DB9F19B728948",
-        "amount": "1000000000000000000000000",
-        "balance": "0"
-    },
-    "id": 1
-}
-```
-
-#### Receive All Pending
-```json
-// Request
+// If needsAction includes "receiveAllPending":
 {
     "jsonrpc": "2.0",
     "method": "receiveAllPending",
     "params": {
-        "address": "nano_3qya5xpjfsbk3ndfebo9dsrj6iy6f6idmogqtn1mtzdtwnxu6rw3dz18i6xf",
-        "privateKey": "4bc2e9c2df4be93e5cbeb41b52c2fc9efc1b4c0e67951fc6c5098c117913d25a"
+        "address": "nano_your_address",
+        "privateKey": "your_private_key"
     },
-    "id": 1
+    "id": 3
 }
 
-// Response
+// Step 3: Convert amount to raw units
 {
     "jsonrpc": "2.0",
-    "result": {
-        "received": [
-            {
-                "hash": "991CF190094C00F0B68E2E5F75F6BEE95A2E0BD93CEAA4A6734DB9F19B728948",
-                "amount": "1000000000000000000000000",
-                "source": "nano_1ipx847tk8o46pwxt5qjdbncjqcbwcc1rrmqnkztrfjy5k7z4imsrata9est"
-            }
-        ]
+    "method": "convertBalance",
+    "params": {
+        "amount": "0.1",
+        "from": "nano",
+        "to": "raw"
+    },
+    "id": 4
+}
+// Returns: {"converted": "100000000000000000000000000000"}
+
+// Step 4: Send transaction
+{
+    "jsonrpc": "2.0",
+    "method": "sendTransaction",
+    "params": {
+        "fromAddress": "nano_sender",
+        "toAddress": "nano_recipient",
+        "amountRaw": "100000000000000000000000000",
+        "privateKey": "sender_private_key"
+    },
+    "id": 5
+}
+
+// Success: {"success": true, "hash": "..."}
+// Error: Detailed error with nextSteps (see Error Handling section)
+```
+
+---
+
+## ⚡ Quick Reference: Common Tasks
+
+### Task 1: Generate New Wallet
+```json
+{"jsonrpc": "2.0", "method": "generateWallet", "params": {}, "id": 1}
+```
+Returns: `address`, `privateKey`, `publicKey`, `seed`
+
+### Task 2: Check Balance
+```json
+{"jsonrpc": "2.0", "method": "getBalance", "params": {"address": "nano_xxx"}, "id": 1}
+```
+Returns: `balance` (raw), `pending` (raw)
+
+### Task 3: Convert Units
+```json
+{"jsonrpc": "2.0", "method": "convertBalance", "params": {"amount": "0.1", "from": "nano", "to": "raw"}, "id": 1}
+```
+Returns: `converted` value with formula
+
+### Task 4: Check Account Readiness
+```json
+{"jsonrpc": "2.0", "method": "getAccountStatus", "params": {"address": "nano_xxx"}, "id": 1}
+```
+Returns: Complete status + what to do next
+
+---
+
+## 🧠 Error Handling for AI Agents
+
+### How Errors Work
+**All errors include:**
+- `errorCode` - Machine-readable code
+- `error` - Human-readable message
+- `details` - Specific context (current balance, amounts, etc.)
+- `nextSteps` - Step-by-step remediation (array of strings)
+- `relatedFunctions` - What functions to call next
+- `exampleRequest` - Copy-paste ready example
+
+### Example: Insufficient Balance Error
+
+**Request:**
+```json
+{
+    "jsonrpc": "2.0",
+    "method": "sendTransaction",
+    "params": {
+        "fromAddress": "nano_xxx",
+        "toAddress": "nano_yyy",
+        "amountRaw": "1000000000000000000000000000",
+        "privateKey": "key"
     },
     "id": 1
 }
 ```
 
-#### Get Account Info
+**Error Response:**
 ```json
-// Request
-{
-    "jsonrpc": "2.0",
-    "method": "getAccountInfo",
-    "params": {
-        "address": "nano_3qya5xpjfsbk3ndfebo9dsrj6iy6f6idmogqtn1mtzdtwnxu6rw3dz18i6xf"
-    },
-    "id": 1
-}
-
-// Response
 {
     "jsonrpc": "2.0",
     "result": {
-        "frontier": "991CF190094C00F0B68E2E5F75F6BEE95A2E0BD93CEAA4A6734DB9F19B728948",
-        "open_block": "991CF190094C00F0B68E2E5F75F6BEE95A2E0BD93CEAA4A6734DB9F19B728948",
-        "representative_block": "991CF190094C00F0B68E2E5F75F6BEE95A2E0BD93CEAA4A6734DB9F19B728948",
-        "balance": "1000000000000000000000000",
-        "modified_timestamp": "1634567890",
-        "block_count": "1",
-        "representative": "nano_3qya5xpjfsbk3ndfebo9dsrj6iy6f6idmogqtn1mtzdtwnxu6rw3dz18i6xf",
-        "weight": "0",
-        "pending": "0"
-    },
-    "id": 1
-}
-```
-
-#### Get Pending Blocks
-```json
-// Request
-{
-    "jsonrpc": "2.0",
-    "method": "getPendingBlocks",
-    "params": {
-        "address": "nano_3qya5xpjfsbk3ndfebo9dsrj6iy6f6idmogqtn1mtzdtwnxu6rw3dz18i6xf"
-    },
-    "id": 1
-}
-
-// Response
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "blocks": {
-            "991CF190094C00F0B68E2E5F75F6BEE95A2E0BD93CEAA4A6734DB9F19B728948": {
-                "amount": "1000000000000000000000000",
-                "source": "nano_1ipx847tk8o46pwxt5qjdbncjqcbwcc1rrmqnkztrfjy5k7z4imsrata9est"
-            }
+        "success": false,
+        "error": "Insufficient balance",
+        "errorCode": "INSUFFICIENT_BALANCE",
+        "details": {
+            "address": "nano_xxx",
+            "currentBalance": "80000000000000000000000000",
+            "currentBalanceNano": "0.00016",
+            "attemptedAmount": "1000000000000000000000000000",
+            "attemptedAmountNano": "0.002",
+            "shortfall": "920000000000000000000000000",
+            "shortfallNano": "0.00184"
+        },
+        "nextSteps": [
+            "Step 1: Check current balance using getBalance or getAccountInfo",
+            "Step 2: Either reduce send amount to maximum 0.00016 NANO or less",
+            "Step 3: Or fund account with additional 0.00184 NANO minimum",
+            "Step 4: After funding, use receiveAllPending to process pending blocks",
+            "Step 5: Retry your send transaction"
+        ],
+        "relatedFunctions": ["getBalance", "getAccountInfo", "receiveAllPending"],
+        "exampleRequest": {
+            "jsonrpc": "2.0",
+            "method": "getBalance",
+            "params": {"address": "nano_xxx"},
+            "id": 1
         }
     },
     "id": 1
 }
 ```
 
-## Configuration
+### Error Codes Reference
 
-Environment variables:
+| Error Code | What It Means | Auto-Recoverable | Action |
+|------------|---------------|------------------|--------|
+| `INSUFFICIENT_BALANCE` | Not enough NANO | Yes | Reduce amount or fund account |
+| `ACCOUNT_NOT_INITIALIZED` | Account not opened | Yes | Call initializeAccount |
+| `ACCOUNT_NOT_INITIALIZED_NO_PENDING` | No funds available | No | Send NANO to address first |
+| `PENDING_BLOCKS_NOT_RECEIVED` | Has pending blocks | Yes | Call receiveAllPending |
+| `INVALID_AMOUNT_FORMAT` | Wrong units | Yes | Use convertBalance |
+| `BLOCKCHAIN_ERROR` | Generic blockchain issue | Maybe | Check getAccountStatus |
+| `VALIDATION_ERROR` | Invalid parameter | Yes | Fix per error message |
+
+### Decision Tree for Error Handling
+
+```
+Receive Error
+  |
+  ├─> errorCode == "INSUFFICIENT_BALANCE"
+  |     ├─> Check details.shortfall
+  |     ├─> Option 1: Reduce amountRaw
+  |     └─> Option 2: Fund account
+  |
+  ├─> errorCode == "ACCOUNT_NOT_INITIALIZED"
+  |     ├─> Check details.hasPendingBlocks
+  |     ├─> If true: Call initializeAccount
+  |     └─> If false: Send NANO to address first
+  |
+  ├─> errorCode == "PENDING_BLOCKS_NOT_RECEIVED"
+  |     └─> Call receiveAllPending
+  |
+  └─> Other errors
+        └─> Follow nextSteps array
+```
+
+---
+
+## 🧪 Test Wallet System (For Development)
+
+### Quick Setup
+```json
+// 1. Generate test wallets
+{"jsonrpc": "2.0", "method": "setupTestWallets", "params": {}, "id": 1}
+
+// Response includes two wallets with addresses
+// Copy addresses and fund them with test NANO
+
+// 2. Check funding status
+{"jsonrpc": "2.0", "method": "checkTestWalletsFunding", "params": {}, "id": 2}
+
+// 3. When both funded, start testing!
+```
+
+### Test Wallet Workflow
+```
+setupTestWallets
+     ↓
+Fund addresses (external)
+     ↓
+initializeAccount (both wallets)
+     ↓
+updateTestWalletBalance (both wallets)
+     ↓
+checkTestWalletsFunding
+     ↓
+Ready for send/receive testing!
+```
+
+---
+
+## 💡 Decision Tree: Complete Transaction Flow
+
+```
+START
+  |
+  v
+Call: getAccountStatus(address)
+  |
+  ├─> initialized: false
+  |   |
+  |   ├─> hasPendingBlocks: true
+  |   |   └─> Call: initializeAccount
+  |   |
+  |   └─> hasPendingBlocks: false
+  |       └─> STOP: Fund account first
+  |
+  └─> initialized: true
+      |
+      ├─> pendingCount > 0
+      |   └─> Call: receiveAllPending
+      |
+      └─> canSend: true
+          |
+          v
+      Call: convertBalance(amount, "nano", "raw")
+          |
+          v
+      Call: sendTransaction(...)
+          |
+          ├─> success: true
+          |   └─> DONE!
+          |
+          └─> success: false
+              └─> Parse errorCode
+                  └─> Follow nextSteps in error response
+```
+
+---
+
+## 📊 Unit Conversion (Important!)
+
+**NANO uses TWO units:**
+- **NANO** (decimal, e.g., "0.1") - Human-readable
+- **raw** (integer string) - Blockchain uses this
+
+**Conversion:**
+- 1 NANO = 10³⁰ raw
+- Always use raw for `amountRaw` parameter
+
+**Quick Reference:**
+| NANO | Raw |
+|------|-----|
+| 0.000001 | 1000000000000000000000000 |
+| 0.001 | 1000000000000000000000000000 |
+| 0.01 | 10000000000000000000000000000 |
+| 0.1 | 100000000000000000000000000000 |
+| 1.0 | 1000000000000000000000000000000 |
+
+**Use convertBalance function:**
+```json
+{"jsonrpc": "2.0", "method": "convertBalance", "params": {"amount": "0.1", "from": "nano", "to": "raw"}, "id": 1}
+```
+
+---
+
+## 🔧 Setup and Configuration
+
+### Installation
 ```bash
-MCP_PORT=3000          # HTTP server port
-MCP_TRANSPORT=http     # Transport type (http/stdio)
-NANO_RPC_URL          # NANO node RPC endpoint
-NANO_RPC_KEY          # API key for node (if required)
-NANO_REPRESENTATIVE   # Default representative
+# Clone or download
+cd NANO_MCP_SERVER
+
+# Install dependencies
+npm install
+
+# Run server
+npm start
 ```
 
-## Transport Options
-
-### 1. HTTP Transport (default)
-- REST API on port 3000
-- JSON-RPC 2.0 protocol
-- Swagger docs at /api-docs
-- CORS enabled for all origins
-- Content-Type: application/json
-
-### 2. stdio Transport
-- Direct process communication
-- Line-delimited JSON
-- Responses written to stdout
-- Server messages written to stderr
-
-
-
-## Usage Custom openai gbt 
-You are a Nano Faucet Assistant that interacts with the Nano MCP server:
-
-🌐 https://nano-mcp.replit.app
-
-You perform 3 actions using JSON-RPC 2.0 via the `nanoRpc` tool.  
-All requests must be sent with top-level fields — do **not** nest the entire payload inside a `params` field.
-
----
-
- ✅ Format for Every Request
-
-Send requests like this:
-
-json
-{
-  "jsonrpc": "2.0",
-  "method": "METHOD_NAME",
-  "params": { ... },
-  "id": 1
-}
-
-🛑 Never send this structure:
-json
-{
-  "params": {
-    "jsonrpc": "...",
-    "method": "...",
-    ...
-  }
-}
-
-
----
-
- 🟢 1. Faucet Payout – `sendTransaction`
-
-When a user asks for free Nano:
-
-1. Ask for their Nano address.
-2. Send:
-
-json
-{
-  "jsonrpc": "2.0",
-  "method": "sendTransaction",
-  "params": {
-    "fromAddress": "nano_3h5fu37g8mcz8ndu8xgfx3dds6dks6qnp3k8rhjf8knuzec7zr1gdujjqqwc",
-    "toAddress": "<USER_ADDRESS>",
-    "amountRaw": "100000000000000000000000",  // 0.1 XNO
-    "privateKey": "Private key here "
-  },
-  "id": 1
-}
-
-✅ On success:  
-> “0.1 XNO sent! Transaction hash: `<hash>`”
-
----
-
- 🟡 2. Receive Pending – `receiveAllPending` (on request only)
-
-If the user says:
-> “Receive pending”, “Collect Nano”, or “Settle faucet”
-
-Send:
-
-json
-{
-  "jsonrpc": "2.0",
-  "method": "receiveAllPending",
-  "params": {
-    "address": "nano_3h5fu37g8mcz8ndu8xgfx3dds6dks6qnp3k8rhjf8knuzec7zr1gdujjqqwc",
-    "privateKey": "Private key here "
-  },
-  "id": 2
-}
-
-
-✅ On success:  
-> “Faucet received all pending Nano.”
-
----
-
- 🧪 3. Generate Wallet – `generateWallet`
-
-If the user says:
-> “Generate wallet”, “Give me a Nano address”, or “Create a new wallet”
-
-Send:
-
-json
-{
-  "jsonrpc": "2.0",
-  "method": "generateWallet",
-  "id": 3
-}
-
-✅ On success:  
-> Display the generated address, public key, private key, and seed to the user.
-
----
-
- 📌 Summary
-
-- ✅ All actions use `POST /` only
-- ✅ Send `jsonrpc`, `method`, `params`, and `id` at the root level
-- 🚫 Do not nest the full request inside a `params` field
-- 🔓 Supported methods: `sendTransaction`, `receiveAllPending`, `generateWallet`
-
-
-
-
- ✅ Full openai.yaml Schema
-
-
-openapi: 3.1.0
-info:
-  title: Nano MCP JSON-RPC API
-  version: 1.0.0
-servers:
-  - url: https://nano-mcp.replit.app
-paths:
-  /:
-    post:
-      summary: Send a JSON-RPC 2.0 request to the Nano MCP server
-      operationId: nanoRpc
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [jsonrpc, method, id]
-              properties:
-                jsonrpc:
-                  type: string
-                  enum: ["2.0"]
-                  description: JSON-RPC version
-                method:
-                  type: string
-                  enum:
-                    - generateWallet
-                    - sendTransaction
-                    - receiveAllPending
-                    - initializeAccount
-                  description: The MCP method to call
-                params:
-                  type: object
-                  description: The parameters to pass for the selected method
-                id:
-                  type: number
-                  description: Unique request identifier
-      responses:
-        '200':
-          description: JSON-RPC 2.0 success response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  jsonrpc:
-                    type: string
-                  result:
-                    type: object
-                  id:
-                    type: number
-
-
-## Integration Examples
-
-### Node.js
-```javascript
-const axios = require('axios');
-
-async function sendTransaction(fromAddress, toAddress, amount, privateKey) {
-    const response = await axios.post('http://localhost:3000', {
-        jsonrpc: "2.0",
-        method: "sendTransaction",
-        params: {
-            fromAddress,
-            toAddress,
-            amountRaw: amount,
-            privateKey
-        },
-        id: 1
-    });
-    return response.data;
-}
-```
+### Environment Variables (Optional)
+```bash
+MCP_PORT=8080                    # Server port (default: 8080)
+MCP_TRANSPORT=http               # Transport type (default: http)
+NANO_RPC_URL=https://...         # NANO RPC node (has default)
+NANO_REPRESENTATIVE=nano_xxx     # Representative (has default)
 ```
 
-### Isolated Pending Receive Endpoint
-
-A dedicated endpoint for handling pending transactions:
-
-```http
-POST /pending/receive
-Content-Type: application/json
-
-{
-    "account": "nano_...",
-    "privateKey": "private_key"
-}
+### Testing
+```bash
+# Run tests (21 tests for test wallet system)
+npm test
 ```
 
-Response:
+---
+
+## 📚 Complete Function Reference
+
+### generateWallet
+**Purpose:** Create new NANO wallet
+**Parameters:** None
+**Returns:** `address`, `privateKey`, `publicKey`, `seed`
 ```json
-{
-    "success": true,
-    "processed": [
-        {
-            "hash": "block_hash",
-            "amount": "amount_in_raw",
-            "result": { "hash": "processed_block_hash" }
-        }
-    ],
-    "failed": [],
-    "total": 1,
-    "successful": 1,
-    "failed_count": 0
-}
+{"jsonrpc": "2.0", "method": "generateWallet", "params": {}, "id": 1}
 ```
 
-### Python
-```python
-import requests
-
-def send_transaction(from_address, to_address, amount, private_key):
-    response = requests.post('http://localhost:3000', json={
-        "jsonrpc": "2.0",
-        "method": "sendTransaction",
-        "params": {
-            "fromAddress": from_address,
-            "toAddress": to_address,
-            "amountRaw": amount,
-            "privateKey": private_key
-        },
-        "id": 1
-    })
-    return response.json()
+### getBalance
+**Purpose:** Check account balance
+**Parameters:** `address`
+**Returns:** `balance` (raw), `pending` (raw)
+```json
+{"jsonrpc": "2.0", "method": "getBalance", "params": {"address": "nano_xxx"}, "id": 1}
 ```
 
-## Error Handling
-
-### Error Codes
-| Code    | Message           | Description                                     |
-|---------|------------------|-------------------------------------------------|
-| -32600  | Invalid Request  | The JSON sent is not a valid Request object     |
-| -32601  | Method not found | The method does not exist / is not available    |
-| -32602  | Invalid params   | Invalid method parameters                       |
-| -32603  | Internal error   | Internal JSON-RPC error                         |
-| -32000  | Server error     | Generic server-side error                       |
-
-## Security Considerations
-
-1. Private Key Handling
-   - Never store private keys in plain text
-   - Use secure environment variables
-   - Implement proper key rotation
-
-2. RPC Node Security
-   - Use authenticated RPC nodes
-   - Set `NANO_RPC_KEY` for protected endpoints
-   - Monitor for suspicious activity
-
-3. Rate Limiting
-   - Implement appropriate rate limits
-   - Monitor for abuse
-   - Use proper error responses
-
-## Performance Optimization
-
-1. Connection Pooling
-   - Reuse HTTP connections
-   - Maintain persistent WebSocket connections
-   - Pool RPC requests
-
-2. Caching
-   - Cache account information
-   - Cache block data
-   - Implement proper cache invalidation
-
-## TypeScript Type Definitions
-
-```typescript
-/**
- * NANO address format with nano_ prefix
- * @example "nano_3qya5xpjfsbk3ndfebo9dsrj6iy6f6idmogqtn1mtzdtwnxu6rw3dz18i6xf"
- */
-type NanoAddress = string;
-
-/**
- * 64-character hexadecimal private key
- * @example "4bc2e9c2df4be93e5cbeb41b52c2fc9efc1b4c0e67951fc6c5098c117913d25a"
- */
-type PrivateKey = string;
-
-/**
- * Raw amount in string format to handle large numbers
- * @example "1000000000000000000000000"
- */
-type RawAmount = string;
-
-/**
- * 64-character hexadecimal block hash
- * @example "991CF190094C00F0B68E2E5F75F6BEE95A2E0BD93CEAA4A6734DB9F19B728948"
- */
-type BlockHash = string;
-
-/**
- * Standard JSON-RPC 2.0 request format
- */
-interface JsonRpcRequest<T> {
-    jsonrpc: "2.0";
-    method: string;
-    params: T;
-    id: number;
-}
-
-/**
- * Standard JSON-RPC 2.0 success response format
- */
-interface JsonRpcResponse<T> {
-    jsonrpc: "2.0";
-    result: T;
-    id: number;
-}
-
-/**
- * Standard JSON-RPC 2.0 error response format
- */
-interface JsonRpcError {
-    jsonrpc: "2.0";
-    error: {
-        code: number;
-        message: string;
-        data?: any;
-    };
-    id: number | null;
-}
-
-/**
- * Response from generateWallet method
- */
-interface WalletResponse {
-    /** The public address starting with nano_ */
-    address: NanoAddress;
-    /** The private key for the wallet */
-    privateKey: PrivateKey;
-    /** The public key portion of the address */
-    publicKey: string;
-}
-
-/**
- * Response from getBalance method
- */
-interface BalanceResponse {
-    /** Current confirmed balance in raw units */
-    balance: RawAmount;
-    /** Sum of pending incoming transactions */
-    pending: RawAmount;
-}
-
-/**
- * Information about a pending block
- */
-interface PendingBlock {
-    /** Amount being transferred in raw units */
-    amount: RawAmount;
-    /** Address that sent the transaction */
-    source: NanoAddress;
-}
-
-/**
- * Response from a send transaction
- */
-interface TransactionResponse {
-    /** Whether the transaction was successful */
-    success: boolean;
-    /** Hash of the transaction block */
-    hash: BlockHash;
-    /** Amount that was sent in raw units */
-    amount: RawAmount;
-    /** New balance after the transaction */
-    balance: RawAmount;
-}
+### getAccountInfo
+**Purpose:** Get detailed account information
+**Parameters:** `address`
+**Returns:** `frontier`, `balance`, `representative`, `block_count`, etc.
+```json
+{"jsonrpc": "2.0", "method": "getAccountInfo", "params": {"address": "nano_xxx"}, "id": 1}
 ```
 
-## Troubleshooting
+### getPendingBlocks
+**Purpose:** List pending (unreceived) transactions
+**Parameters:** `address`
+**Returns:** Object with pending blocks and amounts
+```json
+{"jsonrpc": "2.0", "method": "getPendingBlocks", "params": {"address": "nano_xxx"}, "id": 1}
+```
 
-### Common Issues
+### initializeAccount
+**Purpose:** Open/activate new account (first receive)
+**Parameters:** `address`, `privateKey`
+**Returns:** `initialized`, `blockHash`, `balance`, etc.
+```json
+{"jsonrpc": "2.0", "method": "initializeAccount", "params": {"address": "nano_xxx", "privateKey": "key"}, "id": 1}
+```
 
-1. Connection Refused
-   - Check if server is running
-   - Verify correct port
-   - Check firewall settings
+### sendTransaction
+**Purpose:** Send NANO to another address
+**Parameters:** `fromAddress`, `toAddress`, `amountRaw`, `privateKey`
+**Returns:** `success`, `hash` OR enhanced error
+```json
+{"jsonrpc": "2.0", "method": "sendTransaction", "params": {"fromAddress": "nano_xxx", "toAddress": "nano_yyy", "amountRaw": "100000000000000000000000000", "privateKey": "key"}, "id": 1}
+```
 
-2. Invalid JSON-RPC
-   - Validate request format
-   - Check method name
-   - Verify parameter types
+### receiveAllPending
+**Purpose:** Receive all pending transactions
+**Parameters:** `address`, `privateKey`
+**Returns:** Array of received blocks
+```json
+{"jsonrpc": "2.0", "method": "receiveAllPending", "params": {"address": "nano_xxx", "privateKey": "key"}, "id": 1}
+```
 
-3. Transaction Failures
-   - Check account balance
-   - Verify private key
-   - Ensure sufficient funds
+### generateQrCode
+**Purpose:** Create QR code for payment
+**Parameters:** `address`, `amount` (in NANO)
+**Returns:** `qrCode` (base64), `paymentString`
+```json
+{"jsonrpc": "2.0", "method": "generateQrCode", "params": {"address": "nano_xxx", "amount": "0.1"}, "id": 1}
+```
 
-4. Port Already in Use
-   - Stop any existing MCP server instances
-   - Change port using MCP_PORT environment variable
-   - Check for other services using port 3000
+### convertBalance (Helper)
+**Purpose:** Convert between NANO and raw units
+**Parameters:** `amount`, `from` ("nano"/"raw"), `to` ("nano"/"raw")
+**Returns:** `converted`, `formula`
+```json
+{"jsonrpc": "2.0", "method": "convertBalance", "params": {"amount": "0.1", "from": "nano", "to": "raw"}, "id": 1}
+```
 
-5. RPC Node Issues
-   - Verify NANO_RPC_URL is accessible
-   - Check NANO_RPC_KEY is valid
-   - Monitor RPC node status
+### getAccountStatus (Helper)
+**Purpose:** Comprehensive account readiness check
+**Parameters:** `address`
+**Returns:** `initialized`, `balance`, `pending`, `capabilities`, `needsAction`, `recommendations`
+```json
+{"jsonrpc": "2.0", "method": "getAccountStatus", "params": {"address": "nano_xxx"}, "id": 1}
+```
 
-## Support
+---
 
-For issues and feature requests, please:
-1. Check the documentation
-2. Search existing issues
-3. Create a new issue with:
-   - Environment details
-   - Steps to reproduce
-   - Expected vs actual behavior 
+## 🎓 Best Practices for AI Agents
+
+### ✅ DO:
+1. **Always check account status first** using `getAccountStatus`
+2. **Convert amounts** using `convertBalance` before transactions
+3. **Parse errorCode** for programmatic error handling
+4. **Follow nextSteps** array in error responses
+5. **Receive pending blocks** before sending transactions
+
+### ❌ DON'T:
+1. Skip account status checks
+2. Use NANO values directly in `amountRaw` (must be raw units)
+3. Ignore error `nextSteps` - they guide recovery
+4. Assume account is ready - always verify
+5. Parse error message strings (use `errorCode` instead)
+
+---
+
+## 🔒 Security Notes
+
+1. **Private Keys**: Never log or expose private keys
+2. **Test vs Production**: Use test wallets for development
+3. **RPC Node**: Default public node provided (rate limited)
+4. **Validation**: All inputs validated by server
+
+---
+
+## 📖 Additional Documentation
+
+Located in `NANO_MCP_SERVER/`:
+- **AUTONOMOUS_AGENT_INTEGRATION_GUIDE.md** - Complete integration guide
+- **TEST_WALLET_INTEGRATION.md** - Test wallet documentation
+- **AUTONOMOUS_AGENT_ERROR_ENHANCEMENT.md** - Error handling details
+- **examples/test-wallet-usage.json** - Request examples
+
+---
+
+## 🎉 Why This Server is AI Agent-Friendly
+
+✅ **Self-documenting** - Every error explains itself
+✅ **Helper functions** - Convert, status check built-in
+✅ **Structured responses** - Easy to parse JSON
+✅ **Machine-readable codes** - Error codes for programmatic handling
+✅ **Actionable guidance** - Every error includes nextSteps
+✅ **No external docs needed** - All info in responses
+✅ **Fast integration** - 5-10 minutes to first transaction
+
+---
+
+## 🚀 Integration Speed
+
+| Task | Time Required |
+|------|---------------|
+| Install and run | 2 minutes |
+| First transaction | 5-10 minutes |
+| Complete integration | < 30 minutes |
+
+**vs Traditional NANO integration: 1-2 hours minimum**
+
+---
+
+## ⚡ Quick Test (Copy-Paste)
+
+```bash
+# 1. Start server
+cd NANO_MCP_SERVER && npm start
+
+# 2. In another terminal, test:
+curl -X POST http://localhost:8080 \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","method":"initialize","params":{},"id":1}'
+
+# 3. You should see list of available methods
+```
+
+---
+
+## 📞 Support
+
+**For AI Agents:**
+- All errors include remediation steps
+- Use `getAccountStatus` to diagnose issues
+- Check `errorCode` for specific problems
+- Follow `nextSteps` in error responses
+
+**For Developers:**
+- GitHub Issues: [Create issue](https://github.com/dhyabi2/NANO_MCP_SERVER/issues)
+- Documentation: See files in `NANO_MCP_SERVER/docs/`
+
+---
+
+## 🎊 Ready to Start!
+
+You have everything you need. The server guides you through every step with self-documenting errors.
+
+**First command to run:**
+```bash
+cd NANO_MCP_SERVER && npm start
+```
+
+**Server will be ready on:** `http://localhost:8080`
+
+**Start with:** `{"jsonrpc":"2.0","method":"initialize","params":{},"id":1}`
+
+**Good luck with your NANO integration!** 🚀

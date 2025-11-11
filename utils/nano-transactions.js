@@ -19,6 +19,8 @@ const node_fetch_1 = __importDefault(require("node-fetch"));
 const nanocurrency_web_1 = require("nanocurrency-web");
 const nanocurrency = require('nanocurrency');
 const { block } = require('nanocurrency-web');
+const { EnhancedErrorHandler } = require('./error-handler');
+const { BalanceConverter } = require('./balance-converter');
 class NanoTransactions {
     /**
      * Constructs a NanoTransactions instance with custom and global configuration.
@@ -465,7 +467,9 @@ class NanoTransactions {
             
             if (accountInfo.error) {
                 if (accountInfo.error === 'Account not found') {
-                    throw new Error('Account has no previous blocks. Please make sure it has received some NANO first.');
+                    // Check if there are pending blocks to initialize with
+                    const pendingCheck = await this.getPendingBlocks(formattedFromAddress);
+                    return EnhancedErrorHandler.accountNotInitialized(formattedFromAddress, pendingCheck);
                 }
                 throw new Error(accountInfo.error);
             }
@@ -475,6 +479,17 @@ class NanoTransactions {
             // Calculate new balance after sending
             const currentBalance = BigInt(accountInfo.balance);
             const sendAmount = BigInt(amountRawString);
+            
+            // Check if sufficient balance BEFORE attempting transaction
+            if (currentBalance < sendAmount) {
+                console.log('Insufficient balance detected');
+                return EnhancedErrorHandler.insufficientBalance(
+                    accountInfo.balance,
+                    amountRawString,
+                    formattedFromAddress
+                );
+            }
+            
             const newBalance = (currentBalance - sendAmount).toString();
 
             console.log('Current balance:', currentBalance.toString());
@@ -522,13 +537,32 @@ class NanoTransactions {
             });
 
             if (processResult.error) {
-                throw new Error(processResult.error);
+                // Handle blockchain errors with enhanced messaging
+                return EnhancedErrorHandler.blockchainError(
+                    processResult.error,
+                    'send transaction',
+                    {
+                        fromAddress: formattedFromAddress,
+                        toAddress: formattedToAddress,
+                        amountRaw: amountRawString,
+                        currentBalance: accountInfo.balance
+                    }
+                );
             }
 
             return { success: true, hash: processResult.hash };
         } catch (error) {
             console.error('Send Transaction Error:', error);
-            return { success: false, error: error.message };
+            // Return enhanced error if it's already an enhanced error object
+            if (error.errorCode) {
+                return error;
+            }
+            // Otherwise wrap in blockchain error
+            return EnhancedErrorHandler.blockchainError(
+                error.message,
+                'send transaction preparation',
+                { fromAddress: formattedFromAddress, toAddress: formattedToAddress }
+            );
         }
     }
     /**

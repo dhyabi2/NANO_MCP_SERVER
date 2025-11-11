@@ -1,0 +1,254 @@
+{
+  "description": "Example JSON-RPC requests for Test Wallet Management",
+  "examples": [
+    {
+      "name": "Setup Test Wallets",
+      "description": "Generate two new test wallets for integration testing",
+      "request": {
+        "jsonrpc": "2.0",
+        "method": "setupTestWallets",
+        "params": {},
+        "id": 1
+      },
+      "expected_response": {
+        "jsonrpc": "2.0",
+        "result": {
+          "wallet1": {
+            "address": "nano_3xxxxx...",
+            "privateKey": "XXXXXXXX...",
+            "publicKey": "YYYYYYYY...",
+            "seed": "ZZZZZZZZ...",
+            "balance": "0",
+            "funded": false
+          },
+          "wallet2": {
+            "address": "nano_1xxxxx...",
+            "privateKey": "AAAAAAAA...",
+            "publicKey": "BBBBBBBB...",
+            "seed": "CCCCCCCC...",
+            "balance": "0",
+            "funded": false
+          },
+          "created": "2025-11-11T15:20:06.987Z",
+          "status": "awaiting_funding",
+          "message": "Test wallets generated successfully. Please fund both wallets with test NANO to proceed with testing.",
+          "fundingInstructions": [
+            "Send test NANO to Wallet 1: nano_3xxxxx...",
+            "Send test NANO to Wallet 2: nano_1xxxxx...",
+            "After funding, use checkFundingStatus to verify both wallets are funded",
+            "Recommended test amount: 0.1 NANO or more per wallet"
+          ]
+        },
+        "id": 1
+      }
+    },
+    {
+      "name": "Get Test Wallets",
+      "description": "Retrieve existing test wallets with private keys",
+      "request": {
+        "jsonrpc": "2.0",
+        "method": "getTestWallets",
+        "params": {
+          "includePrivateKeys": true
+        },
+        "id": 2
+      },
+      "expected_response": {
+        "jsonrpc": "2.0",
+        "result": {
+          "exists": true,
+          "wallet1": {
+            "address": "nano_3xxxxx...",
+            "privateKey": "XXXXXXXX...",
+            "publicKey": "YYYYYYYY...",
+            "seed": "ZZZZZZZZ...",
+            "balance": "1000000000000000000000000000",
+            "funded": true
+          },
+          "wallet2": {
+            "address": "nano_1xxxxx...",
+            "privateKey": "AAAAAAAA...",
+            "publicKey": "BBBBBBBB...",
+            "seed": "CCCCCCCC...",
+            "balance": "1000000000000000000000000000",
+            "funded": true
+          },
+          "created": "2025-11-11T15:20:06.987Z",
+          "lastUpdated": "2025-11-11T15:25:30.123Z"
+        },
+        "id": 2
+      }
+    },
+    {
+      "name": "Get Test Wallets Without Private Keys",
+      "description": "Retrieve wallets without exposing private keys",
+      "request": {
+        "jsonrpc": "2.0",
+        "method": "getTestWallets",
+        "params": {
+          "includePrivateKeys": false
+        },
+        "id": 3
+      },
+      "expected_response": {
+        "jsonrpc": "2.0",
+        "result": {
+          "exists": true,
+          "wallet1": {
+            "address": "nano_3xxxxx...",
+            "publicKey": "YYYYYYYY...",
+            "balance": "1000000000000000000000000000",
+            "funded": true
+          },
+          "wallet2": {
+            "address": "nano_1xxxxx...",
+            "publicKey": "BBBBBBBB...",
+            "balance": "1000000000000000000000000000",
+            "funded": true
+          },
+          "created": "2025-11-11T15:20:06.987Z",
+          "lastUpdated": "2025-11-11T15:25:30.123Z"
+        },
+        "id": 3
+      }
+    },
+    {
+      "name": "Update Wallet Balance",
+      "description": "Update balance for wallet1 after funding",
+      "request": {
+        "jsonrpc": "2.0",
+        "method": "updateTestWalletBalance",
+        "params": {
+          "walletIdentifier": "wallet1",
+          "balance": "1000000000000000000000000000"
+        },
+        "id": 4
+      },
+      "expected_response": {
+        "jsonrpc": "2.0",
+        "result": {
+          "success": true,
+          "wallet": "wallet1",
+          "balance": "1000000000000000000000000000",
+          "funded": true,
+          "address": "nano_3xxxxx..."
+        },
+        "id": 4
+      }
+    },
+    {
+      "name": "Check Funding Status",
+      "description": "Check if both wallets are funded and ready for testing",
+      "request": {
+        "jsonrpc": "2.0",
+        "method": "checkTestWalletsFunding",
+        "params": {},
+        "id": 5
+      },
+      "expected_response": {
+        "jsonrpc": "2.0",
+        "result": {
+          "wallet1": {
+            "address": "nano_3xxxxx...",
+            "funded": true,
+            "balance": "1000000000000000000000000000"
+          },
+          "wallet2": {
+            "address": "nano_1xxxxx...",
+            "funded": true,
+            "balance": "1000000000000000000000000000"
+          },
+          "bothFunded": true,
+          "readyForTesting": true,
+          "message": "Both wallets are funded and ready for testing"
+        },
+        "id": 5
+      }
+    },
+    {
+      "name": "Reset Test Wallets",
+      "description": "Delete existing test wallets to start fresh",
+      "request": {
+        "jsonrpc": "2.0",
+        "method": "resetTestWallets",
+        "params": {},
+        "id": 6
+      },
+      "expected_response": {
+        "jsonrpc": "2.0",
+        "result": {
+          "success": true,
+          "message": "Test wallets deleted successfully. Generate new wallets to start fresh."
+        },
+        "id": 6
+      }
+    },
+    {
+      "name": "Complete Testing Flow - Send from Wallet1 to Wallet2",
+      "description": "After wallets are funded, send NANO from wallet1 to wallet2",
+      "request": {
+        "jsonrpc": "2.0",
+        "method": "sendTransaction",
+        "params": {
+          "fromAddress": "nano_3xxxxx...",
+          "toAddress": "nano_1xxxxx...",
+          "amountRaw": "100000000000000000000000000",
+          "privateKey": "WALLET1_PRIVATE_KEY"
+        },
+        "id": 7
+      },
+      "expected_response": {
+        "jsonrpc": "2.0",
+        "result": {
+          "success": true,
+          "hash": "ABC123..."
+        },
+        "id": 7
+      }
+    },
+    {
+      "name": "Complete Testing Flow - Receive on Wallet2",
+      "description": "Receive the pending transaction on wallet2",
+      "request": {
+        "jsonrpc": "2.0",
+        "method": "receiveAllPending",
+        "params": {
+          "address": "nano_1xxxxx...",
+          "privateKey": "WALLET2_PRIVATE_KEY"
+        },
+        "id": 8
+      },
+      "expected_response": {
+        "jsonrpc": "2.0",
+        "result": [
+          {
+            "hash": "XYZ789..."
+          }
+        ],
+        "id": 8
+      }
+    }
+  ],
+  "notes": {
+    "balance_conversion": {
+      "1_NANO": "1000000000000000000000000000",
+      "0.1_NANO": "100000000000000000000000000",
+      "0.01_NANO": "10000000000000000000000000",
+      "0.001_NANO": "1000000000000000000000000"
+    },
+    "workflow": [
+      "1. Call setupTestWallets to generate wallets",
+      "2. Fund both wallets with test NANO (from faucet or existing wallet)",
+      "3. Call initializeAccount for each wallet to open them on-chain",
+      "4. Call updateTestWalletBalance for each wallet with their on-chain balances",
+      "5. Call checkTestWalletsFunding to verify both are funded",
+      "6. Use sendTransaction and receiveAllPending for testing"
+    ],
+    "security": [
+      "Private keys are stored in tests/test-wallets.json",
+      "Add this file to .gitignore",
+      "This is for testing only, not production use"
+    ]
+  }
+}
+

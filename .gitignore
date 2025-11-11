@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Test wallets (contains private keys)
+tests/test-wallets.json
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+server-err.log
+server-out.log
+server-output.log
+
+# Coverage
+coverage/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build
+dist/
+build/
+

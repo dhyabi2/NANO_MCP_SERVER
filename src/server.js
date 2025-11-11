@@ -3,6 +3,8 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerSpecs = require('./swagger');
 const { NanoTransactions } = require('../utils/nano-transactions');
 const { SchemaValidator } = require('../utils/schema-validator');
+const { TestWalletManager } = require('../utils/test-wallet-manager');
+const { BalanceConverter } = require('../utils/balance-converter');
 const path = require('path');
 const fs = require('fs');
 const express = require('express');
@@ -80,6 +82,59 @@ const REQUEST_TEMPLATES = {
         params: {
             address: "nano_3xxxxx...",
             amount: "0.1"
+        },
+        id: 1
+    },
+    setupTestWallets: {
+        jsonrpc: "2.0",
+        method: "setupTestWallets",
+        params: {},
+        id: 1
+    },
+    getTestWallets: {
+        jsonrpc: "2.0",
+        method: "getTestWallets",
+        params: {
+            includePrivateKeys: true
+        },
+        id: 1
+    },
+    updateTestWalletBalance: {
+        jsonrpc: "2.0",
+        method: "updateTestWalletBalance",
+        params: {
+            walletIdentifier: "wallet1",
+            balance: "1000000000000000000000000000"
+        },
+        id: 1
+    },
+    checkTestWalletsFunding: {
+        jsonrpc: "2.0",
+        method: "checkTestWalletsFunding",
+        params: {},
+        id: 1
+    },
+    resetTestWallets: {
+        jsonrpc: "2.0",
+        method: "resetTestWallets",
+        params: {},
+        id: 1
+    },
+    convertBalance: {
+        jsonrpc: "2.0",
+        method: "convertBalance",
+        params: {
+            amount: "100000000000000000000000000",
+            from: "raw",
+            to: "nano"
+        },
+        id: 1
+    },
+    getAccountStatus: {
+        jsonrpc: "2.0",
+        method: "getAccountStatus",
+        params: {
+            address: "nano_3xxxxx..."
         },
         id: 1
     }
@@ -229,6 +284,101 @@ const MCP_TOOLS = [
             },
             required: ['address', 'amount']
         }
+    },
+    {
+        name: 'setupTestWallets',
+        description: 'Generate two test wallets for integration testing. Saves wallets with private keys and prompts user to fund them with test NANO.',
+        inputSchema: {
+            type: 'object',
+            properties: {},
+            required: []
+        }
+    },
+    {
+        name: 'getTestWallets',
+        description: 'Retrieve existing test wallets with their addresses, balances, and funding status',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                includePrivateKeys: {
+                    type: 'boolean',
+                    description: 'Whether to include private keys in the response (default: true)'
+                }
+            },
+            required: []
+        }
+    },
+    {
+        name: 'updateTestWalletBalance',
+        description: 'Update the balance and funding status for a test wallet (used after checking on-chain balance)',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                walletIdentifier: {
+                    type: 'string',
+                    description: 'Wallet identifier: "wallet1" or "wallet2"'
+                },
+                balance: {
+                    type: 'string',
+                    description: 'New balance in raw units'
+                }
+            },
+            required: ['walletIdentifier', 'balance']
+        }
+    },
+    {
+        name: 'checkTestWalletsFunding',
+        description: 'Check the funding status of both test wallets to determine if they are ready for testing',
+        inputSchema: {
+            type: 'object',
+            properties: {},
+            required: []
+        }
+    },
+    {
+        name: 'resetTestWallets',
+        description: 'Delete existing test wallets to start fresh with new wallet generation',
+        inputSchema: {
+            type: 'object',
+            properties: {},
+            required: []
+        }
+    },
+    {
+        name: 'convertBalance',
+        description: 'Convert between NANO and raw units. Helps autonomous agents with amount formatting.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                amount: {
+                    type: 'string',
+                    description: 'Amount to convert'
+                },
+                from: {
+                    type: 'string',
+                    description: 'Source unit: "nano" or "raw"'
+                },
+                to: {
+                    type: 'string',
+                    description: 'Target unit: "nano" or "raw"'
+                }
+            },
+            required: ['amount', 'from', 'to']
+        }
+    },
+    {
+        name: 'getAccountStatus',
+        description: 'Get comprehensive account status with readiness checks, pending blocks, and actionable recommendations for autonomous agents',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                address: {
+                    type: 'string',
+                    description: 'NANO address to check status for'
+                }
+            },
+            required: ['address']
+        }
     }
 ];
 
@@ -276,6 +426,7 @@ class NanoMCPServer {
         };
         this.nanoTransactions = new NanoTransactions(this.config);
         this.schemaValidator = SchemaValidator.getInstance();
+        this.testWalletManager = new TestWalletManager();
     }
 
     /**
@@ -393,6 +544,158 @@ class NanoMCPServer {
                         }
                     });
                     result = await this.nanoTransactions.generateQrCode(params.address, params.amount);
+                    break;
+                case 'setupTestWallets':
+                    result = await this.testWalletManager.generateTestWallets();
+                    break;
+                case 'getTestWallets':
+                    const includePrivateKeys = params.includePrivateKeys !== undefined ? params.includePrivateKeys : true;
+                    const wallets = await this.testWalletManager.getTestWallets(includePrivateKeys);
+                    if (!wallets) {
+                        result = {
+                            exists: false,
+                            message: 'No test wallets found. Use setupTestWallets to generate new wallets.'
+                        };
+                    } else {
+                        result = {
+                            exists: true,
+                            ...wallets
+                        };
+                    }
+                    break;
+                case 'updateTestWalletBalance':
+                    this.schemaValidator.validate(params, {
+                        type: 'object',
+                        required: ['walletIdentifier', 'balance'],
+                        properties: {
+                            walletIdentifier: { type: 'string' },
+                            balance: { type: 'string' }
+                        }
+                    });
+                    result = await this.testWalletManager.updateWalletBalance(params.walletIdentifier, params.balance);
+                    break;
+                case 'checkTestWalletsFunding':
+                    result = await this.testWalletManager.checkFundingStatus();
+                    break;
+                case 'resetTestWallets':
+                    result = await this.testWalletManager.resetTestWallets();
+                    break;
+                case 'convertBalance':
+                    this.schemaValidator.validate(params, {
+                        type: 'object',
+                        required: ['amount', 'from', 'to'],
+                        properties: {
+                            amount: { type: 'string' },
+                            from: { type: 'string' },
+                            to: { type: 'string' }
+                        }
+                    });
+                    const from = params.from.toLowerCase();
+                    const to = params.to.toLowerCase();
+                    
+                    if (from === 'nano' && to === 'raw') {
+                        const raw = BalanceConverter.nanoToRaw(params.amount);
+                        result = {
+                            original: params.amount,
+                            originalUnit: 'NANO',
+                            converted: raw,
+                            convertedUnit: 'raw',
+                            formula: 'raw = NANO × 10^30'
+                        };
+                    } else if (from === 'raw' && to === 'nano') {
+                        const nano = BalanceConverter.rawToNano(params.amount);
+                        result = {
+                            original: params.amount,
+                            originalUnit: 'raw',
+                            converted: nano,
+                            convertedUnit: 'NANO',
+                            formula: 'NANO = raw ÷ 10^30'
+                        };
+                    } else {
+                        throw new Error(`Invalid conversion: from="${from}" to="${to}". Must be nano→raw or raw→nano`);
+                    }
+                    break;
+                case 'getAccountStatus':
+                    this.schemaValidator.validate(params, {
+                        type: 'object',
+                        required: ['address'],
+                        properties: {
+                            address: { type: 'string' }
+                        }
+                    });
+                    
+                    // Get comprehensive account status
+                    let accountInfo;
+                    try {
+                        accountInfo = await this.nanoTransactions.getAccountInfo(params.address);
+                    } catch (error) {
+                        accountInfo = { error: 'Account not found' };
+                    }
+                    
+                    const pendingBlocks = await this.nanoTransactions.getPendingBlocks(params.address);
+                    const hasPending = pendingBlocks.blocks && Object.keys(pendingBlocks.blocks).length > 0;
+                    let pendingCount = 0;
+                    let totalPending = BigInt(0);
+                    
+                    if (hasPending) {
+                        pendingCount = Object.keys(pendingBlocks.blocks).length;
+                        for (const block of Object.values(pendingBlocks.blocks)) {
+                            totalPending += BigInt(block.amount);
+                        }
+                    }
+                    
+                    const initialized = !accountInfo.error;
+                    const balance = initialized ? accountInfo.balance : '0';
+                    const canSend = initialized && BigInt(balance) > 0;
+                    const canReceive = true; // Can always receive
+                    const needsAction = [];
+                    
+                    if (!initialized && hasPending) {
+                        needsAction.push({
+                            action: 'initializeAccount',
+                            reason: 'Account not initialized but has pending blocks',
+                            priority: 'high'
+                        });
+                    }
+                    
+                    if (initialized && hasPending) {
+                        needsAction.push({
+                            action: 'receiveAllPending',
+                            reason: `${pendingCount} pending block(s) waiting to be received`,
+                            priority: 'medium'
+                        });
+                    }
+                    
+                    if (!initialized && !hasPending) {
+                        needsAction.push({
+                            action: 'fundAccount',
+                            reason: 'Account has no balance and no pending blocks',
+                            priority: 'high'
+                        });
+                    }
+                    
+                    result = {
+                        address: params.address,
+                        initialized: initialized,
+                        balance: {
+                            raw: balance,
+                            nano: BalanceConverter.rawToNano(balance)
+                        },
+                        pending: {
+                            count: pendingCount,
+                            totalAmount: totalPending.toString(),
+                            totalAmountNano: BalanceConverter.rawToNano(totalPending.toString())
+                        },
+                        capabilities: {
+                            canSend: canSend,
+                            canReceive: canReceive
+                        },
+                        needsAction: needsAction,
+                        readyForTesting: initialized && canSend,
+                        recommendations: needsAction.length === 0 
+                            ? ['Account is ready for transactions'] 
+                            : needsAction.map(a => `${a.priority.toUpperCase()}: ${a.action} - ${a.reason}`)
+                    };
                     break;
                 default:
                     throw new Error(`Method ${method} not found`);
