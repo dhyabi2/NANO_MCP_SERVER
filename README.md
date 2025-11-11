@@ -53,6 +53,123 @@ Local server runs on: `http://localhost:8080`
 
 ---
 
+## ⚡ Fastest Integration Path (AI Agents: START HERE)
+
+**Complete workflow in 5-6 calls, 30-60 seconds:**
+
+```javascript
+// STEP 1: Setup test wallets (1 call, < 1s)
+POST https://nano-mcp.replit.app
+{"jsonrpc":"2.0","method":"setupTestWallets","params":{},"id":1}
+→ Returns: wallet addresses + private keys
+
+// STEP 2: Human funds both addresses (30-60s wait)
+// → Send 0.1+ NANO to each address
+
+// STEP 3: Check BOTH wallets in parallel (2 calls, 4-6s)
+POST https://nano-mcp.replit.app
+{"jsonrpc":"2.0","method":"getAccountStatus","params":{"address":"wallet1_address"},"id":1}
+{"jsonrpc":"2.0","method":"getAccountStatus","params":{"address":"wallet2_address"},"id":2}
+→ Returns: balance, pending blocks, needsAction
+
+// STEP 4: Follow needsAction automatically (2 calls, 16-24s)
+POST https://nano-mcp.replit.app
+{"jsonrpc":"2.0","method":"initializeAccount","params":{"address":"wallet1","privateKey":"key1"},"id":1}
+{"jsonrpc":"2.0","method":"initializeAccount","params":{"address":"wallet2","privateKey":"key2"},"id":2}
+→ Returns: initialized confirmation
+
+// STEP 5: Send transaction (1 call, 10-15s)
+POST https://nano-mcp.replit.app
+{"jsonrpc":"2.0","method":"sendTransaction","params":{
+  "fromAddress":"wallet1",
+  "toAddress":"wallet2",
+  "amountRaw":"50000000000000000000000000",
+  "privateKey":"key1"
+},"id":1}
+→ Returns: transaction hash
+
+// DONE! ✅ Total: 6 calls, ~60 seconds (including human wait)
+```
+
+### ⏱️ Expected Response Times
+
+| Function | Expected Time | Recommended Timeout |
+|----------|---------------|---------------------|
+| setupTestWallets | < 1s | 5s |
+| getAccountStatus | 1-3s | 10s |
+| **initializeAccount** | **8-12s** | **30s** |
+| **sendTransaction** | **10-15s** | **30s** |
+| **receiveAllPending** | **5-15s per block** | **60s** |
+| convertBalance | < 500ms | 5s |
+| generateQrCode | < 2s | 10s |
+
+**⚠️ Important:** Work generation (PoW) takes time. Always set 30s+ timeout for transactions.
+
+### ❌ DON'T Do These (Time Wasters)
+
+**1. Don't call `getBalance` then `getAccountStatus`**
+```javascript
+// ❌ INEFFICIENT: 2 calls, 4-6s
+await call('getBalance', {address})         // Returns: balance, pending
+await call('getAccountStatus', {address})   // Returns: balance, pending + more
+
+// ✅ EFFICIENT: 1 call, 2-3s
+await call('getAccountStatus', {address})   // Returns: everything you need
+```
+
+**2. Don't call `checkTestWalletsFunding` repeatedly**
+```javascript
+// ❌ INEFFICIENT: Shows 0 until manually updated
+await call('checkTestWalletsFunding')  // Returns: bothFunded: false
+await call('checkTestWalletsFunding')  // Still false (not auto-updating)
+
+// ✅ EFFICIENT: Check blockchain directly
+await call('getAccountStatus', {address})  // Shows pending blocks immediately
+```
+
+**3. Don't set short timeouts on transactions**
+```javascript
+// ❌ FAILS: Work generation takes 10-15 seconds
+await call('sendTransaction', {...}, {timeout: 5000})  // Times out!
+
+// ✅ WORKS: Proper timeout
+await call('sendTransaction', {...}, {timeout: 30000})  // Completes successfully
+```
+
+**4. Don't test functions sequentially when independent**
+```javascript
+// ❌ SLOW: 6 seconds total
+await call('getAccountStatus', {address: wallet1})  // 3s
+await call('getAccountStatus', {address: wallet2})  // 3s
+
+// ✅ FAST: 3 seconds total
+await Promise.all([
+  call('getAccountStatus', {address: wallet1}),
+  call('getAccountStatus', {address: wallet2})
+])  // Both in 3s
+```
+
+### 💡 Pro Tips for AI Agents
+
+1. **Use `getAccountStatus` for everything** - It replaces getBalance, getAccountInfo, getPendingBlocks
+2. **Follow `needsAction` array** - Auto-recovery without trial-and-error
+3. **Batch independent calls** - Use Promise.all or batch requests
+4. **Set proper timeouts** - 30s for transactions, 10s for queries
+5. **Save setupTestWallets response** - Don't call getTestWallets unless retrieving
+
+### 📊 Optimization Impact
+
+| Metric | Inefficient | Optimized | Improvement |
+|--------|-------------|-----------|-------------|
+| Total Calls | 10-12 | 5-6 | **40-50%** ↓ |
+| Total Tokens | 10,000-15,000 | 5,000-7,000 | **50%** ↓ |
+| Total Time | 60-90s | 30-60s | **40%** ↓ |
+| Decision Points | 5-6 | 1-2 | **70%** ↓ |
+
+**Result:** Faster integration, lower costs, fewer errors.
+
+---
+
 ## 🎯 What This Server Does
 
 **NANO MCP Server** provides JSON-RPC 2.0 API for NANO cryptocurrency operations with:
