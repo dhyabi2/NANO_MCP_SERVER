@@ -42,6 +42,74 @@ The server responds with all available methods. Start using them immediately.
 
 ---
 
+## 🔍 **JSON Schema Auto-Discovery (NEW!)**
+
+### **Zero-Shot Integration for AI Agents**
+
+**🎯 No documentation reading required!** Fetch the complete JSON Schema and auto-generate your client code:
+
+```bash
+# Get complete JSON Schema with all 16 tools
+GET https://nano-mcp.replit.app/schema
+
+# Get TypeScript definitions
+GET https://nano-mcp.replit.app/schema/typescript
+
+# Get OpenAPI 3.0 spec (Swagger compatible)
+GET https://nano-mcp.replit.app/openapi.json
+```
+
+### **Schema Features**
+- ✅ **Input/Output Schemas** - Full JSON Schema with validation patterns
+- ✅ **Ready-to-Use Examples** - Copy-paste examples for every tool
+- ✅ **Type Definitions** - TypeScript `.d.ts` for type-safe clients
+- ✅ **Parameter Validation** - Regex patterns for addresses, keys, amounts
+- ✅ **Error Schemas** - All 29 error codes with handling guidance
+- ✅ **Performance Notes** - Expected durations and timeout recommendations
+- ✅ **Prerequisites** - Dependency information for each operation
+
+### **Quick Schema Usage**
+```bash
+# Get schema for specific tool
+GET https://nano-mcp.replit.app/schema/tools/sendTransaction
+
+# Get examples for a tool
+GET https://nano-mcp.replit.app/schema/examples/generateWallet
+
+# Validate parameters before sending
+POST https://nano-mcp.replit.app/schema/validate/sendTransaction
+{ "fromAddress": "...", "toAddress": "...", "amountRaw": "...", "privateKey": "..." }
+
+# Get tools by category (query, transaction, utility, etc.)
+GET https://nano-mcp.replit.app/schema/category/transaction
+
+# Get all error codes
+GET https://nano-mcp.replit.app/schema/errors
+```
+
+### **Code Generation Example**
+```typescript
+// 1. Download TypeScript definitions
+// curl https://nano-mcp.replit.app/schema/typescript > nano-mcp.d.ts
+
+// 2. Import types
+import type { SendTransactionParams, SendTransactionResult } from './nano-mcp';
+
+// 3. Use with full type safety
+const params: SendTransactionParams = {
+  fromAddress: "nano_...",
+  toAddress: "nano_...",
+  amountRaw: "1000000000000000000000000000",
+  privateKey: "..."
+};  // TypeScript validates all fields!
+```
+
+**📖 Complete Guide:** See [`docs/JSON_SCHEMA_AI_AGENT_GUIDE.md`](docs/JSON_SCHEMA_AI_AGENT_GUIDE.md) for detailed schema integration patterns.
+
+**⏱️ Estimated Integration Time:** **5 minutes** (vs. hours of documentation reading)
+
+---
+
 ### Local Development (Optional)
 If you need to run locally for development:
 ```bash

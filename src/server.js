@@ -6,6 +6,7 @@ const { SchemaValidator } = require('../utils/schema-validator');
 const { TestWalletManager } = require('../utils/test-wallet-manager');
 const { BalanceConverter } = require('../utils/balance-converter');
 const { EnhancedErrorHandler } = require('../utils/error-handler');
+const { schemaProvider } = require('../utils/schema-provider');
 const path = require('path');
 const fs = require('fs');
 const express = require('express');
@@ -1130,6 +1131,94 @@ class NanoMCPServer {
                     tools: MCP_TOOLS
                 },
                 id: null
+            });
+        });
+
+        // ====================================================================
+        // JSON SCHEMA ENDPOINTS FOR AI AGENT AUTO-DISCOVERY
+        // ====================================================================
+
+        // GET complete JSON Schema
+        app.get('/schema', (req, res) => {
+            res.json(schemaProvider.getFullSchema());
+        });
+
+        // GET OpenAPI 3.0 specification
+        app.get('/openapi.json', (req, res) => {
+            res.json(schemaProvider.generateOpenApiSpec());
+        });
+
+        // GET TypeScript definitions
+        app.get('/schema/typescript', (req, res) => {
+            const tsPath = path.join(__dirname, '../schemas/mcp-tools.d.ts');
+            if (fs.existsSync(tsPath)) {
+                res.setHeader('Content-Type', 'text/plain');
+                res.sendFile(tsPath);
+            } else {
+                res.status(404).json({ error: 'TypeScript definitions not found' });
+            }
+        });
+
+        // GET schema for specific tool
+        app.get('/schema/tools/:toolName', (req, res) => {
+            const toolSchema = schemaProvider.getToolSchema(req.params.toolName);
+            if (toolSchema) {
+                res.json(toolSchema);
+            } else {
+                res.status(404).json({ 
+                    error: 'Tool not found',
+                    availableTools: schemaProvider.getToolNames()
+                });
+            }
+        });
+
+        // GET tools by category
+        app.get('/schema/category/:category', (req, res) => {
+            const tools = schemaProvider.getToolsByCategory(req.params.category);
+            res.json({
+                category: req.params.category,
+                tools: tools,
+                count: tools.length
+            });
+        });
+
+        // GET all error codes
+        app.get('/schema/errors', (req, res) => {
+            res.json({
+                errorCodes: schemaProvider.getErrorCodes(),
+                errorSchema: schemaProvider.getFullSchema().errorSchema,
+                count: schemaProvider.getErrorCodes().length
+            });
+        });
+
+        // GET examples for a specific tool
+        app.get('/schema/examples/:toolName', (req, res) => {
+            const examples = schemaProvider.getExamples(req.params.toolName);
+            if (examples) {
+                res.json({
+                    tool: req.params.toolName,
+                    examples: examples
+                });
+            } else {
+                res.status(404).json({
+                    error: 'Tool not found or no examples available',
+                    availableTools: schemaProvider.getToolNames()
+                });
+            }
+        });
+
+        // GET schema metadata
+        app.get('/schema/metadata', (req, res) => {
+            res.json(schemaProvider.getMetadata());
+        });
+
+        // POST validate parameters for a tool
+        app.post('/schema/validate/:toolName', (req, res) => {
+            const validation = schemaProvider.validateParams(req.params.toolName, req.body);
+            res.json({
+                tool: req.params.toolName,
+                params: req.body,
+                validation: validation
             });
         });
 
