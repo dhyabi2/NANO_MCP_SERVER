@@ -246,7 +246,7 @@ export class NanoMcpClient {
     }
     if (!NANO_ADDRESS_REGEX.test(address)) {
       throw new Error(
-        `${paramName} must be a valid NANO address (starts with 'nano_' or 'xrb_', 60-65 chars)`
+        `${paramName} must be a valid NANO address (starts with 'nano_' or 'xrb_', 64-65 chars)`
       );
     }
   }
@@ -410,6 +410,18 @@ export class NanoMcpClient {
   }
 
   /**
+   * Get pending blocks for an address
+   */
+  async getPendingBlocks(address: string, count?: number): Promise<any> {
+    this.validateAddress(address);
+    const params: any = { address };
+    if (count) {
+      params.count = count;
+    }
+    return this.callMCP<any>("getPendingBlocks", params);
+  }
+
+  /**
    * Generate QR code for payment request
    */
   async generateQrCode(address: string, amount?: string): Promise<QrCodeResult> {
@@ -419,6 +431,42 @@ export class NanoMcpClient {
       params.amount = amount;
     }
     return this.callMCP<QrCodeResult>("generateQrCode", params);
+  }
+
+  // ==========================================================================
+  // HELPER METHODS
+  // ==========================================================================
+
+  /**
+   * Convert NANO to raw (client-side conversion)
+   */
+  nanoToRaw(nanoAmount: string): string {
+    const nano = parseFloat(nanoAmount);
+    if (isNaN(nano) || nano < 0) {
+      throw new Error('Invalid NANO amount');
+    }
+    // 1 NANO = 10^30 raw
+    const multiplier = BigInt('1000000000000000000000000000000');
+    const nanoAsRaw = BigInt(Math.floor(nano * 1e6)) * multiplier / BigInt(1e6);
+    return nanoAsRaw.toString();
+  }
+
+  /**
+   * Convert raw to NANO (client-side conversion)
+   */
+  rawToNano(rawAmount: string): string {
+    try {
+      const raw = BigInt(rawAmount);
+      if (raw < 0n) {
+        throw new Error('Invalid raw amount');
+      }
+      // 1 NANO = 10^30 raw
+      const divisor = BigInt('1000000000000000000000000000000');
+      const nano = Number(raw) / Number(divisor);
+      return nano.toFixed(6);
+    } catch (error) {
+      throw new Error('Invalid raw amount');
+    }
   }
 
   // ==========================================================================
