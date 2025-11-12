@@ -173,9 +173,15 @@ export class NanoMcpClient {
 
         const jsonResponse = await response.json() as JsonRpcResponse<T>;
 
+        // Debug: Log full response for debugging
+        if (process.env.DEBUG_MCP) {
+          console.log(`[MCP DEBUG] Full response:`, JSON.stringify(jsonResponse, null, 2));
+        }
+
         // Handle JSON-RPC error
         if (jsonResponse.error) {
           const error = jsonResponse.error as ErrorResponse;
+          console.error(`[MCP ERROR] Server error:`, JSON.stringify(error, null, 2));
           const errorMessage = this.formatError(error);
           throw new Error(errorMessage);
         }
@@ -186,6 +192,7 @@ export class NanoMcpClient {
           return jsonResponse.result;
         }
 
+        console.error(`[MCP ERROR] Invalid response - no result or error:`, JSON.stringify(jsonResponse, null, 2));
         throw new Error('Invalid JSON-RPC response: no result or error');
 
       } catch (error: any) {
@@ -214,22 +221,41 @@ export class NanoMcpClient {
     throw lastError || new Error(`${method} failed after ${retries} attempts`);
   }
 
-  private formatError(error: ErrorResponse): string {
-    let message = `[${error.errorCode}] ${error.error}`;
-    
-    if (error.details) {
-      message += `\nDetails: ${JSON.stringify(error.details, null, 2)}`;
+  private formatError(error: ErrorResponse | any): string {
+    if (!error) {
+      return '[UNKNOWN ERROR] No error information available';
     }
     
-    if (error.nextSteps && error.nextSteps.length > 0) {
-      message += `\n\nNext Steps:\n${error.nextSteps.map(s => `  - ${s}`).join('\n')}`;
+    // If it's a properly formatted ErrorResponse
+    if (error.errorCode && error.error) {
+      let message = `[${error.errorCode}] ${error.error}`;
+      
+      if (error.details) {
+        message += `\nDetails: ${JSON.stringify(error.details, null, 2)}`;
+      }
+      
+      if (error.nextSteps && error.nextSteps.length > 0) {
+        message += `\n\nNext Steps:\n${error.nextSteps.map((s: string) => `  - ${s}`).join('\n')}`;
+      }
+      
+      if (error.relatedFunctions && error.relatedFunctions.length > 0) {
+        message += `\n\nRelated Functions: ${error.relatedFunctions.join(', ')}`;
+      }
+      
+      return message;
     }
     
-    if (error.relatedFunctions && error.relatedFunctions.length > 0) {
-      message += `\n\nRelated Functions: ${error.relatedFunctions.join(', ')}`;
+    // If it's a plain error object or string
+    if (error.message) {
+      return `[ERROR] ${error.message}`;
     }
     
-    return message;
+    // Fallback: stringify the error
+    try {
+      return `[ERROR] ${JSON.stringify(error)}`;
+    } catch (e) {
+      return `[ERROR] ${String(error)}`;
+    }
   }
 
   private sleep(ms: number): Promise<void> {

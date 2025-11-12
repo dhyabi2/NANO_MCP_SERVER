@@ -7,6 +7,7 @@
     "test": "ts-node test-client.ts",
     "test:js": "node test-client.js",
     "test:integration": "ts-node integration-test.ts",
+    "test:transaction": "ts-node transaction-test.ts",
     "example": "ts-node example-usage.ts",
     "compile": "tsc nano-mcp-client.ts test-client.ts example-usage.ts --target ES2020 --module commonjs --lib ES2020 --esModuleInterop",
     "compile:test": "tsc test-client.ts --target ES2020 --module commonjs --lib ES2020 --esModuleInterop"

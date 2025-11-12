@@ -467,12 +467,18 @@ class NanoTransactions {
      * @returns {Promise<Object>} - Success status and block hash or error message.
      */
     async sendTransaction(fromAddress, privateKey, toAddress, amountRaw) {
+        // Define these outside try block so they're available in catch and throughout function
+        let formattedFromAddress;
+        let formattedToAddress;
+        let privateKeyString;
+        let amountRawString;
+        
         try {
             // Ensure all parameters are properly typed
-            const formattedFromAddress = String(fromAddress).replace('xrb_', 'nano_');
-            const formattedToAddress = String(toAddress).replace('xrb_', 'nano_');
-            const privateKeyString = String(privateKey);
-            const amountRawString = String(amountRaw);
+            formattedFromAddress = String(fromAddress).replace('xrb_', 'nano_');
+            formattedToAddress = String(toAddress).replace('xrb_', 'nano_');
+            privateKeyString = String(privateKey);
+            amountRawString = String(amountRaw);
 
             // IMPORTANT: Check for pending blocks and receive them first
             console.log('Checking for pending blocks before sending...');
