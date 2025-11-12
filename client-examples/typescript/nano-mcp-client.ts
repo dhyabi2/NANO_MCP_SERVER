@@ -171,7 +171,7 @@ export class NanoMcpClient {
           throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
 
-        const jsonResponse: JsonRpcResponse<T> = await response.json();
+        const jsonResponse = await response.json() as JsonRpcResponse<T>;
 
         // Handle JSON-RPC error
         if (jsonResponse.error) {
@@ -288,7 +288,7 @@ export class NanoMcpClient {
         return { valid: false, errors: [`HTTP ${response.status}: ${response.statusText}`] };
       }
 
-      const result = await response.json();
+      const result = await response.json() as any;
       return result.validation;
     } catch (error: any) {
       return { valid: false, errors: [error.message] };
