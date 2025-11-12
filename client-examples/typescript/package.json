@@ -1,0 +1,31 @@
+{
+  "name": "nano-mcp-typescript-client",
+  "version": "1.0.0",
+  "description": "Production-level TypeScript client for NANO MCP Server",
+  "main": "nano-mcp-client.ts",
+  "scripts": {
+    "test": "ts-node test-client.ts",
+    "test:js": "node test-client.js",
+    "example": "ts-node example-usage.ts",
+    "compile": "tsc nano-mcp-client.ts test-client.ts example-usage.ts --target ES2020 --module commonjs --lib ES2020 --esModuleInterop",
+    "compile:test": "tsc test-client.ts --target ES2020 --module commonjs --lib ES2020 --esModuleInterop"
+  },
+  "keywords": [
+    "nano",
+    "cryptocurrency",
+    "mcp",
+    "client",
+    "typescript"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "ts-node": "^10.9.0"
+  },
+  "dependencies": {
+    "node-fetch": "^2.6.7"
+  }
+}
+
