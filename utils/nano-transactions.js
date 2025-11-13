@@ -151,7 +151,7 @@ class NanoTransactions {
         return pending;
     }
     /**
-     * Generates proof-of-work for a given hash, with difficulty based on block type.
+     * Generates proof-of-work for a given hash with timeout protection.
      * Uses LOCAL computation - does NOT rely on RPC node for work generation.
      * ⚠️ DO NOT change this to use remote work generation from RPC nodes.
      * @param {string} hash - The hash to generate work for.
@@ -180,8 +180,11 @@ class NanoTransactions {
             console.log(`Computing work with ${isOpen ? 'RECEIVE/OPEN' : 'SEND/CHANGE'} difficulty threshold: ${threshold}`);
             console.log('This may take 10-15 seconds for SEND blocks, 4-6 seconds for RECEIVE blocks...');
             
-            // Use nanocurrency's local work generation with proper threshold
-            const work = await nanocurrency.work(hash, threshold);
+            // Set timeout based on block type (30s for send, 15s for receive)
+            const timeout = isOpen ? 15000 : 30000;
+            
+            // Use nanocurrency's local work generation with timeout protection
+            const work = await this._generateWorkWithTimeout(hash, threshold, timeout);
             
             if (!work) {
                 throw new Error('Work generation returned null - threshold not met');
@@ -193,6 +196,63 @@ class NanoTransactions {
             console.error('Local work generation failed:', error);
             throw new Error(`Failed to generate work locally: ${error.message}`);
         }
+    }
+    
+    /**
+     * Internal method: Generate work with timeout protection
+     * @private
+     */
+    async _generateWorkWithTimeout(hash, threshold, timeoutMs) {
+        return new Promise(async (resolve, reject) => {
+            const timer = setTimeout(() => {
+                reject(new Error(`Work generation timed out after ${timeoutMs}ms. This may indicate CPU is too slow or the work generation is stuck. Please retry.`));
+            }, timeoutMs);
+            
+            try {
+                const work = await nanocurrency.work(hash, threshold);
+                clearTimeout(timer);
+                resolve(work);
+            } catch (error) {
+                clearTimeout(timer);
+                reject(error);
+            }
+        });
+    }
+    
+    /**
+     * Generates proof-of-work with retry logic and exponential backoff.
+     * This is useful for production environments where work generation may occasionally fail.
+     * @param {string} hash - The hash to generate work for.
+     * @param {boolean} isOpen - Whether this is for an open block (lower difficulty).
+     * @param {number} maxRetries - Maximum number of retry attempts (default: 3).
+     * @returns {Promise<string>} - The generated work value.
+     */
+    async generateWorkWithRetry(hash, isOpen = false, maxRetries = 3) {
+        console.log(`Generating work with retry logic (max ${maxRetries} attempts)...`);
+        
+        let lastError;
+        for (let attempt = 1; attempt <= maxRetries; attempt++) {
+            try {
+                console.log(`Work generation attempt ${attempt}/${maxRetries}...`);
+                const work = await this.generateWork(hash, isOpen);
+                console.log(`Work generation succeeded on attempt ${attempt}`);
+                return work;
+            } catch (error) {
+                lastError = error;
+                console.error(`Work generation attempt ${attempt} failed:`, error.message);
+                
+                if (attempt < maxRetries) {
+                    // Exponential backoff: 1s, 2s, 4s, etc.
+                    const backoffMs = Math.pow(2, attempt - 1) * 1000;
+                    console.log(`Retrying in ${backoffMs}ms...`);
+                    await new Promise(resolve => setTimeout(resolve, backoffMs));
+                } else {
+                    console.error(`All ${maxRetries} work generation attempts failed`);
+                }
+            }
+        }
+        
+        throw new Error(`Work generation failed after ${maxRetries} retry attempts. Last error: ${lastError.message}`);
     }
     /**
      * Creates and processes a receive (or open) block for a pending transaction.
@@ -225,9 +285,9 @@ class NanoTransactions {
             
             console.log('Using work hash:', workHash);
 
-            // Generate work LOCALLY - does not use RPC node
-            console.log('Generating work locally...');
-            const workValue = await this.generateWork(workHash, !accountInfo || accountInfo.error);
+            // Generate work LOCALLY with retry logic for production reliability
+            console.log('Generating work locally with retry protection...');
+            const workValue = await this.generateWorkWithRetry(workHash, !accountInfo || accountInfo.error, 2);
             
             const work = { work: workValue };
 
@@ -533,9 +593,9 @@ class NanoTransactions {
             console.log('Send amount:', sendAmount.toString());
             console.log('New balance after send:', newBalance);
 
-            // Generate work LOCALLY - does not use RPC node
-            console.log('Generating work locally for send transaction...');
-            const workValue = await this.generateWork(accountInfo.frontier, false);
+            // Generate work LOCALLY with retry logic for production reliability
+            console.log('Generating work locally for send transaction with retry protection...');
+            const workValue = await this.generateWorkWithRetry(accountInfo.frontier, false, 2);
             const workData = { work: workValue };
 
             if (!workData || !workData.work) {
