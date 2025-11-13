@@ -1,12 +1,12 @@
 /**
  * Work Generation Tests - TDD approach
- * Tests for work generation timeout, error handling, and retry logic
+ * Tests for RPC work generation timeout, error handling, and retry logic
  */
 
 const { NanoTransactions } = require('../utils/nano-transactions');
 const { tools } = require('nanocurrency-web');
 
-describe('Work Generation Error Handling', () => {
+describe('RPC Work Generation Error Handling', () => {
     let nanoTransactions;
     
     beforeEach(() => {
@@ -25,54 +25,56 @@ describe('Work Generation Error Handling', () => {
     });
 
     describe('Timeout Protection', () => {
-        test('should timeout work generation after 30 seconds for send blocks', async () => {
+        test('should timeout RPC work generation after 10 seconds for send blocks', async () => {
             // Create a test hash for work generation
             const testHash = '0000000000000000000000000000000000000000000000000000000000000001';
             
-            // Generate work with timeout protection (should be implemented)
+            // Mock RPC call to simulate timeout
+            jest.spyOn(nanoTransactions, 'rpcCall').mockImplementation(() => {
+                return new Promise((resolve) => {
+                    setTimeout(() => resolve({ work: 'mock_work_value' }), 15000);
+                });
+            });
+            
             const startTime = Date.now();
             
             try {
                 await nanoTransactions.generateWork(testHash, false); // send block
-                // If we get here, work was generated successfully or we need to check time
-                const elapsed = Date.now() - startTime;
-                expect(elapsed).toBeLessThan(30000); // Should complete within 30s or timeout
+                fail('Should have timed out');
             } catch (error) {
                 const elapsed = Date.now() - startTime;
                 
-                // If it times out, it should be around 30 seconds and have proper error
-                if (error.message.includes('timeout') || error.message.includes('timed out')) {
-                    expect(elapsed).toBeGreaterThanOrEqual(29000);
-                    expect(elapsed).toBeLessThan(35000);
-                    expect(error.message).toContain('timeout');
-                } else {
-                    // Other errors are acceptable (e.g., initialization issues)
-                    expect(error.message).toBeDefined();
-                }
+                // Should timeout around 10 seconds
+                expect(elapsed).toBeGreaterThanOrEqual(9000);
+                expect(elapsed).toBeLessThan(12000);
+                expect(error.message.toLowerCase()).toContain('timed out');
             }
-        }, 35000); // Test timeout of 35 seconds to allow for 30s work timeout
+        }, 15000);
 
-        test('should timeout work generation after 15 seconds for receive blocks', async () => {
+        test('should timeout RPC work generation after 5 seconds for receive blocks', async () => {
             const testHash = '0000000000000000000000000000000000000000000000000000000000000001';
+            
+            // Mock RPC call to simulate timeout
+            jest.spyOn(nanoTransactions, 'rpcCall').mockImplementation(() => {
+                return new Promise((resolve) => {
+                    setTimeout(() => resolve({ work: 'mock_work_value' }), 10000);
+                });
+            });
             
             const startTime = Date.now();
             
             try {
-                await nanoTransactions.generateWork(testHash, true); // receive block (lower difficulty)
-                const elapsed = Date.now() - startTime;
-                expect(elapsed).toBeLessThan(15000);
+                await nanoTransactions.generateWork(testHash, true); // receive block
+                fail('Should have timed out');
             } catch (error) {
                 const elapsed = Date.now() - startTime;
                 
-                if (error.message.includes('timeout') || error.message.includes('timed out')) {
-                    expect(elapsed).toBeGreaterThanOrEqual(14000);
-                    expect(elapsed).toBeLessThan(20000);
-                    expect(error.message).toContain('timeout');
-                } else {
-                    expect(error.message).toBeDefined();
-                }
+                // Should timeout around 5 seconds
+                expect(elapsed).toBeGreaterThanOrEqual(4000);
+                expect(elapsed).toBeLessThan(7000);
+                expect(error.message.toLowerCase()).toContain('timed out');
             }
-        }, 20000);
+        }, 10000);
     });
 
     describe('Error Handling', () => {
@@ -84,54 +86,74 @@ describe('Work Generation Error Handling', () => {
             await expect(nanoTransactions.generateWork('')).rejects.toThrow('Hash is required');
         });
 
-        test('should handle nanocurrency initialization failure gracefully', async () => {
+        test('should handle RPC errors gracefully', async () => {
             const testHash = '0000000000000000000000000000000000000000000000000000000000000001';
             
+            // Mock RPC call to return error
+            jest.spyOn(nanoTransactions, 'rpcCall').mockResolvedValue({
+                error: 'RPC node error'
+            });
+            
             try {
-                const result = await nanoTransactions.generateWork(testHash, true);
-                // If successful, result should be a valid work string
-                expect(typeof result).toBe('string');
-                expect(result.length).toBeGreaterThan(0);
+                await nanoTransactions.generateWork(testHash, true);
+                fail('Should have thrown an error');
             } catch (error) {
-                // Should have a descriptive error message
-                expect(error.message).toBeDefined();
-                expect(error.message.length).toBeGreaterThan(0);
+                expect(error.message).toContain('RPC work_generate error');
+                expect(error.message).toContain('RPC node error');
+            }
+        });
+
+        test('should handle missing work value in RPC response', async () => {
+            const testHash = '0000000000000000000000000000000000000000000000000000000000000001';
+            
+            // Mock RPC call to return no work
+            jest.spyOn(nanoTransactions, 'rpcCall').mockResolvedValue({});
+            
+            try {
+                await nanoTransactions.generateWork(testHash, true);
+                fail('Should have thrown an error');
+            } catch (error) {
+                expect(error.message).toContain('RPC returned no work value');
             }
         });
     });
 
     describe('Retry Logic', () => {
-        test('should retry work generation on failure with exponential backoff', async () => {
+        test('should retry RPC work generation on failure with exponential backoff', async () => {
             const testHash = '0000000000000000000000000000000000000000000000000000000000000001';
             
-            // This test verifies that the retry logic exists and works
-            try {
-                const result = await nanoTransactions.generateWorkWithRetry(testHash, true, 2);
-                expect(typeof result).toBe('string');
-            } catch (error) {
-                // Even if it fails, it should have attempted retries
-                expect(error.message).toBeDefined();
-            }
-        }, 45000);
+            let callCount = 0;
+            jest.spyOn(nanoTransactions, 'rpcCall').mockImplementation(() => {
+                callCount++;
+                if (callCount < 2) {
+                    return Promise.reject(new Error('RPC temporarily unavailable'));
+                }
+                return Promise.resolve({ work: 'mock_work_after_retry' });
+            });
+            
+            const result = await nanoTransactions.generateWorkWithRetry(testHash, true, 3);
+            
+            // Should succeed on second attempt
+            expect(result).toBe('mock_work_after_retry');
+            expect(callCount).toBe(2);
+        }, 10000);
 
         test('should give up after maximum retry attempts', async () => {
-            // Test with invalid hash to force failure
-            const invalidHash = 'invalid';
+            const testHash = '0000000000000000000000000000000000000000000000000000000000000001';
+            
+            // Mock RPC to always fail
+            jest.spyOn(nanoTransactions, 'rpcCall').mockRejectedValue(
+                new Error('RPC node permanently unavailable')
+            );
             
             try {
-                await nanoTransactions.generateWorkWithRetry(invalidHash, true, 2);
-                // Should not reach here
+                await nanoTransactions.generateWorkWithRetry(testHash, true, 2);
                 fail('Should have thrown an error');
             } catch (error) {
-                expect(error.message).toBeDefined();
-                // Should indicate that retries were exhausted
-                expect(
-                    error.message.includes('retry') || 
-                    error.message.includes('attempts') ||
-                    error.message.includes('failed')
-                ).toBeTruthy();
+                expect(error.message).toContain('RPC work generation failed after');
+                expect(error.message).toContain('retry attempts');
             }
-        }, 45000);
+        }, 10000);
     });
 
     describe('receiveAllPending Integration', () => {
@@ -204,43 +226,49 @@ describe('Work Generation Error Handling', () => {
     });
 
     describe('Concurrent Work Generation', () => {
-        test('should handle multiple concurrent work generation requests', async () => {
+        test('should handle multiple concurrent RPC work generation requests', async () => {
             const hashes = [
                 '0000000000000000000000000000000000000000000000000000000000000001',
                 '0000000000000000000000000000000000000000000000000000000000000002',
                 '0000000000000000000000000000000000000000000000000000000000000003'
             ];
             
+            // Mock RPC to return different work for each hash
+            jest.spyOn(nanoTransactions, 'rpcCall').mockImplementation(async (action, params) => {
+                return { work: `work_for_${params.hash.slice(-4)}` };
+            });
+            
             const startTime = Date.now();
             
-            try {
-                const promises = hashes.map(hash => 
-                    nanoTransactions.generateWork(hash, true)
-                );
-                const results = await Promise.all(promises);
-                
-                const elapsed = Date.now() - startTime;
-                
-                // All should complete (successfully or with timeout)
-                expect(results.length).toBe(3);
-                results.forEach(result => {
-                    expect(typeof result).toBe('string');
-                });
-                
-                // Should take advantage of parallel processing
-                expect(elapsed).toBeLessThan(45000); // 3 x 15s = 45s max
-            } catch (error) {
-                // If any fail, that's acceptable as long as error is handled
-                expect(error.message).toBeDefined();
-            }
-        }, 50000);
+            const promises = hashes.map(hash => 
+                nanoTransactions.generateWork(hash, true)
+            );
+            const results = await Promise.all(promises);
+            
+            const elapsed = Date.now() - startTime;
+            
+            // All should complete successfully
+            expect(results.length).toBe(3);
+            results.forEach((result, index) => {
+                expect(typeof result).toBe('string');
+                expect(result).toContain('work_for_');
+            });
+            
+            // RPC is fast, should complete quickly
+            expect(elapsed).toBeLessThan(5000);
+        }, 10000);
     });
 
     describe('Logging and Debugging', () => {
-        test('should log work generation progress for debugging', async () => {
+        test('should log RPC work generation progress for debugging', async () => {
             const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
             
             const testHash = '0000000000000000000000000000000000000000000000000000000000000001';
+            
+            // Mock successful RPC call
+            jest.spyOn(nanoTransactions, 'rpcCall').mockResolvedValue({
+                work: 'mock_work_value_123'
+            });
             
             try {
                 await nanoTransactions.generateWork(testHash, true);
@@ -248,12 +276,12 @@ describe('Work Generation Error Handling', () => {
                 // Error is acceptable for this test
             }
             
-            // Should have logged work generation start
+            // Should have logged RPC work generation start
             const logCalls = consoleLogSpy.mock.calls.flat().join(' ');
-            expect(logCalls).toContain('Generating work LOCALLY');
+            expect(logCalls).toContain('Generating work using RPC');
             
-            // Should have logged difficulty threshold
-            expect(logCalls).toContain('Computing work with');
+            // Should have logged difficulty
+            expect(logCalls).toContain('Requesting work generation from RPC');
         });
 
         test('should log errors during work generation', async () => {
