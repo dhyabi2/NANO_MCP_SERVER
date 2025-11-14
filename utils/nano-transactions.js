@@ -21,7 +21,6 @@ const nanocurrency = require('nanocurrency');
 const { block } = require('nanocurrency-web');
 const { EnhancedErrorHandler } = require('./error-handler');
 const { BalanceConverter } = require('./balance-converter');
-const { WorkCache } = require('./work-cache');
 class NanoTransactions {
     /**
      * Constructs a NanoTransactions instance with custom and global configuration.
@@ -46,12 +45,7 @@ class NanoTransactions {
         this.failoverAttempts = 0;
         this.maxFailoverAttempts = this.rpcNodes.length * 2; // Try each node twice before giving up
         
-        // Initialize work cache for instant transactions
-        this.workCache = new WorkCache(this.rpcCall.bind(this), {
-            ttl: 10 * 60 * 1000, // 10 minutes
-            maxSize: 100 // Cache up to 100 precomputed works
-        });
-        console.log('[NanoTransactions] Work cache initialized for instant transactions');
+        console.log('[NanoTransactions] Initialized without work cache to prevent cache-related issues');
     }
 
     async getCurrentRpcNode() {
@@ -138,21 +132,11 @@ class NanoTransactions {
     }
     /**
      * Retrieves account information for a given Nano account.
-     * Automatically precomputes work for the account's frontier for instant future transactions.
      * @param {string} account - The Nano account address.
      * @returns {Promise<Object>} - Account information from the node.
      */
     async getAccountInfo(account) {
         const info = await this.rpcCall('account_info', { account });
-        
-        // Precompute work for the account's frontier for instant future sends
-        if (info && !info.error && info.frontier) {
-            console.log('[NanoTransactions] Precomputing work for account frontier');
-            this.workCache.precomputeWork(info.frontier, false).catch(err => {
-                console.log('[NanoTransactions] Background work precomputation failed:', err.message);
-            });
-        }
-        
         return info;
     }
     /**
@@ -170,8 +154,6 @@ class NanoTransactions {
     }
     /**
      * Generates proof-of-work for a given hash using RPC node with timeout protection.
-     * First checks cache for precomputed work for INSTANT transactions.
-     * Uses concurrency-safe method to prevent work reuse in multi-user scenarios.
      * Uses RPC node's work_generate action for fast, reliable work generation.
      * @param {string} hash - The hash to generate work for.
      * @param {boolean} isOpen - Whether this is for an open block (lower difficulty).
@@ -180,14 +162,6 @@ class NanoTransactions {
     async generateWork(hash, isOpen = false) {
         if (!hash) {
             throw new Error('Hash is required for work generation');
-        }
-        
-        // Check cache first for INSTANT transactions (concurrency-safe)
-        // This prevents two users from using the same work simultaneously
-        const cachedWork = this.workCache.getWorkAndMarkUsed(hash, isOpen);
-        if (cachedWork) {
-            console.log('⚡ INSTANT: Using precomputed work from cache for hash:', hash);
-            return cachedWork;
         }
         
         console.log('Generating work using RPC node for hash:', hash);
@@ -686,17 +660,6 @@ class NanoTransactions {
                 );
             }
 
-            // Transaction successful! Prepare for next instant send
-            // 1. Invalidate old cached work (frontier changed)
-            this.workCache.invalidate(accountInfo.frontier, false);
-            
-            // 2. Precompute work for NEW frontier (the block we just created)
-            const newFrontier = processResult.hash;
-            console.log('[NanoTransactions] Precomputing work for new frontier:', newFrontier);
-            this.workCache.precomputeWork(newFrontier, false).catch(err => {
-                console.log('[NanoTransactions] Background work precomputation failed:', err.message);
-            });
-
             return { success: true, hash: processResult.hash };
         } catch (error) {
             console.error('Send Transaction Error:', error);
@@ -723,14 +686,6 @@ class NanoTransactions {
             balance: balance.balance,
             pending: balance.pending
         };
-    }
-
-    /**
-     * Get work cache statistics for monitoring
-     * @returns {Object} - Cache statistics (hits, misses, hit rate, size, etc.)
-     */
-    getWorkCacheStats() {
-        return this.workCache.getStats();
     }
 
     /**
