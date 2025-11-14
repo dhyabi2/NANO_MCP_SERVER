@@ -45,7 +45,12 @@ class NanoTransactions {
         this.failoverAttempts = 0;
         this.maxFailoverAttempts = this.rpcNodes.length * 2; // Try each node twice before giving up
         
+        // Track recently attempted blocks to prevent duplicates
+        this.recentBlockAttempts = new Map(); // key: blockHash, value: { timestamp, attempts }
+        this.duplicateBlockTTL = 60000; // 60 seconds
+        
         console.log('[NanoTransactions] Initialized without work cache to prevent cache-related issues');
+        console.log('[NanoTransactions] Duplicate block detection enabled (60s TTL)');
     }
 
     async getCurrentRpcNode() {
@@ -670,10 +675,58 @@ class NanoTransactions {
             };
 
             console.log('Block data for send:', blockData);
+            
+            // Log block-determining parameters (these create the block hash)
+            console.log('[BlockHash] Block hash is determined by:');
+            console.log('[BlockHash]   - Frontier:', accountInfo.frontier);
+            console.log('[BlockHash]   - New Balance:', newBalance);
+            console.log('[BlockHash]   - Amount:', amountRawString);
+            console.log('[BlockHash]   - Destination:', formattedToAddress);
+            console.log('[BlockHash]   - Representative:', representative);
+            console.log('[BlockHash] NOTE: Work is NOT part of hash, only validates PoW');
 
             // Sign the block using nanocurrency-web
             const signedBlock = nanocurrency_web_1.block.send(blockData, privateKeyString);
             console.log('Signed block:', signedBlock);
+            console.log('[BlockHash] Generated block hash:', signedBlock.hash || 'N/A');
+            
+            // Check for duplicate block attempts
+            const blockHash = signedBlock.hash;
+            const now = Date.now();
+            
+            // Clean up old entries
+            for (const [hash, data] of this.recentBlockAttempts.entries()) {
+                if (now - data.timestamp > this.duplicateBlockTTL) {
+                    this.recentBlockAttempts.delete(hash);
+                }
+            }
+            
+            // Check if this exact block was recently attempted
+            if (this.recentBlockAttempts.has(blockHash)) {
+                const attemptData = this.recentBlockAttempts.get(blockHash);
+                attemptData.attempts++;
+                attemptData.lastAttempt = now;
+                
+                console.warn('[BlockHash] ⚠️  DUPLICATE BLOCK DETECTED!');
+                console.warn(`[BlockHash] This exact block hash has been attempted ${attemptData.attempts} time(s) in the last 60 seconds`);
+                console.warn('[BlockHash] Block hash:', blockHash);
+                console.warn('[BlockHash] This means identical parameters: frontier, balance, amount, destination');
+                console.warn('[BlockHash] CRITICAL: If previous attempt failed, frontier may be stale!');
+                console.warn('[BlockHash] Proceeding with attempt, but this will likely fail...');
+            } else {
+                this.recentBlockAttempts.set(blockHash, {
+                    timestamp: now,
+                    lastAttempt: now,
+                    attempts: 1,
+                    parameters: {
+                        frontier: accountInfo.frontier,
+                        balance: newBalance,
+                        amount: amountRawString,
+                        destination: formattedToAddress
+                    }
+                });
+                console.log('[BlockHash] First attempt with this block hash');
+            }
 
             // Process the block
             const processResult = await this.makeRequest('process', {
@@ -683,8 +736,17 @@ class NanoTransactions {
             });
 
             if (processResult.error) {
+                // Log duplicate block info if this was a duplicate attempt
+                if (this.recentBlockAttempts.has(blockHash)) {
+                    const attemptData = this.recentBlockAttempts.get(blockHash);
+                    console.error('[BlockHash] ❌ Transaction failed and this was a DUPLICATE block!');
+                    console.error('[BlockHash] Previous attempts:', attemptData.attempts);
+                    console.error('[BlockHash] Likely cause: Stale frontier data (account state not updated)');
+                    console.error('[BlockHash] Solution: Wait a moment for network to settle, then fetch fresh account_info');
+                }
+                
                 // Handle blockchain errors with enhanced messaging
-                return EnhancedErrorHandler.blockchainError(
+                const errorResponse = EnhancedErrorHandler.blockchainError(
                     processResult.error,
                     'send transaction',
                     {
@@ -694,11 +756,32 @@ class NanoTransactions {
                         currentBalance: accountInfo.balance,
                         hash: accountInfo.frontier,
                         work: workData.work,
-                        blockType: 'send'
+                        blockType: 'send',
+                        duplicateBlock: this.recentBlockAttempts.has(blockHash),
+                        blockHash: blockHash
                     }
                 );
+                
+                // Add duplicate block guidance if detected
+                if (this.recentBlockAttempts.has(blockHash)) {
+                    errorResponse.duplicateBlockDetected = true;
+                    errorResponse.duplicateBlockGuidance = [
+                        "⚠️  DUPLICATE BLOCK: Same block hash was attempted multiple times",
+                        "This happens when retrying with identical: frontier, balance, amount, destination",
+                        "SOLUTION: Wait 5-10 seconds for network to settle before retry",
+                        "SOLUTION: Check account_info to get fresh frontier before retry",
+                        "SOLUTION: If sending full balance, try sending slightly less",
+                        "CRITICAL: Do NOT retry immediately - you'll create same invalid block!"
+                    ];
+                }
+                
+                return errorResponse;
             }
 
+            // Success! Clean up this block from recent attempts
+            this.recentBlockAttempts.delete(blockHash);
+            console.log('[BlockHash] ✅ Block processed successfully, hash:', processResult.hash);
+            
             return { success: true, hash: processResult.hash };
         } catch (error) {
             console.error('Send Transaction Error:', error);
