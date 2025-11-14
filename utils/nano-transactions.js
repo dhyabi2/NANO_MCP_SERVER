@@ -554,13 +554,50 @@ class NanoTransactions {
             console.log('Checking for pending blocks before sending...');
             const pending = await this.getPendingBlocks(formattedFromAddress);
             
+            let lastFrontier = null;
             if (pending.blocks && Object.keys(pending.blocks).length > 0) {
                 console.log(`Found ${Object.keys(pending.blocks).length} pending block(s). Receiving them first...`);
+                
+                // Get frontier BEFORE receiving
+                const preReceiveInfo = await this.makeRequest('account_info', {
+                    account: formattedFromAddress
+                });
+                lastFrontier = preReceiveInfo.frontier;
+                console.log('[FrontierTrack] Frontier before receive:', lastFrontier);
+                
                 const receiveResults = await this.receiveAllPending(formattedFromAddress, privateKeyString);
                 console.log('Received all pending blocks:', receiveResults);
                 
-                // Wait a moment for the account to update
-                await new Promise(resolve => setTimeout(resolve, 1000));
+                // Get the new frontier from the last successful receive
+                const lastSuccessfulReceive = receiveResults.filter(r => r.hash).pop();
+                if (lastSuccessfulReceive && lastSuccessfulReceive.hash) {
+                    lastFrontier = lastSuccessfulReceive.hash;
+                    console.log('[FrontierTrack] New frontier from receive:', lastFrontier);
+                }
+                
+                // Wait for RPC node to update with retry mechanism
+                console.log('[FrontierTrack] Waiting for RPC node to confirm new frontier...');
+                let retries = 0;
+                const maxRetries = 5;
+                while (retries < maxRetries) {
+                    await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
+                    
+                    const checkInfo = await this.makeRequest('account_info', {
+                        account: formattedFromAddress
+                    });
+                    
+                    console.log(`[FrontierTrack] Retry ${retries + 1}/${maxRetries} - Current frontier:`, checkInfo.frontier);
+                    
+                    if (checkInfo.frontier === lastFrontier) {
+                        console.log('[FrontierTrack] ✅ Frontier confirmed! RPC node is up to date.');
+                        break;
+                    }
+                    
+                    retries++;
+                    if (retries === maxRetries) {
+                        console.warn('[FrontierTrack] ⚠️ Max retries reached. Proceeding with last known frontier.');
+                    }
+                }
             } else {
                 console.log('No pending blocks to receive.');
             }
@@ -571,6 +608,8 @@ class NanoTransactions {
                 representative: true,
                 json_block: 'true'
             });
+            
+            console.log('[FrontierTrack] Final frontier for send transaction:', accountInfo.frontier);
             
             if (accountInfo.error) {
                 if (accountInfo.error === 'Account not found') {
