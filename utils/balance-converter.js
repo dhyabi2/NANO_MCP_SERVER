@@ -49,13 +49,19 @@ class BalanceConverter {
             console.log(`[BalanceConverter] Converting ${rawAmount} raw to NANO`);
             
             const raw = BigInt(rawAmount);
-            const nano = raw * BigInt(1000000) / NANO_TO_RAW_MULTIPLIER;
-            const remainder = raw % NANO_TO_RAW_MULTIPLIER;
             
-            // Format with up to 6 decimal places
-            const wholeNano = Number(nano) / 1000000;
-            const decimalPart = Number(remainder) / Number(NANO_TO_RAW_MULTIPLIER);
-            const result = (wholeNano + decimalPart).toFixed(6).replace(/\.?0+$/, '');
+            // Simple division: raw / 10^30 = NANO
+            // Use string manipulation for precision
+            const rawStr = raw.toString().padStart(31, '0'); // Ensure at least 31 digits
+            const len = rawStr.length;
+            const decimalPos = len - 30; // 30 decimals for NANO
+            
+            const wholePart = rawStr.substring(0, decimalPos) || '0';
+            const decimalPart = rawStr.substring(decimalPos);
+            
+            // Combine and remove trailing zeros
+            const combined = wholePart + '.' + decimalPart;
+            const result = combined.replace(/\.?0+$/, '').replace(/^0+(?=\.)/, '0');
             
             console.log(`[BalanceConverter] Result: ${result} NANO`);
             return result;
