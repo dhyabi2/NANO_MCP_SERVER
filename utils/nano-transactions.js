@@ -329,7 +329,7 @@ class NanoTransactions {
 
             // Prepare block data for block.receive
             const receiveBlockData = {
-                walletBalanceRaw: accountInfo && !accountInfo.error ? accountInfo.balance : '0',
+                walletBalanceRaw: newBalance,
                 toAddress: nanoAccount,
                 representativeAddress: representative,
                 frontier: accountInfo && !accountInfo.error ? accountInfo.frontier : '0000000000000000000000000000000000000000000000000000000000000000',
