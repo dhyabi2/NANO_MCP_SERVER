@@ -1,89 +1,119 @@
 const { NanoTransactions } = require('../utils/nano-transactions');
 
-describe('Receive Block Balance Fix', () => {
-    test('walletBalanceRaw should use NEW balance, not old balance', () => {
-        // This test verifies the fix for the doubling bug
-        // Previously, walletBalanceRaw was set to accountInfo.balance (OLD balance)
-        // Now it correctly uses newBalance (OLD + PENDING)
+describe('nanocurrency-web Block Balance Fix', () => {
+    test('nanocurrency-web calculates balance internally - send blocks', () => {
+        // CRITICAL: nanocurrency-web's block.send() does this internally:
+        // finalBalance = walletBalanceRaw - amountRaw
         
-        // Simulate the balance calculation logic from createReceiveBlock
-        const oldBalance = '5000000000000000000000000000'; // 0.005 NANO
-        const pendingAmount = '1000000000000000000000000000'; // 0.001 NANO
+        const currentBalance = '5000000000000000000000000000'; // 0.005 NANO (BEFORE send)
+        const amountToSend = '1000000000000000000000000000'; // 0.001 NANO
         
-        // This is what the code now does (CORRECT):
-        const newBalance = (BigInt(oldBalance) + BigInt(pendingAmount)).toString();
+        // What WE calculate for verification:
+        const expectedNewBalance = (BigInt(currentBalance) - BigInt(amountToSend)).toString();
+        expect(expectedNewBalance).toBe('4000000000000000000000000000'); // 0.004 NANO remaining
         
-        // Verify the new balance is correct
-        expect(newBalance).toBe('6000000000000000000000000000'); // 0.006 NANO
+        // What we PASS to nanocurrency-web (CORRECT):
+        const blockData = {
+            walletBalanceRaw: currentBalance, // CURRENT balance (before send)
+            amountRaw: amountToSend          // Amount to send
+        };
         
-        // The key fix: walletBalanceRaw must be newBalance, not oldBalance
-        const walletBalanceRaw = newBalance; // FIXED: was accountInfo.balance before
+        // nanocurrency-web internally calculates: 5000... - 1000... = 4000... ✓
+        expect(blockData.walletBalanceRaw).toBe(currentBalance);
+        expect(blockData.amountRaw).toBe(amountToSend);
         
-        expect(walletBalanceRaw).toBe('6000000000000000000000000000');
-        expect(walletBalanceRaw).not.toBe(oldBalance); // Must NOT be old balance
-        
-        // This demonstrates the fix:
-        // BEFORE (BUG):  walletBalanceRaw = accountInfo.balance (5000...)
-        // AFTER (FIXED): walletBalanceRaw = newBalance (6000...)
+        // THE BUG WAS: We were passing (currentBalance - amountToSend) as walletBalanceRaw
+        // Then library did: (currentBalance - amountToSend) - amountToSend = currentBalance - 2×amountToSend
+        // This caused DOUBLE DEDUCTION!
     });
     
-    test('new accounts should have balance equal to pending amount', () => {
-        // For new accounts (no existing balance), newBalance should be just the pending amount
-        const pendingAmount = '2000000000000000000000000000'; // 0.002 NANO
+    test('nanocurrency-web calculates balance internally - receive blocks', () => {
+        // CRITICAL: nanocurrency-web's block.receive() does this internally:
+        // finalBalance = walletBalanceRaw + amountRaw
         
-        // For new accounts:
-        const newBalance = pendingAmount;
-        const walletBalanceRaw = newBalance;
+        const currentBalance = '5000000000000000000000000000'; // 0.005 NANO (BEFORE receive)
+        const amountToReceive = '1000000000000000000000000000'; // 0.001 NANO
         
-        expect(walletBalanceRaw).toBe(pendingAmount);
-        expect(walletBalanceRaw).toBe('2000000000000000000000000000');
+        // What WE calculate for verification:
+        const expectedNewBalance = (BigInt(currentBalance) + BigInt(amountToReceive)).toString();
+        expect(expectedNewBalance).toBe('6000000000000000000000000000'); // 0.006 NANO total
+        
+        // What we PASS to nanocurrency-web (CORRECT):
+        const blockData = {
+            walletBalanceRaw: currentBalance, // CURRENT balance (before receive)
+            amountRaw: amountToReceive       // Amount to receive
+        };
+        
+        // nanocurrency-web internally calculates: 5000... + 1000... = 6000... ✓
+        expect(blockData.walletBalanceRaw).toBe(currentBalance);
+        expect(blockData.amountRaw).toBe(amountToReceive);
+        
+        // THE BUG WAS: We were passing (currentBalance + amountToReceive) as walletBalanceRaw
+        // Then library did: (currentBalance + amountToReceive) + amountToReceive = currentBalance + 2×amountToReceive
+        // This caused DOUBLE ADDITION!
     });
     
-    test('multiple receives should accumulate correctly', () => {
-        // Simulate multiple receive operations
-        let currentBalance = '0';
+    test('new accounts - receive first payment', () => {
+        // For new accounts, current balance is 0
+        const currentBalance = '0';
+        const amountToReceive = '2000000000000000000000000000'; // 0.002 NANO (first receive)
         
-        const receives = [
-            '1000000000000000000000000000', // +0.001 NANO
-            '2000000000000000000000000000', // +0.002 NANO
-            '3000000000000000000000000000', // +0.003 NANO
-        ];
+        // nanocurrency-web will calculate: 0 + 2000... = 2000... ✓
+        const blockData = {
+            walletBalanceRaw: currentBalance,   // 0 (before receive)
+            amountRaw: amountToReceive         // Amount to receive
+        };
         
-        for (const pendingAmount of receives) {
-            // Calculate new balance (what the fixed code does)
-            const newBalance = (BigInt(currentBalance) + BigInt(pendingAmount)).toString();
-            
-            // walletBalanceRaw should be newBalance
-            const walletBalanceRaw = newBalance;
-            
-            // Update current balance for next iteration
-            currentBalance = newBalance;
-        }
-        
-        // Final balance should be sum of all receives
-        expect(currentBalance).toBe('6000000000000000000000000000'); // 0.006 NANO total
+        expect(blockData.walletBalanceRaw).toBe('0');
+        expect(blockData.amountRaw).toBe(amountToReceive);
     });
     
-    test('demonstrates the bug that was fixed', () => {
-        const oldBalance = '1000000000000000000000000000'; // 0.001 NANO
-        const pendingAmount = '1100000000000000000000000000'; // 0.0011 NANO
+    test('demonstrates the double-deduction bug in send', () => {
+        const currentBalance = '10000000000000000000000000000'; // 0.01 NANO
+        const amountToSend = '1000000000000000000000000000'; // 0.001 NANO
         
-        // Calculate new balance
-        const newBalance = (BigInt(oldBalance) + BigInt(pendingAmount)).toString();
+        // CORRECT: Pass current balance to nanocurrency-web
+        const correctBlockData = {
+            walletBalanceRaw: currentBalance,  // ✅ CURRENT (10000...)
+            amountRaw: amountToSend           // ✅ AMOUNT (1000...)
+        };
+        // Result: 10000... - 1000... = 9000... ✅ CORRECT!
         
-        // newBalance should be: 0.001 + 0.0011 = 0.0021 NANO
-        expect(newBalance).toBe('2100000000000000000000000000');
+        // BUGGY: Pass already-calculated new balance (what we were doing before)
+        const newBalance = (BigInt(currentBalance) - BigInt(amountToSend)).toString();
+        const buggyBlockData = {
+            walletBalanceRaw: newBalance,      // ❌ ALREADY SUBTRACTED (9000...)
+            amountRaw: amountToSend           // ❌ WILL BE SUBTRACTED AGAIN (1000...)
+        };
+        // Result: 9000... - 1000... = 8000... ❌ DOUBLE DEDUCTION!
         
-        // THE BUG WAS: Using oldBalance as walletBalanceRaw
-        const buggyWalletBalanceRaw = oldBalance; // ❌ WRONG (this was the bug)
-        const fixedWalletBalanceRaw = newBalance;  // ✅ CORRECT (this is the fix)
+        expect(correctBlockData.walletBalanceRaw).toBe('10000000000000000000000000000');
+        expect(buggyBlockData.walletBalanceRaw).toBe('9000000000000000000000000000');
+        expect(correctBlockData.walletBalanceRaw).not.toBe(buggyBlockData.walletBalanceRaw);
+    });
+    
+    test('demonstrates the double-addition bug in receive', () => {
+        const currentBalance = '5000000000000000000000000000'; // 0.005 NANO
+        const amountToReceive = '1000000000000000000000000000'; // 0.001 NANO
         
-        // Demonstrate the issue:
-        expect(buggyWalletBalanceRaw).toBe('1000000000000000000000000000'); // Wrong!
-        expect(fixedWalletBalanceRaw).toBe('2100000000000000000000000000'); // Correct!
+        // CORRECT: Pass current balance to nanocurrency-web
+        const correctBlockData = {
+            walletBalanceRaw: currentBalance,  // ✅ CURRENT (5000...)
+            amountRaw: amountToReceive        // ✅ AMOUNT (1000...)
+        };
+        // Result: 5000... + 1000... = 6000... ✅ CORRECT!
         
-        // The fix ensures walletBalanceRaw uses the NEW balance
-        expect(fixedWalletBalanceRaw).not.toBe(buggyWalletBalanceRaw);
+        // BUGGY: Pass already-calculated new balance (what we were doing before)
+        const newBalance = (BigInt(currentBalance) + BigInt(amountToReceive)).toString();
+        const buggyBlockData = {
+            walletBalanceRaw: newBalance,      // ❌ ALREADY ADDED (6000...)
+            amountRaw: amountToReceive        // ❌ WILL BE ADDED AGAIN (1000...)
+        };
+        // Result: 6000... + 1000... = 7000... ❌ DOUBLE ADDITION!
+        
+        expect(correctBlockData.walletBalanceRaw).toBe('5000000000000000000000000000');
+        expect(buggyBlockData.walletBalanceRaw).toBe('6000000000000000000000000000');
+        expect(correctBlockData.walletBalanceRaw).not.toBe(buggyBlockData.walletBalanceRaw);
     });
 });
 

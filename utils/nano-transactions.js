@@ -316,25 +316,33 @@ class NanoTransactions {
             }
             console.log('Using representative:', representative);
 
-            // Calculate new balance
+            // Calculate new balance for verification
             let newBalance;
+            let currentBalance;
             if (accountInfo && !accountInfo.error) {
                 // For existing accounts, add pending amount to current balance
-                newBalance = (BigInt(accountInfo.balance) + BigInt(pendingAmount)).toString();
+                currentBalance = accountInfo.balance;
+                newBalance = (BigInt(currentBalance) + BigInt(pendingAmount)).toString();
             } else {
-                // For new accounts, balance is just the pending amount
+                // For new accounts, balance starts at 0
+                currentBalance = '0';
                 newBalance = pendingAmount;
             }
-            console.log('New balance:', newBalance);
+            console.log('Current balance:', currentBalance);
+            console.log('Pending amount:', pendingAmount);
+            console.log('Expected new balance:', newBalance);
 
             // Prepare block data for block.receive
+            // IMPORTANT: nanocurrency-web's block.receive() calculates newBalance internally by doing:
+            // newBalance = walletBalanceRaw + amountRaw
+            // So walletBalanceRaw should be the CURRENT balance (before receive), NOT the new balance
             const receiveBlockData = {
-                walletBalanceRaw: newBalance,
+                walletBalanceRaw: currentBalance, // Current balance BEFORE receive
                 toAddress: nanoAccount,
                 representativeAddress: representative,
                 frontier: accountInfo && !accountInfo.error ? accountInfo.frontier : '0000000000000000000000000000000000000000000000000000000000000000',
                 transactionHash: pendingBlock,
-                amountRaw: pendingAmount,
+                amountRaw: pendingAmount, // Amount to receive (will be added by library)
                 work: work.work
             };
 
@@ -687,22 +695,26 @@ class NanoTransactions {
             console.log('Using representative:', representative);
 
             // Prepare block data
+            // IMPORTANT: nanocurrency-web's block.send() calculates newBalance internally by doing:
+            // newBalance = walletBalanceRaw - amountRaw
+            // So walletBalanceRaw should be the CURRENT balance (before send), NOT the remaining balance
             const blockData = {
-                walletBalanceRaw: newBalance,
+                walletBalanceRaw: currentBalance.toString(), // Current balance BEFORE send
                 fromAddress: formattedFromAddress,
                 toAddress: formattedToAddress,
                 representativeAddress: representative,
                 frontier: accountInfo.frontier,
-                amountRaw: amountRawString,
+                amountRaw: amountRawString, // Amount to send (will be subtracted by library)
                 work: workData.work
             };
 
             console.log('Block data for send:', blockData);
             console.log('[AmountTrack] ========== BLOCK DATA VERIFICATION ==========');
             console.log('[AmountTrack] Block.amountRaw (what receiver will get):', amountRawString);
-            console.log('[AmountTrack] Block.walletBalanceRaw (sender remaining):', newBalance);
-            console.log('[AmountTrack] IMPORTANT: amountRaw is what gets SENT to receiver');
-            console.log('[AmountTrack] IMPORTANT: walletBalanceRaw is what REMAINS with sender');
+            console.log('[AmountTrack] Block.walletBalanceRaw (sender current balance BEFORE send):', currentBalance.toString());
+            console.log('[AmountTrack] Expected balance AFTER send:', newBalance);
+            console.log('[AmountTrack] IMPORTANT: nanocurrency-web will calculate: finalBalance = walletBalanceRaw - amountRaw');
+            console.log('[AmountTrack] IMPORTANT: This prevents double-deduction bug');
             
             // Log block-determining parameters (these create the block hash)
             console.log('[BlockHash] Block hash is determined by:');
