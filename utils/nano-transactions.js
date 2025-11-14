@@ -554,6 +554,16 @@ class NanoTransactions {
             formattedToAddress = String(toAddress).replace('xrb_', 'nano_');
             privateKeyString = String(privateKey);
             amountRawString = String(amountRaw);
+            
+            // Log the requested amount IMMEDIATELY to track any doubling
+            console.log('[AmountTrack] ========== SEND TRANSACTION STARTED ==========');
+            console.log('[AmountTrack] Amount REQUESTED by user (raw):', amountRawString);
+            try {
+                const requestedNano = BalanceConverter.rawToNano(amountRawString);
+                console.log('[AmountTrack] Amount REQUESTED by user (NANO):', requestedNano);
+            } catch (e) {
+                console.log('[AmountTrack] Could not convert to NANO (invalid raw value?)');
+            }
 
             // IMPORTANT: Check for pending blocks and receive them first
             console.log('Checking for pending blocks before sending...');
@@ -631,6 +641,10 @@ class NanoTransactions {
             const currentBalance = BigInt(accountInfo.balance);
             const sendAmount = BigInt(amountRawString);
             
+            console.log('[AmountTrack] Current balance (raw):', currentBalance.toString());
+            console.log('[AmountTrack] Amount to SEND (raw):', sendAmount.toString());
+            console.log('[AmountTrack] Verifying: sendAmount === requested?', sendAmount.toString() === amountRawString);
+            
             // Check if sufficient balance BEFORE attempting transaction
             if (currentBalance < sendAmount) {
                 console.log('Insufficient balance detected');
@@ -646,6 +660,15 @@ class NanoTransactions {
             console.log('Current balance:', currentBalance.toString());
             console.log('Send amount:', sendAmount.toString());
             console.log('New balance after send:', newBalance);
+            console.log('[AmountTrack] Remaining balance after send (raw):', newBalance);
+            try {
+                const remainingNano = BalanceConverter.rawToNano(newBalance);
+                const sendingNano = BalanceConverter.rawToNano(sendAmount.toString());
+                console.log('[AmountTrack] Amount SENDING (NANO):', sendingNano);
+                console.log('[AmountTrack] Remaining balance (NANO):', remainingNano);
+            } catch (e) {
+                console.log('[AmountTrack] Conversion error:', e.message);
+            }
 
             // Generate work via RPC with retry logic for production reliability
             console.log('Generating work via RPC for send transaction with retry protection...');
@@ -675,6 +698,11 @@ class NanoTransactions {
             };
 
             console.log('Block data for send:', blockData);
+            console.log('[AmountTrack] ========== BLOCK DATA VERIFICATION ==========');
+            console.log('[AmountTrack] Block.amountRaw (what receiver will get):', amountRawString);
+            console.log('[AmountTrack] Block.walletBalanceRaw (sender remaining):', newBalance);
+            console.log('[AmountTrack] IMPORTANT: amountRaw is what gets SENT to receiver');
+            console.log('[AmountTrack] IMPORTANT: walletBalanceRaw is what REMAINS with sender');
             
             // Log block-determining parameters (these create the block hash)
             console.log('[BlockHash] Block hash is determined by:');
@@ -689,6 +717,15 @@ class NanoTransactions {
             const signedBlock = nanocurrency_web_1.block.send(blockData, privateKeyString);
             console.log('Signed block:', signedBlock);
             console.log('[BlockHash] Generated block hash:', signedBlock.hash || 'N/A');
+            console.log('[AmountTrack] ========== SIGNED BLOCK VERIFICATION ==========');
+            if (signedBlock.link) {
+                console.log('[AmountTrack] Signed block link (destination):', signedBlock.link);
+            }
+            if (signedBlock.balance) {
+                console.log('[AmountTrack] Signed block balance (remaining after send):', signedBlock.balance);
+                console.log('[AmountTrack] NOTE: This is the REMAINING balance, NOT the sent amount!');
+            }
+            console.log('[AmountTrack] Amount being sent to receiver:', amountRawString);
             
             // Check for duplicate block attempts
             const blockHash = signedBlock.hash;
