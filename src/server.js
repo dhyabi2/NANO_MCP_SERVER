@@ -5,6 +5,7 @@ const { NanoTransactions } = require('../utils/nano-transactions');
 const { SchemaValidator } = require('../utils/schema-validator');
 const { TestWalletManager } = require('../utils/test-wallet-manager');
 const { BalanceConverter } = require('../utils/balance-converter');
+const { NanoConverter } = require('../utils/nano-converter');
 const { EnhancedErrorHandler } = require('../utils/error-handler');
 const { schemaProvider } = require('../utils/schema-provider');
 const path = require('path');
@@ -138,6 +139,12 @@ const REQUEST_TEMPLATES = {
         params: {
             address: "nano_3xxxxx..."
         },
+        id: 1
+    },
+    nanoConverterHelp: {
+        jsonrpc: "2.0",
+        method: "nanoConverterHelp",
+        params: {},
         id: 1
     }
 };
@@ -380,6 +387,15 @@ const MCP_TOOLS = [
                 }
             },
             required: ['address']
+        }
+    },
+    {
+        name: 'nanoConverterHelp',
+        description: 'Get comprehensive help and examples for Nano (XNO) conversion utilities. Includes conversion formulas, common mistakes, best practices, and ready-to-use examples. Essential for clients who are unfamiliar with Nano number formats and raw unit conversions.',
+        inputSchema: {
+            type: 'object',
+            properties: {},
+            required: []
         }
     }
 ];
@@ -987,6 +1003,47 @@ class NanoMCPServer {
                         recommendations: needsAction.length === 0 
                             ? ['Account is ready for transactions'] 
                             : needsAction.map(a => `${a.priority.toUpperCase()}: ${a.action} - ${a.reason}`)
+                    };
+                    break;
+                case 'nanoConverterHelp':
+                    // Return comprehensive Nano conversion help for clients unfamiliar with Nano formats
+                    result = {
+                        ...NanoConverter.getConversionHelp(),
+                        utilityFunctions: {
+                            xnoToRaw: {
+                                description: "Convert XNO amount to raw units (use this for all transaction amounts)",
+                                example: "xnoToRaw(1) => '1000000000000000000000000000000'",
+                                usage: "Always use this before sending transactions"
+                            },
+                            rawToXNO: {
+                                description: "Convert raw units to XNO amount (use for display purposes)",
+                                example: "rawToXNO('1000000000000000000000000000000') => '1'",
+                                usage: "Use for human-readable display of balances"
+                            },
+                            isValidNanoAddress: {
+                                description: "Validate Nano address format before transactions",
+                                example: "isValidNanoAddress('nano_3xxx...') => true",
+                                usage: "Always validate addresses before sending"
+                            },
+                            formatXNO: {
+                                description: "Format XNO amount for display with specific decimal places",
+                                example: "formatXNO('0.123456789', 6) => '0.123457'",
+                                usage: "Use for consistent display formatting (display only, not for calculations)"
+                            }
+                        },
+                        exampleWorkflow: [
+                            "Step 1: Get user input in XNO (e.g., '0.1')",
+                            "Step 2: Convert to raw using NanoConverter.xnoToRaw('0.1')",
+                            "Step 3: Validate address using NanoConverter.isValidNanoAddress(address)",
+                            "Step 4: Use raw amount in sendTransaction",
+                            "Step 5: Display confirmation using NanoConverter.formatXNO()"
+                        ],
+                        integrationWithMCP: {
+                            convertBalance: "Use 'convertBalance' MCP method for conversions in production",
+                            getAccountStatus: "Use 'getAccountStatus' to see balances in both raw and XNO",
+                            sendTransaction: "Always use raw amounts for 'amountRaw' parameter"
+                        },
+                        warning: "IMPORTANT: Most clients don't know Nano uses 30 decimal places. Always educate users that 1 XNO = 10^30 raw units. Never use floating-point arithmetic for currency calculations."
                     };
                     break;
                 default:

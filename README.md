@@ -267,7 +267,7 @@ await Promise.all([
 
 ---
 
-## 📋 Available MCP Functions (16 Total)
+## 📋 Available MCP Functions (17 Total)
 
 ### Initialization (1)
 1. `initialize` - Get server capabilities and all available functions
@@ -282,16 +282,17 @@ await Promise.all([
 8. `receiveAllPending` - Receive all pending blocks
 9. `generateQrCode` - Create payment QR code with base64 PNG
 
-### Helper Functions (2) - For Autonomous Agents
+### Helper Functions (3) - For Autonomous Agents
 10. **`convertBalance`** - Convert NANO ↔ raw units
 11. **`getAccountStatus`** - One call shows: balance, pending, capabilities, what actions needed
+12. **`nanoConverterHelp`** - **NEW!** Comprehensive guide for Nano (XNO) conversions, formats, and number handling (essential for clients unfamiliar with Nano)
 
 ### Test Wallet Functions (5) - For Development
-12. `setupTestWallets` - Generate two test wallets (requires human funding)
-13. `getTestWallets` - Retrieve test wallet info
-14. `updateTestWalletBalance` - Update wallet balance tracking
-15. `checkTestWalletsFunding` - Check if wallets are ready
-16. `resetTestWallets` - Delete and start fresh
+13. `setupTestWallets` - Generate two test wallets (requires human funding)
+14. `getTestWallets` - Retrieve test wallet info
+15. `updateTestWalletBalance` - Update wallet balance tracking
+16. `checkTestWalletsFunding` - Check if wallets are ready
+17. `resetTestWallets` - Delete and start fresh
 
 ---
 
@@ -934,6 +935,63 @@ npm test
 ```json
 {"jsonrpc": "2.0", "method": "getAccountStatus", "params": {"address": "nano_xxx"}, "id": 1}
 ```
+
+### nanoConverterHelp (Helper) - **NEW!**
+**Purpose:** Get comprehensive help for Nano (XNO) conversion utilities and number formats
+**Parameters:** None
+**Returns:** Conversion formulas, examples, common mistakes, best practices, and utility function documentation
+
+**⚠️ IMPORTANT: Essential for clients unfamiliar with Nano!**
+
+**Why this tool exists:**
+Most cryptocurrency clients expect simple decimal numbers like Bitcoin or Ethereum. However, Nano uses 30 decimal places (10^30 raw units = 1 XNO), which requires special handling to avoid precision errors.
+
+**Example Request:**
+```json
+{"jsonrpc": "2.0", "method": "nanoConverterHelp", "params": {}, "id": 1}
+```
+
+**Example Response (truncated):**
+```json
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "description": "Nano (XNO) uses raw units for all on-chain operations. 1 XNO = 10^30 raw. This ensures exact precision without floating-point errors.",
+    "formula": "raw = XNO × 10^30",
+    "reverseFormula": "XNO = raw ÷ 10^30",
+    "decimalPlaces": 30,
+    "examples": {
+      "0.1_XNO": "100000000000000000000000000000",
+      "1_XNO": "1000000000000000000000000000000"
+    },
+    "commonMistakes": [
+      "Using XNO value instead of raw in amountRaw parameter",
+      "Using floating-point arithmetic which causes rounding errors"
+    ],
+    "utilityFunctions": {
+      "xnoToRaw": {
+        "description": "Convert XNO amount to raw units (use this for all transaction amounts)",
+        "example": "xnoToRaw(1) => '1000000000000000000000000000000'",
+        "usage": "Always use this before sending transactions"
+      }
+    },
+    "exampleWorkflow": [
+      "Step 1: Get user input in XNO (e.g., '0.1')",
+      "Step 2: Convert to raw using NanoConverter.xnoToRaw('0.1')",
+      "Step 3: Validate address using NanoConverter.isValidNanoAddress(address)",
+      "Step 4: Use raw amount in sendTransaction"
+    ],
+    "warning": "IMPORTANT: Most clients don't know Nano uses 30 decimal places. Always educate users that 1 XNO = 10^30 raw units."
+  },
+  "id": 1
+}
+```
+
+**Use Cases:**
+1. **First-time Integration**: Call this method before implementing any Nano transactions to understand the number format
+2. **Debugging Conversion Errors**: If you get "AMOUNT_WRONG_UNIT" errors, this explains the correct format
+3. **Client Education**: Use the returned information to educate end-users about Nano's precision
+4. **Reference Documentation**: Keep this response as a reference for your implementation
 
 ### setupTestWallets (Test Wallet)
 **Purpose:** Generate two test wallets with all credentials
