@@ -3,19 +3,20 @@
 const { NanoMCPServer } = require('./server');
 const { StdioTransport } = require('./stdio-transport');
 
-// ⚠️ CRITICAL: DO NOT CHANGE THE RPC NODE URL
-// ⚠️ This RPC node has been specifically configured by the user
-// ⚠️ NEVER modify, replace, or add additional RPC nodes
-// ⚠️ URL: https://uk1.public.xnopay.com/proxy
-// ⚠️ NO API KEY REQUIRED - This is a public node
+// ⚠️ CRITICAL: RPC NODE CONFIGURATION WITH REDUNDANCY
+// ⚠️ Primary RPC Node: https://uk1.public.xnopay.com/proxy
+// ⚠️ Backup RPC Node: https://node.somenano.com/proxy (tested and verified)
+// ⚠️ Both nodes are public and require NO API KEY
+// ⚠️ Failover is automatic if primary node becomes unavailable
 
 // Default configuration
 const config = {
     port: 8080,
     rpcNodes: [
-        'https://uk1.public.xnopay.com/proxy' // ⚠️ DO NOT CHANGE THIS RPC NODE
+        'https://uk1.public.xnopay.com/proxy',  // Primary RPC node
+        'https://node.somenano.com/proxy'       // Backup RPC node (redundancy)
     ],
-    rpcKey: null, // No API key required for xnopay public node
+    rpcKey: null, // No API key required for public nodes
     defaultRepresentative: process.env.NANO_REPRESENTATIVE || 'nano_3qya5xpjfsbk3ndfebo9dsrj6iy6f6idmogqtn1mtzdtwnxu6rw3dz18i6xf',
     transport: process.env.MCP_TRANSPORT || 'http' // 'http' or 'stdio'
 };
