@@ -1,0 +1,461 @@
+{
+  "timestamp": "2025-11-21T18:57:53.852Z",
+  "rpcPort": 45000,
+  "totalServers": 167,
+  "workingServers": 0,
+  "failedServers": 167,
+  "duration": "59.27",
+  "working": [],
+  "failed": [
+    {
+      "hostname": "ns106224.ip-147-1",
+      "ip": null,
+      "port": 45000,
+      "resolved": false,
+      "portOpen": false,
+      "rpcWorking": false,
+      "error": "DNS resolution failed"
+    },
+    {
+      "hostname": "static.109.247.55",
+      "ip": null,
+      "port": 45000,
+      "resolved": false,
+      "portOpen": false,
+      "rpcWorking": false,
+      "error": "DNS resolution failed"
+    },
+    {
+      "hostname": "ec2-54-188-171-19",
+      "ip": null,
+      "port": 45000,
+      "resolved": false,
+      "portOpen": false,
+      "rpcWorking": false,
+      "error": "DNS resolution failed"
+    },
+    {
+      "hostname": "static.5.66.109.6",
+      "ip": null,
+      "port": 45000,
+      "resolved": false,
+      "portOpen": false,
+      "rpcWorking": false,
+      "error": "DNS resolution failed"
+    },
+    {
+      "hostname": "static.255.124.47",
+      "ip": null,
+      "port": 45000,
+      "resolved": false,
+      "portOpen": false,
+      "rpcWorking": false,
+      "error": "DNS resolution failed"
+    },
+    {
+      "hostname": "adsl.94-252-97-14",
+      "ip": null,
+      "port": 45000,
+      "resolved": false,
+      "portOpen": false,
+      "rpcWorking": false,
+      "error": "DNS resolution failed"
+    },
+    {
+      "hostname": "ec2-18-176-245-12",
+      "ip": null,
+      "port": 45000,
+      "resolved": false,
+      "portOpen": false,
+      "rpcWorking": false,
+      "error": "DNS resolution failed"
+    },
+    {
+      "hostname": "ec2-13-213-34-10.a",
+      "ip": null,
+      "port": 45000,
+      "resolved": false,
+      "portOpen": false,
+      "rpcWorking": false,
+      "error": "DNS resolution failed"
+    },
+    {
+      "hostname": "ec2-35-73-233-71",
+      "ip": null,
+      "port": 45000,
+      "resolved": false,
+      "portOpen": false,
+      "rpcWorking": false,
+      "error": "DNS resolution failed"
+    },
+    {
+      "hostname": "mail.nifni.eu",
+      "ip": "202.61.238.208",
+      "port": 45000,
+      "resolved": true,
+      "portOpen": false,
+      "rpcWorking": false,
+      "error": "Port not accessible"
+    },
+    {
+      "hostname": "161.35.12.91",
+      "ip": "161.35.12.91",
+      "port": 45000,
+      "resolved": true,
+      "portOpen": false,
+      "rpcWorking": false,
+      "error": "Port not accessible"
+    },
+    {
+      "hostname": "pool-96-236-136-9",
+      "ip": null,
+      "port": 45000,
+      "resolved": false,
+      "portOpen": false,
+      "rpcWorking": false,
+      "error": "DNS resolution failed"
+    },
+    {
+      "hostname": "ec2-35-77-33-134",
+      "ip": null,
+      "port": 45000,
+      "resolved": false,
+      "portOpen": false,
+      "rpcWorking": false,
+      "error": "DNS resolution failed"
+    },
+    {
+      "hostname": "43.133.207.122",
+      "ip": "43.133.207.122",
+      "port": 45000,
+      "resolved": true,
+      "portOpen": false,
+      "rpcWorking": false,
+      "error": "Port not accessible"
+    },
+    {
+      "hostname": "ec2-54-199-79-114",
+      "ip": null,
+      "port": 45000,
+      "resolved": false,
+      "portOpen": false,
+      "rpcWorking": false,
+      "error": "DNS resolution failed"
+    },
+    {
+      "hostname": "static.106.91.108",
+      "ip": null,
+      "port": 45000,
+      "resolved": false,
+      "portOpen": false,
+      "rpcWorking": false,
+      "error": "DNS resolution failed"
+    },
+    {
+      "hostname": "noli-me-tangere-2",
+      "ip": null,
+      "port": 45000,
+      "resolved": false,
+      "portOpen": false,
+      "rpcWorking": false,
+      "error": "DNS resolution failed"
+    },
+    {
+      "hostname": "vmi1203053.contab",
+      "ip": null,
+      "port": 45000,
+      "resolved": false,
+      "portOpen": false,
+      "rpcWorking": false,
+      "error": "DNS resolution failed"
+    },
+    {
+      "hostname": "2001-1c06-2584-db",
+      "ip": null,
+      "port": 45000,
+      "resolved": false,
+      "portOpen": false,
+      "rpcWorking": false,
+      "error": "DNS resolution failed"
+    },
+    {
+      "hostname": "eu.cloud.sellix.i",
+      "ip": null,
+      "port": 45000,
+      "resolved": false,
+      "portOpen": false,
+      "rpcWorking": false,
+      "error": "DNS resolution failed"
+    },
+    {
+      "hostname": "ip70-170-72-35.lv",
+      "ip": null,
+      "port": 45000,
+      "resolved": false,
+      "portOpen": false,
+      "rpcWorking": false,
+      "error": "DNS resolution failed"
+    },
+    {
+      "hostname": "38-41-222-64.dyn",
+      "ip": null,
+      "port": 45000,
+      "resolved": false,
+      "portOpen": false,
+      "rpcWorking": false,
+      "error": "DNS resolution failed"
+    },
+    {
+      "hostname": "static.45.87.63.1",
+      "ip": null,
+      "port": 45000,
+      "resolved": false,
+      "portOpen": false,
+      "rpcWorking": false,
+      "error": "DNS resolution failed"
+    },
+    {
+      "hostname": "ec2-54-188-171-197",
+      "ip": null,
+      "port": 45000,
+      "resolved": false,
+      "portOpen": false,
+      "rpcWorking": false,
+      "error": "DNS resolution failed"
+    },
+    {
+      "hostname": "143.198.101.143",
+      "ip": "143.198.101.143",
+      "port": 45000,
+      "resolved": true,
+      "portOpen": false,
+      "rpcWorking": false,
+      "error": "Port not accessible"
+    },
+    {
+      "hostname": "static.89.194.108",
+      "ip": null,
+      "port": 45000,
+      "resolved": false,
+      "portOpen": false,
+      "rpcWorking": false,
+      "error": "DNS resolution failed"
+    },
+    {
+      "hostname": "51-15-19-228.rev.p",
+      "ip": null,
+      "port": 45000,
+      "resolved": false,
+      "portOpen": false,
+      "rpcWorking": false,
+      "error": "DNS resolution failed"
+    },
+    {
+      "hostname": "ip91.ip-37-187-212",
+      "ip": null,
+      "port": 45000,
+      "resolved": false,
+      "portOpen": false,
+      "rpcWorking": false,
+      "error": "DNS resolution failed"
+    },
+    {
+      "hostname": "static.150.111.21",
+      "ip": null,
+      "port": 45000,
+      "resolved": false,
+      "portOpen": false,
+      "rpcWorking": false,
+      "error": "DNS resolution failed"
+    },
+    {
+      "hostname": "static.213.104.78",
+      "ip": null,
+      "port": 45000,
+      "resolved": false,
+      "portOpen": false,
+      "rpcWorking": false,
+      "error": "DNS resolution failed"
+    },
+    {
+      "hostname": "li2059-63.members",
+      "ip": null,
+      "port": 45000,
+      "resolved": false,
+      "portOpen": false,
+      "rpcWorking": false,
+      "error": "DNS resolution failed"
+    },
+    {
+      "hostname": "ec2-35-159-44-159",
+      "ip": null,
+      "port": 45000,
+      "resolved": false,
+      "portOpen": false,
+      "rpcWorking": false,
+      "error": "DNS resolution failed"
+    },
+    {
+      "hostname": "ec2-54-229-85-145",
+      "ip": null,
+      "port": 45000,
+      "resolved": false,
+      "portOpen": false,
+      "rpcWorking": false,
+      "error": "DNS resolution failed"
+    },
+    {
+      "hostname": "static.114.52.202",
+      "ip": null,
+      "port": 45000,
+      "resolved": false,
+      "portOpen": false,
+      "rpcWorking": false,
+      "error": "DNS resolution failed"
+    },
+    {
+      "hostname": "mail.nanswap.com",
+      "ip": "51.15.5.35",
+      "port": 45000,
+      "resolved": true,
+      "portOpen": false,
+      "rpcWorking": false,
+      "error": "Port not accessible"
+    },
+    {
+      "hostname": "c-67-169-22-56.hs",
+      "ip": null,
+      "port": 45000,
+      "resolved": false,
+      "portOpen": false,
+      "rpcWorking": false,
+      "error": "DNS resolution failed"
+    },
+    {
+      "hostname": "212.192.49.94",
+      "ip": "212.192.49.94",
+      "port": 45000,
+      "resolved": true,
+      "portOpen": false,
+      "rpcWorking": false,
+      "error": "Port not accessible"
+    },
+    {
+      "hostname": "78.129.253.179",
+      "ip": "78.129.253.179",
+      "port": 45000,
+      "resolved": true,
+      "portOpen": false,
+      "rpcWorking": false,
+      "error": "Port not accessible"
+    },
+    {
+      "hostname": "104.130.246.207",
+      "ip": "104.130.246.207",
+      "port": 45000,
+      "resolved": true,
+      "portOpen": false,
+      "rpcWorking": false,
+      "error": "Port not accessible"
+    },
+    {
+      "hostname": "vmi1457152.contab",
+      "ip": null,
+      "port": 45000,
+      "resolved": false,
+      "portOpen": false,
+      "rpcWorking": false,
+      "error": "DNS resolution failed"
+    },
+    {
+      "hostname": "static.41.103.55",
+      "ip": null,
+      "port": 45000,
+      "resolved": false,
+      "portOpen": false,
+      "rpcWorking": false,
+      "error": "DNS resolution failed"
+    },
+    {
+      "hostname": "8.210.142.47",
+      "ip": "8.210.142.47",
+      "port": 45000,
+      "resolved": true,
+      "portOpen": false,
+      "rpcWorking": false,
+      "error": "Port not accessible"
+    },
+    {
+      "hostname": "nano.strnmn.me",
+      "ip": "104.21.0.92",
+      "port": 45000,
+      "resolved": true,
+      "portOpen": false,
+      "rpcWorking": false,
+      "error": "Port not accessible"
+    },
+    {
+      "hostname": "static.219.165.11",
+      "ip": null,
+      "port": 45000,
+      "resolved": false,
+      "portOpen": false,
+      "rpcWorking": false,
+      "error": "DNS resolution failed"
+    },
+    {
+      "hostname": "static.224.130.20",
+      "ip": null,
+      "port": 45000,
+      "resolved": false,
+      "portOpen": false,
+      "rpcWorking": false,
+      "error": "DNS resolution failed"
+    },
+    {
+      "hostname": "8.212.101.240",
+      "ip": "8.212.101.240",
+      "port": 45000,
+      "resolved": true,
+      "portOpen": false,
+      "rpcWorking": false,
+      "error": "Port not accessible"
+    },
+    {
+      "hostname": "161.132.92.119",
+      "ip": "161.132.92.119",
+      "port": 45000,
+      "resolved": true,
+      "portOpen": false,
+      "rpcWorking": false,
+      "error": "Port not accessible"
+    },
+    {
+      "hostname": "177-130-251-46.un",
+      "ip": null,
+      "port": 45000,
+      "resolved": false,
+      "portOpen": false,
+      "rpcWorking": false,
+      "error": "DNS resolution failed"
+    },
+    {
+      "hostname": "ec2-52-220-87-186",
+      "ip": null,
+      "port": 45000,
+      "resolved": false,
+      "portOpen": false,
+      "rpcWorking": false,
+      "error": "DNS resolution failed"
+    },
+    {
+      "hostname": "177-66-167-199.al",
+      "ip": null,
+      "port": 45000,
+      "resolved": false,
+      "portOpen": false,
+      "rpcWorking": false,
+      "error": "DNS resolution failed"
+    }
+  ]
+}
