@@ -10,13 +10,13 @@
  */
 
 const { tools, block, wallet } = require('nanocurrency-web');
-const { NanoTransactions } = require('./utils/nano-transactions');
-const { NanoConverter } = require('./utils/nano-converter');
+const { NanoTransactions } = require('../utils/nano-transactions');
+const { NanoConverter } = require('../utils/nano-converter');
 
 // Configure account credentials
 const ACCOUNT = {
     address: 'nano_35jookk6m8yx5sei1x4x4ixoqg54iw3dfjczd9f89eborcjxb16wisbbquza',
-    privateKey: '55496ae0f5aac.........................................',
+    privateKey: '55496ae0.........................................',
     publicKey: '8e35aca4499bdd1e5900745d143b5bb8628702b6c55f59da63b135c2a3d4809c'
 };
 

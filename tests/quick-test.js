@@ -1,4 +1,4 @@
-const { NanoMCPServer } = require('./src/server');
+const { NanoMCPServer } = require('../src/server');
 
 const config = {
     port: 8080,

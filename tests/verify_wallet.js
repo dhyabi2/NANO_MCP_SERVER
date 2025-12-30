@@ -3,7 +3,7 @@ const { NanoMCPServer } = require('../src/server');
 // User provided credentials
 const USER_WALLET = {
     address: "nano_35jookk6m8yx5sei1x4x4ixoqg54iw3dfjczd9f89eborcjxb16wisbbquza",
-    privateKey: "55496ae0f5aacb0bfb913ba",
+    privateKey: "55496ae0f",
     publicKey: "8e35aca4499bdd1e5900745d143b5bb8628702b6c55f59da63b135c2a3d4809c"
 };
 

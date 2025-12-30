@@ -4,7 +4,7 @@
  * Following TDD principles: Write tests first, watch them fail, then implement
  */
 
-const { TestWalletManager } = require('../utils/test-wallet-manager');
+const { TestWalletManager } = require('./test-wallet-manager');
 const fs = require('fs');
 const path = require('path');
 

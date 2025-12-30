@@ -4,6 +4,7 @@ package-lock.json
 
 # Test wallets (contains private keys)
 tests/test-wallets.json
+tests/wallets.json
 
 # Logs
 logs/

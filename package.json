@@ -1,6 +1,6 @@
 {
   "name": "nano-mcp",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "NANO MCP (Nano Cryptocurrency) Server for AI Assistants - A JSON-RPC 2.0 API server for Nano cryptocurrency operations with QR code generation, local work generation and auto-receive pending blocks",
   "main": "src/index.js",
   "bin": {
@@ -49,14 +49,13 @@
   "bugs": {
     "url": "https://github.com/dhyabi2/NANO_MCP_SERVER/issues"
   },
-  "homepage": "https://github.com/dhyabi2/NANO_MCP_SERVER#readme",
+  "homepage": "https://github.com/dhyabi2/NANO_MCP_SERVER",
   "engines": {
     "node": ">=16.0.0"
   },
   "files": [
     "src/",
     "utils/",
-    "README.md",
     "LICENSE"
   ],
   "publishConfig": {
